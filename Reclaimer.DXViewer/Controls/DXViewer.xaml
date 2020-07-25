@@ -99,11 +99,11 @@
                     </Grid.ColumnDefinitions>
                     <Label Content="Position:" />
                     <Label Grid.Column="1" HorizontalAlignment="Right" 
-                           Content="{Binding Position.X, ElementName=renderer, Converter={StaticResource stringConverter}, ConverterParameter='F2'}" />
+                           Content="{Binding Camera.Position.X, ElementName=renderer, Converter={StaticResource stringConverter}, ConverterParameter='F2'}" />
                     <Label Grid.Column="2" HorizontalAlignment="Right" 
-                           Content="{Binding Position.Y, ElementName=renderer, Converter={StaticResource stringConverter}, ConverterParameter='F2'}" />
+                           Content="{Binding Camera.Position.Y, ElementName=renderer, Converter={StaticResource stringConverter}, ConverterParameter='F2'}" />
                     <Label Grid.Column="3" HorizontalAlignment="Right" 
-                           Content="{Binding Position.Z, ElementName=renderer, Converter={StaticResource stringConverter}, ConverterParameter='F2'}" />
+                           Content="{Binding Camera.Position.Z, ElementName=renderer, Converter={StaticResource stringConverter}, ConverterParameter='F2'}" />
                 </Grid>
                 <Separator />
                 <Grid>
@@ -136,7 +136,7 @@
                     </Grid.ColumnDefinitions>
                     <Label Content="FOV:" />
                     <Label Grid.Column="1" HorizontalAlignment="Right" 
-                           Content="{Binding FieldOfView, ElementName=renderer, Converter={StaticResource stringConverter}, ConverterParameter='F0'}" />
+                           Content="{Binding Camera.FieldOfView, ElementName=renderer, Converter={StaticResource stringConverter}, ConverterParameter='F0'}" />
                 </Grid>
                 <Separator />
                 <Grid>
@@ -181,7 +181,7 @@
                 </TreeView.ItemTemplate>
             </TreeView>
             <Grid>
-                <c:Renderer x:Name="renderer"
+                <local:DXRenderer x:Name="renderer"
                             x:FieldModifier="private" 
                             Background="CornflowerBlue" />
                 <ToggleButton Style="{StaticResource showHideStyle}"

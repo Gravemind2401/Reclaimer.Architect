@@ -87,11 +87,13 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Prism.Wpf.7.2.0.1422\lib\net45\System.Windows.Interactivity.dll</HintPath>
       <Private>True</Private>
@@ -113,6 +115,8 @@
     <Compile Include="Controls\DXViewer.xaml.cs">
       <DependentUpon>DXViewer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\DXRenderer.cs" />
+    <Compile Include="NativeMethods.cs" />
     <Compile Include="Plugins\DXViewerPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
@@ -169,7 +173,9 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>echo f | xcopy ".\$(TargetFileName)" "Plugins\DXViewer\DXViewer.dll" /Y</PostBuildEvent>
+    <PostBuildEvent>echo F | xcopy ".\$(TargetFileName)" "Plugins\DXViewer\DXViewer.dll" /Y
+echo D | xcopy ".\SharpDX*" "Plugins\DXViewer" /Y
+echo D | xcopy ".\HelixToolkit*" "Plugins\DXViewer" /Y</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -32,7 +32,7 @@ namespace Reclaimer.Plugins
 
             try
             {
-                var viewer = new Controls.ModelViewer
+                var viewer = new Controls.DXViewer
                 {
                     LogOutput = LogOutput,
                     LogError = LogError,

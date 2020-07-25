@@ -22,24 +22,29 @@ using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using Helix = HelixToolkit.Wpf.SharpDX;
+
 namespace Reclaimer.Controls
 {
     /// <summary>
     /// Interaction logic for DXViewer.xaml
     /// </summary>
-    public partial class DXViewer : UserControl
+    public partial class DXViewer : IDisposable
     {
+        //private delegate bool GetDataFolder(out string dataFolder);
+        //private delegate bool SaveImage(IBitmap bitmap, string baseDir);
+
         private static readonly string[] AllLods = new[] { "Highest", "High", "Medium", "Low", "Lowest" };
-        private static readonly DiffuseMaterial ErrorMaterial;
+        private static readonly Helix.Material ErrorMaterial = Helix.DiffuseMaterials.Gold;
 
         #region Dependency Properties
         private static readonly DependencyPropertyKey AvailableLodsPropertyKey =
-            DependencyProperty.RegisterReadOnly(nameof(AvailableLods), typeof(IEnumerable<string>), typeof(ModelViewer), new PropertyMetadata());
+            DependencyProperty.RegisterReadOnly(nameof(AvailableLods), typeof(IEnumerable<string>), typeof(DXViewer), new PropertyMetadata());
 
         public static readonly DependencyProperty AvailableLodsProperty = AvailableLodsPropertyKey.DependencyProperty;
 
         public static readonly DependencyProperty SelectedLodProperty =
-            DependencyProperty.Register(nameof(SelectedLod), typeof(int), typeof(ModelViewer), new PropertyMetadata(0, SelectedLodChanged));
+            DependencyProperty.Register(nameof(SelectedLod), typeof(int), typeof(DXViewer), new PropertyMetadata(0, SelectedLodChanged));
 
         public IEnumerable<string> AvailableLods
         {
@@ -60,8 +65,8 @@ namespace Reclaimer.Controls
         }
         #endregion
 
-        private readonly Model3DGroup modelGroup = new Model3DGroup();
-        private readonly ModelVisual3D visual = new ModelVisual3D();
+        private readonly Helix.GroupModel3D modelGroup = new Helix.GroupModel3D();
+        //private readonly ModelVisual3D visual = new ModelVisual3D();
 
         private IRenderGeometry geometry;
         private IGeometryModel model;
@@ -74,11 +79,6 @@ namespace Reclaimer.Controls
         public Action<string> SetStatus { get; set; }
         public Action ClearStatus { get; set; }
 
-        static DXViewer()
-        {
-            (ErrorMaterial = new DiffuseMaterial(Brushes.Gold)).Freeze();
-        }
-
         public DXViewer()
         {
             InitializeComponent();
@@ -86,8 +86,8 @@ namespace Reclaimer.Controls
             TreeViewItems = new ObservableCollection<TreeItemModel>();
             DataContext = this;
 
-            visual.Content = modelGroup;
-            renderer.AddChild(visual);
+            //visual.Content = modelGroup;
+            renderer.AddChild(modelGroup);
         }
 
         public void LoadGeometry(IRenderGeometry geometry, string fileName)
@@ -103,17 +103,27 @@ namespace Reclaimer.Controls
         private void SetLod(int index)
         {
             model = geometry.ReadGeometry(index);
-            var meshes = GetMeshes(model).ToList();
+
+            var materials = GetMaterials(model).ToList();
+            var indexes = model.Regions.SelectMany(r => r.Permutations)
+                .SelectMany(p => Enumerable.Range(p.MeshIndex, p.MeshCount))
+                .Distinct().ToList();
+
+            //var meshes = GetMeshes(model).ToList();
 
             TreeViewItems.Clear();
             modelGroup.Children.Clear();
+
             foreach (var region in model.Regions)
             {
                 var regNode = new TreeItemModel { Header = region.Name, IsChecked = true };
 
                 foreach (var perm in region.Permutations)
                 {
-                    var mesh = meshes[perm.MeshIndex];
+                    if (!indexes.Contains(perm.MeshIndex))
+                        continue;
+
+                    var mesh = GetMesh(model.Meshes[perm.MeshIndex], materials);
                     if (mesh == null)
                         continue;
 
@@ -155,23 +165,24 @@ namespace Reclaimer.Controls
                         tGroup.Children.Add(tform);
                     }
 
-                    Model3DGroup permGroup;
+                    Helix.GroupModel3D permGroup;
                     if (tGroup.Children.Count == 0 && perm.MeshCount == 1)
-                        permGroup = meshes[perm.MeshIndex];
+                        permGroup = mesh;
                     else
                     {
-                        permGroup = new Model3DGroup();
-                        for (int i = 0; i < perm.MeshCount; i++)
-                        {
-                            if (tGroup.Children.Count > 0)
-                            {
-                                (permGroup.Transform = tGroup).Freeze();
+                        permGroup = new Helix.GroupModel3D();
+                        permGroup.Children.Add(mesh);
 
-                                permGroup.Children.Add(meshes[perm.MeshIndex + i]);
-                                permGroup.Freeze();
-                            }
-                            else permGroup.Children.Add(meshes[perm.MeshIndex + i]);
+                        if (tGroup.Children.Count > 0)
+                            (permGroup.Transform = tGroup).Freeze();
+
+                        for (int i = 1; i < perm.MeshCount; i++)
+                        {
+                            var nextMesh = GetMesh(model.Meshes[perm.MeshIndex + i], materials);
+                            permGroup.Children.Add(nextMesh);
                         }
+
+                        //permGroup.Freeze();
                     }
 
                     permNode.Tag = permGroup;
@@ -182,10 +193,10 @@ namespace Reclaimer.Controls
                     TreeViewItems.Add(regNode);
             }
 
-            renderer.ScaleToContent(new[] { modelGroup });
+            //renderer.ScaleToContent(new[] { modelGroup });
         }
 
-        private IEnumerable<Material> GetMaterials(IGeometryModel model)
+        private IEnumerable<Helix.Material> GetMaterials(IGeometryModel model)
         {
             var indexes = model.Meshes.SelectMany(m => m.Submeshes)
                 .Select(s => s.MaterialIndex).Distinct().ToArray();
@@ -199,22 +210,41 @@ namespace Reclaimer.Controls
                 }
 
                 var mat = model.Materials[i];
-                DiffuseMaterial material;
+                Helix.Material material;
 
                 try
                 {
                     var diffuse = mat.Submaterials.First(m => m.Usage == MaterialUsage.Diffuse);
-                    var dds = diffuse.Bitmap.ToDds(0);
+                    var diffuseStream = new System.IO.MemoryStream();
+                    diffuse.Bitmap.ToDds(0).WriteToStream(diffuseStream, System.Drawing.Imaging.ImageFormat.Png, DecompressOptions.Bgr24);
 
-                    var brush = new ImageBrush(dds.ToBitmapSource(DecompressOptions.Bgr24))
+                    var phong = new Helix.DiffuseMaterial
                     {
-                        ViewportUnits = BrushMappingMode.Absolute,
-                        TileMode = TileMode.Tile,
-                        Viewport = new Rect(0, 0, 1f / Math.Abs(diffuse.Tiling.X), 1f / Math.Abs(diffuse.Tiling.Y))
+                        DiffuseMap = new Helix.TextureModel(diffuseStream),
                     };
 
-                    brush.Freeze();
-                    material = new DiffuseMaterial(brush);
+                    //try
+                    //{
+                    //    var normal = mat.Submaterials.FirstOrDefault(m => m.Usage == MaterialUsage.Normal);
+                    //    if (normal != null)
+                    //    {
+                    //        var normalStream = new System.IO.MemoryStream();
+                    //        normal.Bitmap.ToDds(0).WriteToStream(normalStream, System.Drawing.Imaging.ImageFormat.Png, DecompressOptions.Bgr24);
+                    //        phong.DisplacementMap = new Helix.TextureModel(normalStream);
+                    //    }
+                    //}
+                    //catch { }
+
+                    //var brush = new ImageBrush(dds.ToBitmapSource(DecompressOptions.Bgr24))
+                    //{
+                    //    ViewportUnits = BrushMappingMode.Absolute,
+                    //    TileMode = TileMode.Tile,
+                    //    Viewport = new Rect(0, 0, 1f / Math.Abs(diffuse.Tiling.X), 1f / Math.Abs(diffuse.Tiling.Y))
+                    //};
+
+                    //brush.Freeze();
+
+                    material = phong;
                     material.Freeze();
                 }
                 catch
@@ -226,7 +256,7 @@ namespace Reclaimer.Controls
             }
         }
 
-        private IEnumerable<Model3DGroup> GetMeshes(IGeometryModel model)
+        private IEnumerable<Helix.GroupModel3D> GetMeshes(IGeometryModel model)
         {
             var indexes = model.Regions.SelectMany(r => r.Permutations)
                 .SelectMany(p => Enumerable.Range(p.MeshIndex, p.MeshCount))
@@ -236,85 +266,95 @@ namespace Reclaimer.Controls
 
             for (int i = 0; i < model.Meshes.Count; i++)
             {
-                var mesh = model.Meshes[i];
-
-                if (mesh.Submeshes.Count == 0 || !indexes.Contains(i))
-                {
+                if (!indexes.Contains(i))
                     yield return null;
-                    continue;
-                }
-
-                var mGroup = new Model3DGroup();
-                var tGroup = new Transform3DGroup();
-
-                var texMatrix = Matrix.Identity;
-                if (mesh.BoundsIndex >= 0)
-                {
-                    var bounds = model.Bounds[mesh.BoundsIndex.Value];
-                    texMatrix = new Matrix
-                    {
-                        M11 = bounds.UBounds.Length,
-                        M22 = bounds.VBounds.Length,
-                        OffsetX = bounds.UBounds.Min,
-                        OffsetY = bounds.VBounds.Min
-                    };
-
-                    var transform = new Matrix3D
-                    {
-                        M11 = bounds.XBounds.Length,
-                        M22 = bounds.YBounds.Length,
-                        M33 = bounds.ZBounds.Length,
-                        OffsetX = bounds.XBounds.Min,
-                        OffsetY = bounds.YBounds.Min,
-                        OffsetZ = bounds.ZBounds.Min
-                    };
-
-                    var tform = new MatrixTransform3D(transform);
-                    tform.Freeze();
-                    tGroup.Children.Add(tform);
-                }
-
-                foreach (var sub in mesh.Submeshes)
-                {
-                    try
-                    {
-                        var geom = new MeshGeometry3D();
-
-                        var indices = mesh.Indicies.Skip(sub.IndexStart).Take(sub.IndexLength).ToList();
-                        if (mesh.IndexFormat == IndexFormat.TriangleStrip) indices = indices.Unstrip().ToList();
-
-                        var vertStart = indices.Min();
-                        var vertLength = indices.Max() - vertStart + 1;
-
-                        var verts = mesh.Vertices.Skip(vertStart).Take(vertLength);
-                        var positions = verts.Select(v => new Point3D(v.Position[0].X, v.Position[0].Y, v.Position[0].Z));
-
-                        var texcoords = verts.Select(v => new Point(v.TexCoords[0].X, v.TexCoords[0].Y)).ToArray();
-                        if (!texMatrix.IsIdentity) texMatrix.Transform(texcoords);
-
-                        (geom.Positions = new Point3DCollection(positions)).Freeze();
-                        (geom.TextureCoordinates = new PointCollection(texcoords)).Freeze();
-                        (geom.TriangleIndices = new Int32Collection(indices.Select(j => j - vertStart))).Freeze();
-
-                        if (mesh.Vertices[0].Normal.Count > 0)
-                        {
-                            var normals = verts.Select(v => new Vector3D(v.Normal[0].X, v.Normal[0].Y, v.Normal[0].Z));
-                            (geom.Normals = new Vector3DCollection(normals)).Freeze();
-                        }
-
-                        var mat = sub.MaterialIndex >= 0 ? materials[sub.MaterialIndex] : ErrorMaterial;
-                        var subGroup = new GeometryModel3D(geom, mat) { BackMaterial = mat };
-                        subGroup.Freeze();
-                        mGroup.Children.Add(subGroup);
-                    }
-                    catch { }
-                }
-
-                (mGroup.Transform = tGroup).Freeze();
-                mGroup.Freeze();
-
-                yield return mGroup;
+                else
+                    yield return GetMesh(model.Meshes[i], materials);
             }
+        }
+
+        private Helix.GroupModel3D GetMesh(IGeometryMesh mesh, IList<Helix.Material> materials)
+        {
+            if (mesh.Submeshes.Count == 0)
+                return null;
+
+            var mGroup = new Helix.GroupModel3D();
+            var tform = new MatrixTransform3D();
+
+            var texMatrix = Matrix.Identity;
+            if (mesh.BoundsIndex >= 0)
+            {
+                var bounds = model.Bounds[mesh.BoundsIndex.Value];
+                texMatrix = new Matrix
+                {
+                    M11 = bounds.UBounds.Length,
+                    M22 = bounds.VBounds.Length,
+                    OffsetX = bounds.UBounds.Min,
+                    OffsetY = bounds.VBounds.Min
+                };
+
+                var transform = new Matrix3D
+                {
+                    M11 = bounds.XBounds.Length,
+                    M22 = bounds.YBounds.Length,
+                    M33 = bounds.ZBounds.Length,
+                    OffsetX = bounds.XBounds.Min,
+                    OffsetY = bounds.YBounds.Min,
+                    OffsetZ = bounds.ZBounds.Min
+                };
+
+                tform = new MatrixTransform3D(transform);
+                //tform.Freeze();
+            }
+
+            foreach (var sub in mesh.Submeshes)
+            {
+                try
+                {
+                    var geom = new Helix.MeshGeometry3D();
+
+                    var indices = mesh.Indicies.Skip(sub.IndexStart).Take(sub.IndexLength).ToList();
+                    if (mesh.IndexFormat == IndexFormat.TriangleStrip) indices = indices.Unstrip().ToList();
+
+                    var vertStart = indices.Min();
+                    var vertLength = indices.Max() - vertStart + 1;
+
+                    var verts = mesh.Vertices.Skip(vertStart).Take(vertLength);
+                    var positions = verts.Select(v => new SharpDX.Vector3(v.Position[0].X, v.Position[0].Y, v.Position[0].Z));
+
+                    var texcoords = verts.Select(v => new SharpDX.Vector2(v.TexCoords[0].X, v.TexCoords[0].Y)).ToArray();
+                    //if (!texMatrix.IsIdentity) texMatrix.Transform(texcoords);
+
+                    geom.Positions = new Helix.Vector3Collection(positions);
+                    geom.TextureCoordinates = new Helix.Vector2Collection(texcoords);
+                    geom.Indices = new Helix.IntCollection(indices.Select(j => j - vertStart));
+
+                    if (mesh.Vertices[0].Normal.Count > 0)
+                    {
+                        var normals = verts.Select(v => new SharpDX.Vector3(v.Normal[0].X, v.Normal[0].Y, v.Normal[0].Z));
+                        geom.Normals = new Helix.Vector3Collection(normals);
+                    }
+
+                    var mat = sub.MaterialIndex >= 0 ? materials[sub.MaterialIndex] : ErrorMaterial;
+                    var subGroup = new Helix.MeshGeometryModel3D()
+                    {
+                        Geometry = geom,
+                        Material = mat,
+                        CullMode = SharpDX.Direct3D11.CullMode.Back,
+                        DepthBias = 50,
+                        IsDepthClipEnabled = true
+                    };
+
+                    //subGroup.Freeze();
+                    mGroup.Children.Add(subGroup);
+                }
+                catch { }
+            }
+
+            mGroup.Transform = tform;
+            //mGroup.Freeze();
+
+            return mGroup;
         }
 
         #region Treeview Events
@@ -324,7 +364,7 @@ namespace Reclaimer.Controls
             if (item != tv.SelectedItem)
                 return; //because this event bubbles to the parent node
 
-            var mesh = item.Tag as Model3DGroup;
+            var mesh = item.Tag as Helix.GroupModel3D;
             if (mesh != null)
                 renderer.LocateObject(mesh);
         }
@@ -353,7 +393,7 @@ namespace Reclaimer.Controls
                     parent.IsChecked = false;
                 else parent.IsChecked = null;
 
-                var group = item.Tag as Model3DGroup;
+                var group = item.Tag as Helix.GroupModel3D;
                 if (item.IsChecked == true)
                     modelGroup.Children.Add(group);
                 else
@@ -363,7 +403,7 @@ namespace Reclaimer.Controls
             {
                 foreach (TreeItemModel i in item.Items)
                 {
-                    var group = i.Tag as Model3DGroup;
+                    var group = i.Tag as Helix.GroupModel3D;
                     i.IsChecked = item.IsChecked;
                     if (i.IsChecked == true)
                         modelGroup.Children.Add(group);
