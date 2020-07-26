@@ -71,6 +71,9 @@ namespace Reclaimer.Controls
         private IRenderGeometry geometry;
         private IGeometryModel model;
 
+        private SceneManager scene;
+        private ModelManager manager;
+
         public TabModel TabModel { get; }
         public ObservableCollection<TreeItemModel> TreeViewItems { get; }
 
@@ -104,15 +107,19 @@ namespace Reclaimer.Controls
         {
             model = geometry.ReadGeometry(index);
 
-            var materials = GetMaterials(model).ToList();
-            var indexes = model.Regions.SelectMany(r => r.Permutations)
-                .SelectMany(p => Enumerable.Range(p.MeshIndex, p.MeshCount))
-                .Distinct().ToList();
+            //var materials = GetMaterials(model).ToList();
+            //var indexes = model.Regions.SelectMany(r => r.Permutations)
+            //    .SelectMany(p => Enumerable.Range(p.MeshIndex, p.MeshCount))
+            //    .Distinct().ToList();
 
             //var meshes = GetMeshes(model).ToList();
 
             TreeViewItems.Clear();
             modelGroup.Children.Clear();
+
+            scene = new SceneManager();
+            manager = new ModelManager(scene, model);
+            modelGroup.Children.Add(manager.Element);
 
             foreach (var region in model.Regions)
             {
@@ -120,242 +127,260 @@ namespace Reclaimer.Controls
 
                 foreach (var perm in region.Permutations)
                 {
-                    if (!indexes.Contains(perm.MeshIndex))
+                    var element = manager.GetElement(perm);
+                    if (element == null)
                         continue;
 
-                    var mesh = GetMesh(model.Meshes[perm.MeshIndex], materials);
-                    if (mesh == null)
-                        continue;
-
-                    var permNode = new TreeItemModel { Header = perm.Name, IsChecked = true };
+                    var permNode = new TreeItemModel { Header = perm.Name, IsChecked = true, Tag = element };
                     regNode.Items.Add(permNode);
-
-                    var tGroup = new Transform3DGroup();
-
-                    if (perm.TransformScale != 1)
-                    {
-                        var tform = new ScaleTransform3D(perm.TransformScale, perm.TransformScale, perm.TransformScale);
-
-                        tform.Freeze();
-                        tGroup.Children.Add(tform);
-                    }
-
-                    if (!perm.Transform.IsIdentity)
-                    {
-                        var tform = new MatrixTransform3D(new Matrix3D
-                        {
-                            M11 = perm.Transform.M11,
-                            M12 = perm.Transform.M12,
-                            M13 = perm.Transform.M13,
-
-                            M21 = perm.Transform.M21,
-                            M22 = perm.Transform.M22,
-                            M23 = perm.Transform.M23,
-
-                            M31 = perm.Transform.M31,
-                            M32 = perm.Transform.M32,
-                            M33 = perm.Transform.M33,
-
-                            OffsetX = perm.Transform.M41,
-                            OffsetY = perm.Transform.M42,
-                            OffsetZ = perm.Transform.M43
-                        });
-
-                        tform.Freeze();
-                        tGroup.Children.Add(tform);
-                    }
-
-                    Helix.GroupModel3D permGroup;
-                    if (tGroup.Children.Count == 0 && perm.MeshCount == 1)
-                        permGroup = mesh;
-                    else
-                    {
-                        permGroup = new Helix.GroupModel3D();
-                        permGroup.Children.Add(mesh);
-
-                        if (tGroup.Children.Count > 0)
-                            (permGroup.Transform = tGroup).Freeze();
-
-                        for (int i = 1; i < perm.MeshCount; i++)
-                        {
-                            var nextMesh = GetMesh(model.Meshes[perm.MeshIndex + i], materials);
-                            permGroup.Children.Add(nextMesh);
-                        }
-
-                        //permGroup.Freeze();
-                    }
-
-                    permNode.Tag = permGroup;
-                    modelGroup.Children.Add(permGroup);
                 }
 
                 if (regNode.HasItems)
                     TreeViewItems.Add(regNode);
             }
 
+            //foreach (var region in model.Regions)
+            //{
+            //    var regNode = new TreeItemModel { Header = region.Name, IsChecked = true };
+
+            //    foreach (var perm in region.Permutations)
+            //    {
+            //        if (!indexes.Contains(perm.MeshIndex))
+            //            continue;
+
+            //        var mesh = GetMesh(model.Meshes[perm.MeshIndex], materials);
+            //        if (mesh == null)
+            //            continue;
+
+            //        var permNode = new TreeItemModel { Header = perm.Name, IsChecked = true };
+            //        regNode.Items.Add(permNode);
+
+            //        var tGroup = new Transform3DGroup();
+
+            //        if (perm.TransformScale != 1)
+            //        {
+            //            var tform = new ScaleTransform3D(perm.TransformScale, perm.TransformScale, perm.TransformScale);
+
+            //            tform.Freeze();
+            //            tGroup.Children.Add(tform);
+            //        }
+
+            //        if (!perm.Transform.IsIdentity)
+            //        {
+            //            var tform = new MatrixTransform3D(new Matrix3D
+            //            {
+            //                M11 = perm.Transform.M11,
+            //                M12 = perm.Transform.M12,
+            //                M13 = perm.Transform.M13,
+
+            //                M21 = perm.Transform.M21,
+            //                M22 = perm.Transform.M22,
+            //                M23 = perm.Transform.M23,
+
+            //                M31 = perm.Transform.M31,
+            //                M32 = perm.Transform.M32,
+            //                M33 = perm.Transform.M33,
+
+            //                OffsetX = perm.Transform.M41,
+            //                OffsetY = perm.Transform.M42,
+            //                OffsetZ = perm.Transform.M43
+            //            });
+
+            //            tform.Freeze();
+            //            tGroup.Children.Add(tform);
+            //        }
+
+            //        Helix.GroupModel3D permGroup;
+            //        if (tGroup.Children.Count == 0 && perm.MeshCount == 1)
+            //            permGroup = mesh;
+            //        else
+            //        {
+            //            permGroup = new Helix.GroupModel3D();
+            //            permGroup.Children.Add(mesh);
+
+            //            if (tGroup.Children.Count > 0)
+            //                (permGroup.Transform = tGroup).Freeze();
+
+            //            for (int i = 1; i < perm.MeshCount; i++)
+            //            {
+            //                var nextMesh = GetMesh(model.Meshes[perm.MeshIndex + i], materials);
+            //                permGroup.Children.Add(nextMesh);
+            //            }
+
+            //            //permGroup.Freeze();
+            //        }
+
+            //        permNode.Tag = permGroup;
+            //        modelGroup.Children.Add(permGroup);
+            //    }
+
+            //    if (regNode.HasItems)
+            //        TreeViewItems.Add(regNode);
+            //}
+
             //renderer.ScaleToContent(new[] { modelGroup });
         }
 
-        private IEnumerable<Helix.Material> GetMaterials(IGeometryModel model)
-        {
-            var indexes = model.Meshes.SelectMany(m => m.Submeshes)
-                .Select(s => s.MaterialIndex).Distinct().ToArray();
+        //private IEnumerable<Helix.Material> GetMaterials(IGeometryModel model)
+        //{
+        //    var indexes = model.Meshes.SelectMany(m => m.Submeshes)
+        //        .Select(s => s.MaterialIndex).Distinct().ToArray();
 
-            for (short i = 0; i < model.Materials.Count; i++)
-            {
-                if (!indexes.Contains(i))
-                {
-                    yield return null;
-                    continue;
-                }
+        //    for (short i = 0; i < model.Materials.Count; i++)
+        //    {
+        //        if (!indexes.Contains(i))
+        //        {
+        //            yield return null;
+        //            continue;
+        //        }
 
-                var mat = model.Materials[i];
-                Helix.Material material;
+        //        var mat = model.Materials[i];
+        //        Helix.Material material;
 
-                try
-                {
-                    var diffuse = mat.Submaterials.First(m => m.Usage == MaterialUsage.Diffuse);
-                    var diffuseStream = new System.IO.MemoryStream();
-                    diffuse.Bitmap.ToDds(0).WriteToStream(diffuseStream, System.Drawing.Imaging.ImageFormat.Png, DecompressOptions.Bgr24);
+        //        try
+        //        {
+        //            var diffuse = mat.Submaterials.First(m => m.Usage == MaterialUsage.Diffuse);
+        //            var diffuseStream = new System.IO.MemoryStream();
+        //            diffuse.Bitmap.ToDds(0).WriteToStream(diffuseStream, System.Drawing.Imaging.ImageFormat.Png, DecompressOptions.Bgr24);
+        //            var textureDiffuse = new Helix.TextureModel(diffuseStream);
 
-                    var phong = new Helix.DiffuseMaterial
-                    {
-                        DiffuseMap = new Helix.TextureModel(diffuseStream),
-                    };
+        //            //try
+        //            //{
+        //            //    var normal = mat.Submaterials.FirstOrDefault(m => m.Usage == MaterialUsage.Normal);
+        //            //    if (normal != null)
+        //            //    {
+        //            //        var normalStream = new System.IO.MemoryStream();
+        //            //        normal.Bitmap.ToDds(0).WriteToStream(normalStream, System.Drawing.Imaging.ImageFormat.Png, DecompressOptions.Bgr24);
+        //            //        phong.DisplacementMap = new Helix.TextureModel(normalStream);
+        //            //    }
+        //            //}
+        //            //catch { }
 
-                    //try
-                    //{
-                    //    var normal = mat.Submaterials.FirstOrDefault(m => m.Usage == MaterialUsage.Normal);
-                    //    if (normal != null)
-                    //    {
-                    //        var normalStream = new System.IO.MemoryStream();
-                    //        normal.Bitmap.ToDds(0).WriteToStream(normalStream, System.Drawing.Imaging.ImageFormat.Png, DecompressOptions.Bgr24);
-                    //        phong.DisplacementMap = new Helix.TextureModel(normalStream);
-                    //    }
-                    //}
-                    //catch { }
+        //            //var brush = new ImageBrush(dds.ToBitmapSource(DecompressOptions.Bgr24))
+        //            //{
+        //            //    ViewportUnits = BrushMappingMode.Absolute,
+        //            //    TileMode = TileMode.Tile,
+        //            //    Viewport = new Rect(0, 0, 1f / Math.Abs(diffuse.Tiling.X), 1f / Math.Abs(diffuse.Tiling.Y))
+        //            //};
 
-                    //var brush = new ImageBrush(dds.ToBitmapSource(DecompressOptions.Bgr24))
-                    //{
-                    //    ViewportUnits = BrushMappingMode.Absolute,
-                    //    TileMode = TileMode.Tile,
-                    //    Viewport = new Rect(0, 0, 1f / Math.Abs(diffuse.Tiling.X), 1f / Math.Abs(diffuse.Tiling.Y))
-                    //};
+        //            //brush.Freeze();
 
-                    //brush.Freeze();
+        //            var phong = new Helix.DiffuseMaterial
+        //            {
+        //                DiffuseMap = textureDiffuse
+        //            };
 
-                    material = phong;
-                    material.Freeze();
-                }
-                catch
-                {
-                    material = ErrorMaterial;
-                }
+        //            material = phong;
+        //            material.Freeze();
+        //        }
+        //        catch
+        //        {
+        //            material = ErrorMaterial;
+        //        }
 
-                yield return material;
-            }
-        }
+        //        yield return material;
+        //    }
+        //}
 
-        private IEnumerable<Helix.GroupModel3D> GetMeshes(IGeometryModel model)
-        {
-            var indexes = model.Regions.SelectMany(r => r.Permutations)
-                .SelectMany(p => Enumerable.Range(p.MeshIndex, p.MeshCount))
-                .Distinct().ToList();
+        //private IEnumerable<Helix.GroupModel3D> GetMeshes(IGeometryModel model)
+        //{
+        //    var indexes = model.Regions.SelectMany(r => r.Permutations)
+        //        .SelectMany(p => Enumerable.Range(p.MeshIndex, p.MeshCount))
+        //        .Distinct().ToList();
 
-            var materials = GetMaterials(model).ToList();
+        //    var materials = GetMaterials(model).ToList();
 
-            for (int i = 0; i < model.Meshes.Count; i++)
-            {
-                if (!indexes.Contains(i))
-                    yield return null;
-                else
-                    yield return GetMesh(model.Meshes[i], materials);
-            }
-        }
+        //    for (int i = 0; i < model.Meshes.Count; i++)
+        //    {
+        //        if (!indexes.Contains(i))
+        //            yield return null;
+        //        else
+        //            yield return GetMesh(model.Meshes[i], materials);
+        //    }
+        //}
 
-        private Helix.GroupModel3D GetMesh(IGeometryMesh mesh, IList<Helix.Material> materials)
-        {
-            if (mesh.Submeshes.Count == 0)
-                return null;
+        //private Helix.GroupModel3D GetMesh(IGeometryMesh mesh, IList<Helix.Material> materials)
+        //{
+        //    if (mesh.Submeshes.Count == 0)
+        //        return null;
 
-            var mGroup = new Helix.GroupModel3D();
-            var tform = new MatrixTransform3D();
+        //    var mGroup = new Helix.GroupModel3D();
+        //    var tform = new MatrixTransform3D();
 
-            var texMatrix = Matrix.Identity;
-            if (mesh.BoundsIndex >= 0)
-            {
-                var bounds = model.Bounds[mesh.BoundsIndex.Value];
-                texMatrix = new Matrix
-                {
-                    M11 = bounds.UBounds.Length,
-                    M22 = bounds.VBounds.Length,
-                    OffsetX = bounds.UBounds.Min,
-                    OffsetY = bounds.VBounds.Min
-                };
+        //    var texMatrix = SharpDX.Matrix.Identity;
+        //    if (mesh.BoundsIndex >= 0)
+        //    {
+        //        var bounds = model.Bounds[mesh.BoundsIndex.Value];
+        //        texMatrix = new SharpDX.Matrix
+        //        {
+        //            M11 = bounds.UBounds.Length,
+        //            M22 = bounds.VBounds.Length,
+        //            M41 = bounds.UBounds.Min,
+        //            M42 = bounds.VBounds.Min,
+        //            M44 = 1
+        //        };
 
-                var transform = new Matrix3D
-                {
-                    M11 = bounds.XBounds.Length,
-                    M22 = bounds.YBounds.Length,
-                    M33 = bounds.ZBounds.Length,
-                    OffsetX = bounds.XBounds.Min,
-                    OffsetY = bounds.YBounds.Min,
-                    OffsetZ = bounds.ZBounds.Min
-                };
+        //        var transform = new Matrix3D
+        //        {
+        //            M11 = bounds.XBounds.Length,
+        //            M22 = bounds.YBounds.Length,
+        //            M33 = bounds.ZBounds.Length,
+        //            OffsetX = bounds.XBounds.Min,
+        //            OffsetY = bounds.YBounds.Min,
+        //            OffsetZ = bounds.ZBounds.Min
+        //        };
 
-                tform = new MatrixTransform3D(transform);
-                //tform.Freeze();
-            }
+        //        tform = new MatrixTransform3D(transform);
+        //        //tform.Freeze();
+        //    }
 
-            foreach (var sub in mesh.Submeshes)
-            {
-                try
-                {
-                    var geom = new Helix.MeshGeometry3D();
+        //    foreach (var sub in mesh.Submeshes)
+        //    {
+        //        try
+        //        {
+        //            var geom = new Helix.MeshGeometry3D();
 
-                    var indices = mesh.Indicies.Skip(sub.IndexStart).Take(sub.IndexLength).ToList();
-                    if (mesh.IndexFormat == IndexFormat.TriangleStrip) indices = indices.Unstrip().ToList();
+        //            var indices = mesh.Indicies.Skip(sub.IndexStart).Take(sub.IndexLength).ToList();
+        //            if (mesh.IndexFormat == IndexFormat.TriangleStrip) indices = indices.Unstrip().ToList();
 
-                    var vertStart = indices.Min();
-                    var vertLength = indices.Max() - vertStart + 1;
+        //            var vertStart = indices.Min();
+        //            var vertLength = indices.Max() - vertStart + 1;
 
-                    var verts = mesh.Vertices.Skip(vertStart).Take(vertLength);
-                    var positions = verts.Select(v => new SharpDX.Vector3(v.Position[0].X, v.Position[0].Y, v.Position[0].Z));
+        //            var verts = mesh.Vertices.Skip(vertStart).Take(vertLength);
+        //            var positions = verts.Select(v => new SharpDX.Vector3(v.Position[0].X, v.Position[0].Y, v.Position[0].Z));
 
-                    var texcoords = verts.Select(v => new SharpDX.Vector2(v.TexCoords[0].X, v.TexCoords[0].Y)).ToArray();
-                    //if (!texMatrix.IsIdentity) texMatrix.Transform(texcoords);
+        //            var texcoords = verts.Select(v => new SharpDX.Vector2(v.TexCoords[0].X, v.TexCoords[0].Y));
+        //            if (!texMatrix.IsIdentity) texcoords = texcoords.Select(v => SharpDX.Vector2.TransformCoordinate(v, texMatrix));
 
-                    geom.Positions = new Helix.Vector3Collection(positions);
-                    geom.TextureCoordinates = new Helix.Vector2Collection(texcoords);
-                    geom.Indices = new Helix.IntCollection(indices.Select(j => j - vertStart));
+        //            geom.Positions = new Helix.Vector3Collection(positions);
+        //            geom.TextureCoordinates = new Helix.Vector2Collection(texcoords);
+        //            geom.Indices = new Helix.IntCollection(indices.Select(j => j - vertStart));
 
-                    if (mesh.Vertices[0].Normal.Count > 0)
-                    {
-                        var normals = verts.Select(v => new SharpDX.Vector3(v.Normal[0].X, v.Normal[0].Y, v.Normal[0].Z));
-                        geom.Normals = new Helix.Vector3Collection(normals);
-                    }
+        //            if (mesh.Vertices[0].Normal.Count > 0)
+        //            {
+        //                var normals = verts.Select(v => new SharpDX.Vector3(v.Normal[0].X, v.Normal[0].Y, v.Normal[0].Z));
+        //                geom.Normals = new Helix.Vector3Collection(normals);
+        //            }
 
-                    var mat = sub.MaterialIndex >= 0 ? materials[sub.MaterialIndex] : ErrorMaterial;
-                    var subGroup = new Helix.MeshGeometryModel3D()
-                    {
-                        Geometry = geom,
-                        Material = mat,
-                        CullMode = SharpDX.Direct3D11.CullMode.Back,
-                        DepthBias = 50,
-                        IsDepthClipEnabled = true
-                    };
+        //            var mat = sub.MaterialIndex >= 0 ? materials[sub.MaterialIndex] : ErrorMaterial;
+        //            var subGroup = new Helix.MeshGeometryModel3D()
+        //            {
+        //                Geometry = geom,
+        //                Material = mat,
+        //                CullMode = SharpDX.Direct3D11.CullMode.None,
+        //            };
 
-                    //subGroup.Freeze();
-                    mGroup.Children.Add(subGroup);
-                }
-                catch { }
-            }
+        //            //subGroup.Freeze();
+        //            mGroup.Children.Add(subGroup);
+        //        }
+        //        catch { }
+        //    }
 
-            mGroup.Transform = tform;
-            //mGroup.Freeze();
+        //    mGroup.Transform = tform;
+        //    //mGroup.Freeze();
 
-            return mGroup;
-        }
+        //    return mGroup;
+        //}
 
         #region Treeview Events
         private void TreeViewItem_MouseDoubleClick(object sender, RoutedEventArgs e)
@@ -394,10 +419,11 @@ namespace Reclaimer.Controls
                 else parent.IsChecked = null;
 
                 var group = item.Tag as Helix.GroupModel3D;
-                if (item.IsChecked == true)
-                    modelGroup.Children.Add(group);
-                else
-                    modelGroup.Children.Remove(group);
+                group.Visibility = item.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
+                //if (item.IsChecked == true)
+                //    modelGroup.Children.Add(group);
+                //else
+                //    modelGroup.Children.Remove(group);
             }
             else
             {
@@ -405,10 +431,11 @@ namespace Reclaimer.Controls
                 {
                     var group = i.Tag as Helix.GroupModel3D;
                     i.IsChecked = item.IsChecked;
-                    if (i.IsChecked == true)
-                        modelGroup.Children.Add(group);
-                    else
-                        modelGroup.Children.Remove(group);
+                    group.Visibility = item.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
+                    //if (i.IsChecked == true)
+                    //    modelGroup.Children.Add(group);
+                    //else
+                    //    modelGroup.Children.Remove(group);
                 }
             }
         }
@@ -521,6 +548,9 @@ namespace Reclaimer.Controls
         public void Dispose()
         {
             TreeViewItems.Clear();
+            scene.Dispose();
+            manager.Model.Dispose();
+            manager.Dispose();
             renderer.Dispose();
             GC.Collect();
         }

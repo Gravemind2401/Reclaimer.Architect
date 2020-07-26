@@ -11,7 +11,6 @@
                 <ControlTemplate TargetType="c:DXRenderer">
                     <Grid>
                         <hx:Viewport3DX x:Name="PART_Viewport"
-                            EffectsManager="{Binding EffectsManager, RelativeSource={RelativeSource TemplatedParent}}"
                             Camera="{Binding Camera, RelativeSource={RelativeSource TemplatedParent}}"
                             CameraMode="{Binding CameraMode, RelativeSource={RelativeSource TemplatedParent}}"
                             Background="CornflowerBlue"
@@ -19,11 +18,9 @@
                             ShowFrameRate="True"
                             ZoomExtentsWhenLoaded="False"
                             EnableDesignModeRendering="True"
-                                        IsViewCubeEdgeClicksEnabled="True"
-                                        IsViewCubeMoverEnabled="True"
-                                        IsInertiaEnabled="True"
-                                        FixedRotationPointEnabled="True"
-                                        FixedRotationPoint="0,0,0"
+                            IsInertiaEnabled="True"
+                            FixedRotationPointEnabled="True"
+                            FixedRotationPoint="0,0,0"
                             ModelUpDirection="0,0,1">
                             <hx:Viewport3DX.InputBindings>
                                 <!--<KeyBinding Command="hx:ViewportCommands.ZoomExtents" Gesture="Control+E" />-->

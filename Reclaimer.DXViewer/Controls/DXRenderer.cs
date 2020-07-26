@@ -17,6 +17,7 @@ using System.Windows.Navigation;
 using System.Windows.Threading;
 using Keys = System.Windows.Forms.Keys;
 
+using NativeMethods = Reclaimer.Utilities.NativeMethods;
 using Helix = HelixToolkit.Wpf.SharpDX;
 
 namespace Reclaimer.Controls
@@ -31,10 +32,12 @@ namespace Reclaimer.Controls
         private const double RAD_360 = 6.2831853072;
         private const double SpeedMultipler = 0.001;
 
+        private static readonly EffectsManager effectsManager = new DefaultEffectsManager();
+
         #region Dependency Properties
 
-        public static readonly DependencyProperty EffectsManagerProperty =
-            DependencyProperty.Register(nameof(EffectsManager), typeof(EffectsManager), typeof(DXRenderer), new PropertyMetadata(new DefaultEffectsManager()));
+        //public static readonly DependencyProperty EffectsManagerProperty =
+        //    DependencyProperty.Register(nameof(EffectsManager), typeof(EffectsManager), typeof(DXRenderer), new PropertyMetadata(effectsManager));
 
         public static readonly DependencyProperty CameraProperty =
             DependencyProperty.Register(nameof(Camera), typeof(Helix.PerspectiveCamera), typeof(DXRenderer), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
@@ -52,11 +55,11 @@ namespace Reclaimer.Controls
 
         public static readonly DependencyProperty PitchProperty = PitchPropertyKey.DependencyProperty;
 
-        public EffectsManager EffectsManager
-        {
-            get { return (EffectsManager)GetValue(EffectsManagerProperty); }
-            set { SetValue(EffectsManagerProperty, value); }
-        }
+        //public EffectsManager EffectsManager
+        //{
+        //    get { return (EffectsManager)GetValue(EffectsManagerProperty); }
+        //    set { SetValue(EffectsManagerProperty, value); }
+        //}
 
         public Helix.PerspectiveCamera Camera
         {
@@ -90,7 +93,7 @@ namespace Reclaimer.Controls
             DefaultStyleKeyProperty.OverrideMetadata(typeof(DXRenderer), new FrameworkPropertyMetadata(typeof(DXRenderer)));
         }
 
-        private readonly DispatcherTimer timer;
+        //private readonly DispatcherTimer timer;
 
         private Point lastPoint;
 
@@ -160,6 +163,8 @@ namespace Reclaimer.Controls
 
             foreach (var c in children)
                 Viewport.Items.Remove(c);
+
+            Viewport.EffectsManager = null;
         }
 
         private void OnViewportSet()
@@ -169,6 +174,7 @@ namespace Reclaimer.Controls
             foreach (var c in children)
                 Viewport.Items.Add(c);
 
+            Viewport.EffectsManager = effectsManager;
             Viewport.OnRendered += Viewport_OnRendered;
         }
 
@@ -195,8 +201,6 @@ namespace Reclaimer.Controls
             if (Viewport == null)
                 return;
 
-            var x = Viewport.FindBounds3D();
-
             var boundsList = new List<SharpDX.BoundingBox>();
             foreach (var element in Viewport.Items)
                 GetNodeBounds(element.SceneNode, boundsList);
@@ -214,11 +218,12 @@ namespace Reclaimer.Controls
             );
 
             var bounds = new SharpDX.BoundingBox(min, max);
-            ZoomToBounds(bounds);
 
             Viewport.FixedRotationPoint = bounds.Center.ToPoint3D();
             (Viewport.Camera as Helix.PerspectiveCamera).FarPlaneDistance = bounds.Size.Length() * 3;
             (Viewport.Camera as Helix.PerspectiveCamera).NearPlaneDistance = 0.01;
+
+            ZoomToBounds(bounds);
 
             //var len = bounds.Size.Length();
             //CameraSpeed = Math.Ceiling(len);
@@ -290,11 +295,13 @@ namespace Reclaimer.Controls
 
             if (Viewport != null)
             {
+                Viewport.Dispose();
+
                 foreach (var item in Viewport.Items)
                     item.Dispose();
 
+                ClearChildren();
                 Viewport.Items.Clear();
-                Viewport.Dispose();
             }
         }
 
