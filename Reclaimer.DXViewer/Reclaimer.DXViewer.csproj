@@ -117,6 +117,7 @@
     </Compile>
     <Compile Include="Controls\DXRenderer.cs" />
     <Compile Include="Controls\SceneManager.cs" />
+    <Compile Include="Utilities\Extensions.cs" />
     <Compile Include="Utilities\NativeMethods.cs" />
     <Compile Include="Plugins\DXViewerPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">

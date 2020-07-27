@@ -72,36 +72,34 @@ namespace Reclaimer.Controls
 
     public class ModelManager : IDisposable
     {
-        private readonly List<MeshManager> meshes = new List<MeshManager>();
-        private readonly Dictionary<IGeometryPermutation, Helix.Element3D> elementsByPermutation = new Dictionary<IGeometryPermutation, Helix.Element3D>();
+        private readonly Dictionary<int, MeshTemplate> templates = new Dictionary<int, MeshTemplate>();
+        private readonly List<ModelInstance> instances = new List<ModelInstance>();
 
         public SceneManager Scene { get; }
         public IGeometryModel Model { get; }
-        public Helix.GroupModel3D Element { get; }
-        public bool IsFixed { get; }
+
+        public IReadOnlyList<ModelInstance> Instances => instances;
 
         public ModelManager(SceneManager scene, IGeometryModel model)
-            : this(scene, model, true) { }
-
-        public ModelManager(SceneManager scene, IGeometryModel model, bool isFixed)
         {
             Scene = scene;
             Model = model;
-            IsFixed = isFixed;
-            Element = new Helix.GroupModel3D();
-            LoadGeometry();
+
+            for (int i = 0; i < model.Meshes.Count; i++)
+                templates.Add(i, new MeshTemplate(model, i));
         }
 
-        public Helix.Element3D GetElement(IGeometryPermutation permutation) => elementsByPermutation.ValueOrDefault(permutation);
-
-        private void LoadGeometry()
+        public ModelInstance CreateInstance()
         {
+            var element = new Helix.GroupModel3D();
+            var modelInstance = new ModelInstance(element);
+
             foreach (var region in Model.Regions)
             {
                 foreach (var perm in region.Permutations)
                 {
-                    var mesh = GetMesh(perm.MeshIndex);
-                    if (mesh == null)
+                    var template = templates.ValueOrDefault(perm.MeshIndex);
+                    if (template == null || template.IsEmpty)
                         continue;
 
                     var tGroup = new Media3D.Transform3DGroup();
@@ -115,318 +113,169 @@ namespace Reclaimer.Controls
 
                     if (!perm.Transform.IsIdentity)
                     {
-                        var tform = new Media3D.MatrixTransform3D(new Media3D.Matrix3D
-                        {
-                            M11 = perm.Transform.M11,
-                            M12 = perm.Transform.M12,
-                            M13 = perm.Transform.M13,
-
-                            M21 = perm.Transform.M21,
-                            M22 = perm.Transform.M22,
-                            M23 = perm.Transform.M23,
-
-                            M31 = perm.Transform.M31,
-                            M32 = perm.Transform.M32,
-                            M33 = perm.Transform.M33,
-
-                            OffsetX = perm.Transform.M41,
-                            OffsetY = perm.Transform.M42,
-                            OffsetZ = perm.Transform.M43
-                        });
+                        var tform = new Media3D.MatrixTransform3D(perm.Transform.ToMatrix3D());
 
                         tform.Freeze();
                         tGroup.Children.Add(tform);
                     }
 
+                    var meshInstance = template.CreateInstance(Scene, Model);
+
                     Helix.GroupModel3D permGroup;
                     if (tGroup.Children.Count == 0 && perm.MeshCount == 1)
-                        permGroup = mesh.Element;
+                        permGroup = meshInstance;
                     else
                     {
                         permGroup = new Helix.GroupModel3D();
-                        permGroup.Children.Add(mesh.Element);
+                        permGroup.Children.Add(meshInstance);
 
                         if (tGroup.Children.Count > 0)
                             (permGroup.Transform = tGroup).Freeze();
 
                         for (int i = 1; i < perm.MeshCount; i++)
                         {
-                            var nextMesh = GetMesh(perm.MeshIndex + i);
-                            permGroup.Children.Add(nextMesh.Element);
+                            var nextTemplate = templates.ValueOrDefault(perm.MeshIndex);
+                            if (nextTemplate == null || nextTemplate.IsEmpty)
+                                continue;
+
+                            permGroup.Children.Add(nextTemplate.CreateInstance(Scene, Model));
                         }
                     }
 
-                    Element.Children.Add(permGroup);
-                    elementsByPermutation.Add(perm, permGroup);
+                    element.Children.Add(permGroup);
+                    modelInstance.AddKey(perm, permGroup);
                 }
+
             }
-        }
 
-        private MeshManager GetMesh(int index)
-        {
-            if (index < 0 || index > Model.Meshes.Count)
-                return null;
-
-            var mesh = Model.Meshes[index];
-            if (mesh.Submeshes.Count == 0)
-                return null;
-
-            var manager = new MeshManager(this, mesh);
-            meshes.Add(manager);
-
-            //var manager = meshes.ValueOrDefault(index);
-            //if (manager == null)
-            //{
-            //    var mesh = Model.Meshes[index];
-            //    if (mesh.Submeshes.Count == 0)
-            //        return null;
-
-            //    manager = new MeshManager(this, mesh);
-            //    meshes.Add(index, manager);
-            //}
-
-            return manager;
+            instances.Add(modelInstance);
+            return modelInstance;
         }
 
         public void Dispose()
         {
-            foreach (var manager in meshes)
-                manager.Dispose();
+            foreach (var instance in instances)
+            {
+                foreach (var element in instance.Element.EnumerateDescendents().Reverse().ToList())
+                {
+                    (element as Helix.GroupElement3D)?.Children.Clear();
+                    element.Dispose();
+                }
 
-            foreach (IDisposable child in Element.Children)
-                child.Dispose();
+                instance.Element.Children.Clear();
+                instance.Element.Dispose();
+            }
 
-            Element.Children.Clear();
-            Element.Dispose();
+            instances.Clear();
+        }
+
+        private class MeshTemplate
+        {
+            private readonly int submeshCount;
+            private readonly int[] matIndex;
+            private readonly Helix.IntCollection[] indices;
+            private readonly Helix.Vector3Collection[] positions;
+            private readonly Helix.Vector3Collection[] normals;
+            private readonly Helix.Vector2Collection[] texcoords;
+
+            public bool IsEmpty => submeshCount < 1;
+
+            public MeshTemplate(IGeometryModel model, int meshIndex)
+            {
+                var mesh = model.Meshes[meshIndex];
+
+                submeshCount = mesh.Submeshes.Count;
+                matIndex = new int[submeshCount];
+                indices = new Helix.IntCollection[submeshCount];
+                positions = new Helix.Vector3Collection[submeshCount];
+                normals = new Helix.Vector3Collection[submeshCount];
+                texcoords = new Helix.Vector2Collection[submeshCount];
+
+                var texMatrix = SharpDX.Matrix.Identity;
+                var boundsMatrix = SharpDX.Matrix.Identity;
+
+                if (mesh.BoundsIndex >= 0)
+                {
+                    var bounds = model.Bounds[mesh.BoundsIndex.Value];
+                    boundsMatrix = bounds.ToMatrix3();
+                    texMatrix = bounds.ToMatrix2();
+                }
+
+                for (int i = 0; i < submeshCount; i++)
+                {
+                    var sub = mesh.Submeshes[i];
+                    matIndex[i] = sub.MaterialIndex;
+
+                    var subIndices = mesh.Indicies.Skip(sub.IndexStart).Take(sub.IndexLength).ToList();
+                    if (mesh.IndexFormat == IndexFormat.TriangleStrip) subIndices = subIndices.Unstrip().ToList();
+
+                    var vertStart = subIndices.Min();
+                    var vertLength = subIndices.Max() - vertStart + 1;
+                    var subVerts = mesh.Vertices.Skip(vertStart).Take(vertLength);
+
+                    IEnumerable<SharpDX.Vector3> subPositions;
+                    if (boundsMatrix.IsIdentity)
+                        subPositions = subVerts.Select(v => v.Position[0].ToVector3());
+                    else
+                        subPositions = subVerts.Select(v => SharpDX.Vector3.TransformCoordinate(v.Position[0].ToVector3(), boundsMatrix));
+
+                    IEnumerable<SharpDX.Vector2> subTexcoords;
+                    if (texMatrix.IsIdentity)
+                        subTexcoords = subVerts.Select(v => v.TexCoords[0].ToVector2());
+                    else
+                        subTexcoords = subVerts.Select(v => SharpDX.Vector2.TransformCoordinate(v.TexCoords[0].ToVector2(), texMatrix));
+
+                    indices[i] = new Helix.IntCollection(subIndices.Select(j => j - vertStart));
+                    positions[i] = new Helix.Vector3Collection(subPositions);
+                    texcoords[i] = new Helix.Vector2Collection(subTexcoords);
+
+                    if (mesh.Vertices[0].Normal.Count > 0)
+                    {
+                        var subNormals = subVerts.Select(v => new SharpDX.Vector3(v.Normal[0].X, v.Normal[0].Y, v.Normal[0].Z));
+                        normals[i] = new Helix.Vector3Collection(subNormals);
+                    }
+                }
+            }
+
+            public Helix.GroupModel3D CreateInstance(SceneManager manager, IGeometryModel model)
+            {
+                var group = new Helix.GroupModel3D();
+
+                for (int i = 0; i < submeshCount; i++)
+                {
+                    var geom = new Helix.MeshGeometry3D
+                    {
+                        Indices = indices[i],
+                        Positions = positions[i],
+                        Normals = normals[i],
+                        TextureCoordinates = texcoords[i]
+                    };
+
+                    group.Children.Add(new Helix.MeshGeometryModel3D
+                    {
+                        Geometry = geom,
+                        Material = manager.LoadMaterial(model, matIndex[i])
+                    });
+                }
+
+                return group;
+            }
         }
     }
 
-    public class MeshManager : IDisposable
+    public class ModelInstance
     {
-        public ModelManager Parent { get; }
+        private readonly Dictionary<object, Helix.Element3D> lookup = new Dictionary<object, Helix.Element3D>();
+
         public Helix.GroupModel3D Element { get; }
-        //public InstanceCollection Instances { get; }
 
-        public MeshManager(ModelManager parent, IGeometryMesh mesh)
+        internal ModelInstance(Helix.GroupModel3D element)
         {
-            Parent = parent;
-            //Instances = new InstanceCollection(parent, mesh);
-            //Element = Instances.MeshGroup;
-            Element = new Helix.GroupModel3D();
-            LoadMesh(mesh);
+            Element = element;
         }
 
-        private void LoadMesh(IGeometryMesh mesh)
-        {
-            var texMatrix = SharpDX.Matrix.Identity;
-            var boundsMatrix = System.Windows.Media.Media3D.Matrix3D.Identity;
+        internal void AddKey(object key, Helix.Element3D value) => lookup.Add(key, value);
 
-            #region Get Transforms
-            if (mesh.BoundsIndex >= 0)
-            {
-                var bounds = Parent.Model.Bounds[mesh.BoundsIndex.Value];
-
-                texMatrix = new SharpDX.Matrix
-                {
-                    M11 = bounds.UBounds.Length,
-                    M22 = bounds.VBounds.Length,
-                    M41 = bounds.UBounds.Min,
-                    M42 = bounds.VBounds.Min,
-                    M44 = 1
-                };
-
-                boundsMatrix = new System.Windows.Media.Media3D.Matrix3D
-                {
-                    M11 = bounds.XBounds.Length,
-                    M22 = bounds.YBounds.Length,
-                    M33 = bounds.ZBounds.Length,
-                    OffsetX = bounds.XBounds.Min,
-                    OffsetY = bounds.YBounds.Min,
-                    OffsetZ = bounds.ZBounds.Min
-                };
-            }
-            #endregion
-
-            for (int i = 0; i < mesh.Submeshes.Count; i++)
-            {
-                var sub = mesh.Submeshes[i];
-                var geom = new Helix.MeshGeometry3D();
-
-                var indices = mesh.Indicies.Skip(sub.IndexStart).Take(sub.IndexLength).ToList();
-                if (mesh.IndexFormat == IndexFormat.TriangleStrip) indices = indices.Unstrip().ToList();
-
-                var vertStart = indices.Min();
-                var vertLength = indices.Max() - vertStart + 1;
-
-                var verts = mesh.Vertices.Skip(vertStart).Take(vertLength);
-                var positions = verts.Select(v => new SharpDX.Vector3(v.Position[0].X, v.Position[0].Y, v.Position[0].Z));
-                //if (!boundsMatrix.IsIdentity) positions = positions.Select(v => SharpDX.Vector3.TransformCoordinate(v, boundsMatrix));
-
-                var texcoords = verts.Select(v => new SharpDX.Vector2(v.TexCoords[0].X, v.TexCoords[0].Y));
-                if (!texMatrix.IsIdentity) texcoords = texcoords.Select(v => SharpDX.Vector2.TransformCoordinate(v, texMatrix));
-
-                geom.Positions = new Helix.Vector3Collection(positions);
-                geom.TextureCoordinates = new Helix.Vector2Collection(texcoords);
-                geom.Indices = new Helix.IntCollection(indices.Select(j => j - vertStart));
-
-                if (mesh.Vertices[0].Normal.Count > 0)
-                {
-                    var normals = verts.Select(v => new SharpDX.Vector3(v.Normal[0].X, v.Normal[0].Y, v.Normal[0].Z));
-                    geom.Normals = new Helix.Vector3Collection(normals);
-                }
-
-                var data = new Helix.MeshGeometryModel3D()
-                {
-                    Transform = new System.Windows.Media.Media3D.MatrixTransform3D(boundsMatrix),
-                    Geometry = geom,
-                    Material = Parent.Scene.LoadMaterial(Parent.Model, sub.MaterialIndex),
-                    CullMode = SharpDX.Direct3D11.CullMode.None,
-                };
-
-                Element.Children.Add(data);
-            }
-        }
-
-        public void Dispose()
-        {
-            foreach (IDisposable mesh in Element.Children)
-                mesh.Dispose();
-
-            Element.Children.Clear();
-            Element.Dispose();
-        }
+        public Helix.Element3D FindElement(object tag) => lookup.ValueOrDefault(tag);
     }
-
-    //public class InstanceCollection : Collection<SharpDX.Matrix>
-    //{
-    //    private readonly Helix.InstancingMeshGeometryModel3D[] rootInstances;
-
-    //    public Helix.GroupModel3D MeshGroup { get; }
-
-    //    public InstanceCollection(ModelManager parent, IGeometryMesh mesh)
-    //    {
-    //        rootInstances = new Helix.InstancingMeshGeometryModel3D[mesh.Submeshes.Count];
-
-    //        MeshGroup = new Helix.GroupModel3D();
-
-    //        var texMatrix = SharpDX.Matrix.Identity;
-    //        var boundsMatrix = System.Windows.Media.Media3D.Matrix3D.Identity;
-
-    //        #region Get Transforms
-    //        if (mesh.BoundsIndex >= 0)
-    //        {
-    //            var bounds = parent.Model.Bounds[mesh.BoundsIndex.Value];
-
-    //            texMatrix = new SharpDX.Matrix
-    //            {
-    //                M11 = bounds.UBounds.Length,
-    //                M22 = bounds.VBounds.Length,
-    //                M41 = bounds.UBounds.Min,
-    //                M42 = bounds.VBounds.Min,
-    //                M44 = 1
-    //            };
-
-    //            boundsMatrix = new System.Windows.Media.Media3D.Matrix3D
-    //            {
-    //                M11 = bounds.XBounds.Length,
-    //                M22 = bounds.YBounds.Length,
-    //                M33 = bounds.ZBounds.Length,
-    //                OffsetX = bounds.XBounds.Min,
-    //                OffsetY = bounds.YBounds.Min,
-    //                OffsetZ = bounds.ZBounds.Min
-    //            };
-    //        }
-    //        #endregion
-
-    //        for (int i = 0; i < mesh.Submeshes.Count; i++)
-    //        {
-    //            var sub = mesh.Submeshes[i];
-    //            var geom = new Helix.MeshGeometry3D();
-
-    //            var indices = mesh.Indicies.Skip(sub.IndexStart).Take(sub.IndexLength).ToList();
-    //            if (mesh.IndexFormat == IndexFormat.TriangleStrip) indices = indices.Unstrip().ToList();
-
-    //            var vertStart = indices.Min();
-    //            var vertLength = indices.Max() - vertStart + 1;
-
-    //            var verts = mesh.Vertices.Skip(vertStart).Take(vertLength);
-    //            var positions = verts.Select(v => new SharpDX.Vector3(v.Position[0].X, v.Position[0].Y, v.Position[0].Z));
-    //            //if (!boundsMatrix.IsIdentity) positions = positions.Select(v => SharpDX.Vector3.TransformCoordinate(v, boundsMatrix));
-
-    //            var texcoords = verts.Select(v => new SharpDX.Vector2(v.TexCoords[0].X, v.TexCoords[0].Y));
-    //            if (!texMatrix.IsIdentity) texcoords = texcoords.Select(v => SharpDX.Vector2.TransformCoordinate(v, texMatrix));
-
-    //            geom.Positions = new Helix.Vector3Collection(positions);
-    //            geom.TextureCoordinates = new Helix.Vector2Collection(texcoords);
-    //            geom.Indices = new Helix.IntCollection(indices.Select(j => j - vertStart));
-
-    //            if (mesh.Vertices[0].Normal.Count > 0)
-    //            {
-    //                var normals = verts.Select(v => new SharpDX.Vector3(v.Normal[0].X, v.Normal[0].Y, v.Normal[0].Z));
-    //                geom.Normals = new Helix.Vector3Collection(normals);
-    //            }
-
-    //            rootInstances[i] = new Helix.InstancingMeshGeometryModel3D()
-    //            {
-    //                Transform = new System.Windows.Media.Media3D.MatrixTransform3D(boundsMatrix),
-    //                Geometry = geom,
-    //                Material = parent.Scene.LoadMaterial(parent.Model, sub.MaterialIndex),
-    //                CullMode = SharpDX.Direct3D11.CullMode.None,
-    //                OctreeManager = new Helix.InstancingModel3DOctreeManager(),
-    //                Instances = new List<SharpDX.Matrix>(),
-    //                InstanceParamArray = new List<Helix.InstanceParameter>(),
-    //            };
-
-    //            MeshGroup.Children.Add(rootInstances[i]);
-    //        }
-    //    }
-
-    //    #region Overrides
-    //    protected override void InsertItem(int index, SharpDX.Matrix item)
-    //    {
-    //        base.InsertItem(index, item);
-
-    //        foreach (var subMesh in rootInstances)
-    //        {
-    //            subMesh.Instances.Insert(index, item);
-    //            subMesh.InstanceParamArray.Insert(index, new Helix.InstanceParameter
-    //            {
-    //                 DiffuseColor = new SharpDX.Color4(1,1,1,1),
-    //                 EmissiveColor = new SharpDX.Color4(1,1,1,1),
-    //                  TexCoordOffset = new SharpDX.Vector2(0,0)
-    //            });
-    //        }
-    //    }
-
-    //    protected override void RemoveItem(int index)
-    //    {
-    //        base.RemoveItem(index);
-
-    //        foreach (var subMesh in rootInstances)
-    //        {
-    //            subMesh.Instances.RemoveAt(index);
-    //            subMesh.InstanceParamArray.RemoveAt(index);
-    //        }
-    //    }
-
-    //    protected override void SetItem(int index, SharpDX.Matrix item)
-    //    {
-    //        base.SetItem(index, item);
-
-    //        foreach (var subMesh in rootInstances)
-    //            subMesh.Instances[index] = item;
-    //    }
-
-    //    protected override void ClearItems()
-    //    {
-    //        base.ClearItems();
-
-    //        foreach (var subMesh in rootInstances)
-    //        {
-    //            subMesh.Instances.Clear();
-    //            subMesh.InstanceParamArray.Clear();
-    //        }
-    //    }
-    //    #endregion
-    //}
 }

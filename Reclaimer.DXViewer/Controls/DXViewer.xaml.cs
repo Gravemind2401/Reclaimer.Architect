@@ -119,7 +119,8 @@ namespace Reclaimer.Controls
 
             scene = new SceneManager();
             manager = new ModelManager(scene, model);
-            modelGroup.Children.Add(manager.Element);
+            var instance = manager.CreateInstance();
+            modelGroup.Children.Add(instance.Element);
 
             foreach (var region in model.Regions)
             {
@@ -127,7 +128,7 @@ namespace Reclaimer.Controls
 
                 foreach (var perm in region.Permutations)
                 {
-                    var element = manager.GetElement(perm);
+                    var element = instance.FindElement(perm);
                     if (element == null)
                         continue;
 
