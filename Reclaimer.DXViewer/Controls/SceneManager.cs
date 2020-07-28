@@ -8,8 +8,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using static HelixToolkit.Wpf.SharpDX.Media3DExtension;
+
+using Media = System.Windows.Media;
 using Media3D = System.Windows.Media.Media3D;
 using Helix = HelixToolkit.Wpf.SharpDX;
+using System.Windows;
 
 namespace Reclaimer.Controls
 {
@@ -86,7 +90,7 @@ namespace Reclaimer.Controls
             Model = model;
 
             for (int i = 0; i < model.Meshes.Count; i++)
-                templates.Add(i, new MeshTemplate(model, i));
+                templates.Add(i, MeshTemplate.FromModel(model, i));
         }
 
         public ModelInstance CreateInstance()
@@ -119,6 +123,18 @@ namespace Reclaimer.Controls
                         tGroup.Children.Add(tform);
                     }
 
+                    var it = template as InstanceTemplate;
+                    if (it != null)
+                    {
+                        var root = it.CreateInstance(Scene, Model);
+                        if (it.InstanceCount == 0)
+                            element.Children.Add(root);
+
+                        var id = it.AddInstance(tGroup.ToMatrix());
+                        modelInstance.AddKey(perm, root);
+                        continue;
+                    }
+
                     var meshInstance = template.CreateInstance(Scene, Model);
 
                     Helix.GroupModel3D permGroup;
@@ -145,8 +161,10 @@ namespace Reclaimer.Controls
                     element.Children.Add(permGroup);
                     modelInstance.AddKey(perm, permGroup);
                 }
-
             }
+
+            foreach (var inst in templates.OfType<InstanceTemplate>())
+                inst.RefreshInstances();
 
             instances.Add(modelInstance);
             return modelInstance;
@@ -171,19 +189,36 @@ namespace Reclaimer.Controls
 
         private class MeshTemplate
         {
-            private readonly int submeshCount;
-            private readonly int[] matIndex;
-            private readonly Helix.IntCollection[] indices;
-            private readonly Helix.Vector3Collection[] positions;
-            private readonly Helix.Vector3Collection[] normals;
-            private readonly Helix.Vector2Collection[] texcoords;
+            protected readonly int submeshCount;
+            protected readonly int[] matIndex;
+            protected readonly Helix.IntCollection[] indices;
+            protected readonly Helix.Vector3Collection[] positions;
+            protected readonly Helix.Vector3Collection[] normals;
+            protected readonly Helix.Vector2Collection[] texcoords;
 
             public bool IsEmpty => submeshCount < 1;
 
-            public MeshTemplate(IGeometryModel model, int meshIndex)
+            public static MeshTemplate FromModel(IGeometryModel model, int meshIndex)
             {
                 var mesh = model.Meshes[meshIndex];
 
+                if (mesh.IsInstancing)
+                    return new InstanceTemplate(model, mesh);
+                else return new MeshTemplate(model, mesh);
+            }
+
+            protected MeshTemplate(MeshTemplate copy)
+            {
+                submeshCount = copy.submeshCount;
+                matIndex = copy.matIndex;
+                indices = copy.indices;
+                positions = copy.positions;
+                normals = copy.normals;
+                texcoords = copy.texcoords;
+            }
+
+            public MeshTemplate(IGeometryModel model, IGeometryMesh mesh)
+            {
                 submeshCount = mesh.Submeshes.Count;
                 matIndex = new int[submeshCount];
                 indices = new Helix.IntCollection[submeshCount];
@@ -237,7 +272,7 @@ namespace Reclaimer.Controls
                 }
             }
 
-            public Helix.GroupModel3D CreateInstance(SceneManager manager, IGeometryModel model)
+            public virtual Helix.GroupModel3D CreateInstance(SceneManager manager, IGeometryModel model)
             {
                 var group = new Helix.GroupModel3D();
 
@@ -261,11 +296,113 @@ namespace Reclaimer.Controls
                 return group;
             }
         }
+
+        private class InstanceTemplate : MeshTemplate
+        {
+            private static readonly Helix.InstancingModel3DOctreeManager octreeManager = new Helix.InstancingModel3DOctreeManager();
+
+            private readonly Helix.InstanceParameter defaultInstanceParam = new Helix.InstanceParameter
+            {
+                DiffuseColor = Media.Colors.White.ToColor4(),
+                EmissiveColor = Media.Colors.Black.ToColor4(),
+                TexCoordOffset = SharpDX.Vector2.Zero
+            };
+
+            private readonly List<Guid> identifiers = new List<Guid>();
+            private readonly List<SharpDX.Matrix> instances = new List<SharpDX.Matrix>();
+            private readonly List<Helix.InstanceParameter> instanceParams = new List<Helix.InstanceParameter>();
+
+            private readonly Helix.InstancingMeshGeometryModel3D[] rootMeshes;
+
+            private Helix.GroupModel3D group;
+
+            public InstanceTemplate(IGeometryModel model, IGeometryMesh mesh)
+                : base(model, mesh)
+            {
+                rootMeshes = new Helix.InstancingMeshGeometryModel3D[submeshCount];
+            }
+
+            private InstanceTemplate(InstanceTemplate copy)
+                : base(copy)
+            {
+                identifiers = new List<Guid>();
+                instances = new List<SharpDX.Matrix>();
+                instanceParams = new List<Helix.InstanceParameter>();
+            }
+
+            public override Helix.GroupModel3D CreateInstance(SceneManager manager, IGeometryModel model)
+            {
+                if (group != null)
+                    return group;
+
+                group = new Helix.GroupModel3D();
+
+                for (int i = 0; i < submeshCount; i++)
+                {
+                    var geom = new Helix.MeshGeometry3D
+                    {
+                        Indices = indices[i],
+                        Positions = positions[i],
+                        Normals = normals[i],
+                        TextureCoordinates = texcoords[i]
+                    };
+
+                    group.Children.Add(rootMeshes[i] = new Helix.InstancingMeshGeometryModel3D
+                    {
+                        Geometry = geom,
+                        Material = manager.LoadMaterial(model, matIndex[i]),
+                        OctreeManager = new Helix.InstancingModel3DOctreeManager()
+                    });
+                }
+
+                return group;
+            }
+
+            public int InstanceCount => instances.Count;
+
+            public InstanceTemplate Copy() => new InstanceTemplate(this);
+
+            public Guid AddInstance(SharpDX.Matrix matrix)
+            {
+                var id = Guid.NewGuid();
+
+                identifiers.Add(id);
+                instances.Add(matrix);
+                instanceParams.Add(defaultInstanceParam);
+
+                return id;
+            }
+
+            public void RemoveInstance(Guid id)
+            {
+                var index = identifiers.IndexOf(id);
+
+                identifiers.RemoveAt(index);
+                instances.RemoveAt(index);
+                instanceParams.RemoveAt(index);
+            }
+
+            public void RefreshInstances()
+            {
+                var idArray = identifiers.ToArray();
+                var instArray = instances.ToArray();
+                var paramArray = instanceParams.ToArray();
+
+                for (int i = 0; i < submeshCount; i++)
+                {
+                    rootMeshes[i].InstanceIdentifiers = idArray;
+                    rootMeshes[i].Instances = instArray;
+                    rootMeshes[i].InstanceParamArray = paramArray;
+                    rootMeshes[i].InvalidateRender();
+                }
+            }
+        }
     }
 
     public class ModelInstance
     {
-        private readonly Dictionary<object, Helix.Element3D> lookup = new Dictionary<object, Helix.Element3D>();
+        private readonly Dictionary<object, Helix.Element3D> tagLookup = new Dictionary<object, Helix.Element3D>();
+        private readonly Dictionary<object, Guid> instanceLookup = new Dictionary<object, Guid>();
 
         public Helix.GroupModel3D Element { get; }
 
@@ -274,8 +411,18 @@ namespace Reclaimer.Controls
             Element = element;
         }
 
-        internal void AddKey(object key, Helix.Element3D value) => lookup.Add(key, value);
+        internal void AddKey(object key, Helix.Element3D value) => tagLookup.Add(key, value);
 
-        public Helix.Element3D FindElement(object tag) => lookup.ValueOrDefault(tag);
+        internal void AddInstanceKey(object key, Guid value) => instanceLookup.Add(key, value);
+
+        public Helix.Element3D FindElement(object key) => tagLookup.ValueOrDefault(key);
+
+        public void SetElementVisible(object key, bool visible)
+        {
+            var instanceId = instanceLookup.ValueOrDefault(key);
+
+            var element = tagLookup.ValueOrDefault(key);
+            element.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
+        }
     }
 }
