@@ -1,5 +1,4 @@
 ﻿using Adjutant.Spatial;
-using HelixToolkit.Wpf.SharpDX;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,17 +11,20 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Threading;
-using Keys = System.Windows.Forms.Keys;
 
+using Keys = System.Windows.Forms.Keys;
 using NativeMethods = Reclaimer.Utilities.NativeMethods;
+
+using static HelixToolkit.Wpf.SharpDX.Media3DExtension;
+
 using Helix = HelixToolkit.Wpf.SharpDX;
+using Media3D = System.Windows.Media.Media3D;
 
 namespace Reclaimer.Controls
 {
-    [TemplatePart(Name = PART_Viewport, Type = typeof(Viewport3DX))]
+    [TemplatePart(Name = PART_Viewport, Type = typeof(Helix.Viewport3DX))]
     public class DXRenderer : Control, IDisposable
     {
         private const string PART_Viewport = "PART_Viewport";
@@ -32,12 +34,9 @@ namespace Reclaimer.Controls
         private const double RAD_360 = 6.2831853072;
         private const double SpeedMultipler = 0.001;
 
-        private static readonly EffectsManager effectsManager = new DefaultEffectsManager();
+        private static readonly Helix.EffectsManager effectsManager = new Helix.DefaultEffectsManager();
 
         #region Dependency Properties
-
-        //public static readonly DependencyProperty EffectsManagerProperty =
-        //    DependencyProperty.Register(nameof(EffectsManager), typeof(EffectsManager), typeof(DXRenderer), new PropertyMetadata(effectsManager));
 
         public static readonly DependencyProperty CameraProperty =
             DependencyProperty.Register(nameof(Camera), typeof(Helix.PerspectiveCamera), typeof(DXRenderer), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
@@ -54,12 +53,6 @@ namespace Reclaimer.Controls
             DependencyProperty.RegisterReadOnly(nameof(Pitch), typeof(double), typeof(DXRenderer), new PropertyMetadata(0.0));
 
         public static readonly DependencyProperty PitchProperty = PitchPropertyKey.DependencyProperty;
-
-        //public EffectsManager EffectsManager
-        //{
-        //    get { return (EffectsManager)GetValue(EffectsManagerProperty); }
-        //    set { SetValue(EffectsManagerProperty, value); }
-        //}
 
         public Helix.PerspectiveCamera Camera
         {
@@ -97,8 +90,8 @@ namespace Reclaimer.Controls
 
         private Point lastPoint;
 
-        private Viewport3DX Viewport { get; set; }
-        private readonly List<Element3D> children = new List<Element3D>();
+        private Helix.Viewport3DX Viewport { get; set; }
+        private readonly List<Helix.Element3D> children = new List<Helix.Element3D>();
 
         public DXRenderer() : base()
         {
@@ -109,9 +102,9 @@ namespace Reclaimer.Controls
 
             Camera = new Helix.PerspectiveCamera
             {
-                Position = new Point3D(),
-                LookDirection = new Vector3D(1, 0, 0),
-                UpDirection = new Vector3D(0, 0, 1)
+                Position = new Media3D.Point3D(),
+                LookDirection = new Media3D.Vector3D(1, 0, 0),
+                UpDirection = new Media3D.Vector3D(0, 0, 1)
             };
         }
 
@@ -121,7 +114,7 @@ namespace Reclaimer.Controls
             base.OnApplyTemplate();
 
             OnViewportUnset();
-            Viewport = Template.FindName(PART_Viewport, this) as Viewport3DX;
+            Viewport = Template.FindName(PART_Viewport, this) as Helix.Viewport3DX;
             OnViewportSet();
         }
 
@@ -242,7 +235,7 @@ namespace Reclaimer.Controls
             //MaxFarPlaneDistance = Math.Max(MinFarPlaneDistance, Math.Ceiling(len * 3));
         }
 
-        public void LocateObject(GroupModel3D m)
+        public void LocateObject(Helix.GroupModel3D m)
         {
             var boundsList = new List<SharpDX.BoundingBox>();
             GetNodeBounds(m.SceneNode, boundsList);
@@ -263,13 +256,13 @@ namespace Reclaimer.Controls
             ZoomToBounds(bounds);
         }
 
-        public void AddChild(Element3D child)
+        public void AddChild(Helix.Element3D child)
         {
             children.Add(child);
             Viewport?.Items.Add(child);
         }
 
-        public void RemoveChild(Element3D child)
+        public void RemoveChild(Helix.Element3D child)
         {
             children.Remove(child);
             Viewport?.Items.Remove(child);
@@ -299,12 +292,12 @@ namespace Reclaimer.Controls
 
         private void ZoomToBounds(SharpDX.BoundingBox bounds)
         {
-            Viewport.ZoomExtents(new Rect3D(bounds.Minimum.ToPoint3D(), bounds.Size.ToSize3D()), 0);
+            Viewport.ZoomExtents(new Media3D.Rect3D(bounds.Minimum.ToPoint3D(), bounds.Size.ToSize3D()), 0);
 
             if (bounds.Size.X / 2 > bounds.Size.Y)
-                Viewport.ChangeDirection(new Vector3D(0, -1, 0), Camera.UpDirection, 0);
+                Viewport.ChangeDirection(new Media3D.Vector3D(0, -1, 0), Camera.UpDirection, 0);
             else
-                Viewport.ChangeDirection(new Vector3D(-1, 0, 0), Camera.UpDirection, 0);
+                Viewport.ChangeDirection(new Media3D.Vector3D(-1, 0, 0), Camera.UpDirection, 0);
         }
 
         private void ZoomToBounds(RealBounds3D bounds)
@@ -315,19 +308,19 @@ namespace Reclaimer.Controls
 
             if (bounds.XBounds.Length / 2 > bounds.YBounds.Length) //side view for long models like weapons
             {
-                var p = new Point3D(
+                var p = new Media3D.Point3D(
                     bounds.XBounds.Midpoint,
                     bounds.YBounds.Max + len * 0.5,
                     bounds.ZBounds.Midpoint);
-                MoveCamera(p, new Vector3D(0, 0, -2));
+                MoveCamera(p, new Media3D.Vector3D(0, 0, -2));
             }
             else //normal camera position
             {
-                var p = new Point3D(
+                var p = new Media3D.Point3D(
                     bounds.XBounds.Max + len * 0.5,
                     bounds.YBounds.Midpoint,
                     bounds.ZBounds.Midpoint);
-                MoveCamera(p, new Vector3D(-1, 0, 0));
+                MoveCamera(p, new Media3D.Vector3D(-1, 0, 0));
             }
         }
 
@@ -340,7 +333,7 @@ namespace Reclaimer.Controls
             //Pitch = Math.Atan(LookDirection.Y);
         }
 
-        private void MoveCamera(Point3D position, Vector3D direction)
+        private void MoveCamera(Media3D.Point3D position, Media3D.Vector3D direction)
         {
             Camera.Position = position;
             Camera.LookDirection = direction;
@@ -445,7 +438,7 @@ namespace Reclaimer.Controls
             Yaw %= RAD_360;
             Pitch = ClipValue(Pitch, -RAD_089, RAD_089);
 
-            Camera.LookDirection = new Vector3D(Math.Sin(Yaw), Math.Cos(Yaw), Math.Tan(Pitch));
+            Camera.LookDirection = new Media3D.Vector3D(Math.Sin(Yaw), Math.Cos(Yaw), Math.Tan(Pitch));
             NativeMethods.SetCursorPos((int)lastPoint.X, (int)lastPoint.Y);
         }
 
