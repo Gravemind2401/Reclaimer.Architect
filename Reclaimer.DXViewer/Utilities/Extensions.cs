@@ -77,5 +77,16 @@ namespace Reclaimer.Utilities
 
             return descendents;
         }
+
+        public static T[] ToArray<T>(this IEnumerable<T> source, int size)
+        {
+            var result = new T[size];
+
+            int i = 0;
+            foreach (var item in source)
+                result[i++] = item;
+
+            return result;
+        }
     }
 }

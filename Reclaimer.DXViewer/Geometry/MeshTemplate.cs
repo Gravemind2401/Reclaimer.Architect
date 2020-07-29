@@ -25,6 +25,8 @@ namespace Reclaimer.Geometry
 
         public bool IsEmpty => submeshCount < 1;
 
+        public virtual bool IsInstancing => false;
+
         public static MeshTemplate FromModel(IGeometryModel model, int meshIndex)
         {
             var mesh = model.Meshes[meshIndex];
@@ -122,27 +124,40 @@ namespace Reclaimer.Geometry
 
             return group;
         }
+
+        public virtual MeshTemplate Copy() => new MeshTemplate(this);
+
+        public virtual Guid AddInstance(SharpDX.Matrix matrix)
+        {
+            throw new InvalidOperationException();
+        }
+
+        public virtual void SetInstanceVisible(Guid id, bool visible)
+        {
+            throw new InvalidOperationException();
+        }
+
+        public virtual void UpdateInstances()
+        {
+            throw new InvalidOperationException();
+        }
     }
 
     internal class InstancedMeshTemplate : MeshTemplate
     {
-        private static readonly Helix.InstancingModel3DOctreeManager octreeManager = new Helix.InstancingModel3DOctreeManager();
-
-        private static readonly Helix.InstanceParameter defaultInstanceParam = new Helix.InstanceParameter
+        private static readonly Helix.InstanceParameter defaultInstanceParams = new Helix.InstanceParameter
         {
             DiffuseColor = Media.Colors.White.ToColor4(),
             EmissiveColor = Media.Colors.Black.ToColor4(),
             TexCoordOffset = SharpDX.Vector2.Zero
         };
 
-        private readonly List<Guid> identifiers = new List<Guid>();
-        private readonly List<SharpDX.Matrix> instances = new List<SharpDX.Matrix>();
-        private readonly List<Helix.InstanceParameter> instanceParams = new List<Helix.InstanceParameter>();
+        private readonly List<InstanceDetails> instances = new List<InstanceDetails>();
         private readonly Helix.InstancingMeshGeometryModel3D[] rootMeshes;
 
         private Helix.GroupModel3D group;
 
-        public int InstanceCount => instances.Count;
+        public override bool IsInstancing => true;
 
         internal InstancedMeshTemplate(IGeometryModel model, IGeometryMesh mesh)
             : base(model, mesh)
@@ -153,9 +168,8 @@ namespace Reclaimer.Geometry
         protected InstancedMeshTemplate(InstancedMeshTemplate copy)
             : base(copy)
         {
-            identifiers = new List<Guid>();
-            instances = new List<SharpDX.Matrix>();
-            instanceParams = new List<Helix.InstanceParameter>();
+            instances = new List<InstanceDetails>();
+            rootMeshes = new Helix.InstancingMeshGeometryModel3D[submeshCount];
         }
 
         public override Helix.GroupModel3D GenerateModel(SceneManager manager, IGeometryModel model)
@@ -186,33 +200,39 @@ namespace Reclaimer.Geometry
             return group;
         }
 
-        public InstancedMeshTemplate Copy() => new InstancedMeshTemplate(this);
+        public override MeshTemplate Copy() => new InstancedMeshTemplate(this);
 
-        public Guid AddInstance(SharpDX.Matrix matrix)
+        public override Guid AddInstance(SharpDX.Matrix matrix)
         {
-            var id = Guid.NewGuid();
+            var instance = new InstanceDetails
+            {
+                Id = Guid.NewGuid(),
+                IsVisible = true,
+                Transform = matrix,
+                InstanceParams = defaultInstanceParams
+            };
 
-            identifiers.Add(id);
-            instances.Add(matrix);
-            instanceParams.Add(defaultInstanceParam);
+            instances.Add(instance);
 
-            return id;
+            return instance.Id;
         }
 
-        public void RemoveInstance(Guid id)
+        public override void SetInstanceVisible(Guid id, bool visible)
         {
-            var index = identifiers.IndexOf(id);
-
-            identifiers.RemoveAt(index);
-            instances.RemoveAt(index);
-            instanceParams.RemoveAt(index);
+            var instance = instances.FirstOrDefault(i => i.Id == id);
+            instance.IsVisible = visible;
         }
 
-        public void UpdateInstances()
+        public override void UpdateInstances()
         {
-            var idArray = identifiers.ToArray();
-            var instArray = instances.ToArray();
-            var paramArray = instanceParams.ToArray();
+            //instance properties on the mesh are not observable and
+            //need to be assigned a new value for any changes to happen
+
+            var visible = instances.Where(i => i.IsVisible).ToList();
+
+            var idArray = visible.Select(i => i.Id).ToArray(visible.Count);
+            var instArray = visible.Select(i => i.Transform).ToArray(visible.Count);
+            var paramArray = visible.Select(i => i.InstanceParams).ToArray(visible.Count);
 
             for (int i = 0; i < submeshCount; i++)
             {
@@ -221,6 +241,14 @@ namespace Reclaimer.Geometry
                 rootMeshes[i].InstanceParamArray = paramArray;
                 rootMeshes[i].InvalidateRender();
             }
+        }
+
+        private class InstanceDetails
+        {
+            public Guid Id { get; set; }
+            public bool IsVisible { get; set; }
+            public SharpDX.Matrix Transform { get; set; }
+            public Helix.InstanceParameter InstanceParams { get; set; }
         }
     }
 }

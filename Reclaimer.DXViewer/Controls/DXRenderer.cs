@@ -247,27 +247,19 @@ namespace Reclaimer.Controls
             var boundsList = new List<SharpDX.BoundingBox>();
             GetNodeBounds(m.SceneNode, boundsList);
 
-            var bounds = new RealBounds3D
-            {
-                XBounds = new RealBounds
-                {
-                    Min = boundsList.Min(b => b.Minimum.X),
-                    Max = boundsList.Max(b => b.Maximum.X)
-                },
+            var min = new SharpDX.Vector3(
+                boundsList.Min(b => b.Minimum.X),
+                boundsList.Min(b => b.Minimum.Y),
+                boundsList.Min(b => b.Minimum.Z)
+            );
 
-                YBounds = new RealBounds
-                {
-                    Min = boundsList.Min(b => b.Minimum.Y),
-                    Max = boundsList.Max(b => b.Maximum.Y)
-                },
+            var max = new SharpDX.Vector3(
+                boundsList.Max(b => b.Maximum.X),
+                boundsList.Max(b => b.Maximum.Y),
+                boundsList.Max(b => b.Maximum.Z)
+            );
 
-                ZBounds = new RealBounds
-                {
-                    Min = boundsList.Min(b => b.Minimum.Z),
-                    Max = boundsList.Max(b => b.Maximum.Z)
-                }
-            };
-
+            var bounds = new SharpDX.BoundingBox(min, max);
             ZoomToBounds(bounds);
         }
 

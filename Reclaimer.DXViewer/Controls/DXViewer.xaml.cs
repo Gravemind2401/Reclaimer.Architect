@@ -120,7 +120,7 @@ namespace Reclaimer.Controls
 
             scene = new SceneManager();
             manager = new ModelManager(scene, model);
-            var instance = manager.CreateInstance();
+            var instance = manager.GenerateModel();
             modelGroup.Children.Add(instance.Element);
 
             foreach (var region in model.Regions)
@@ -129,11 +129,10 @@ namespace Reclaimer.Controls
 
                 foreach (var perm in region.Permutations)
                 {
-                    var element = instance.FindElement(perm);
-                    if (element == null)
+                    if (!instance.ContainsElement(perm))
                         continue;
 
-                    var permNode = new TreeItemModel { Header = perm.Name, IsChecked = true, Tag = element };
+                    var permNode = new TreeItemModel { Header = perm.Name, IsChecked = true, Tag = perm };
                     regNode.Items.Add(permNode);
                 }
 
@@ -420,8 +419,7 @@ namespace Reclaimer.Controls
                     parent.IsChecked = false;
                 else parent.IsChecked = null;
 
-                var group = item.Tag as Helix.GroupModel3D;
-                group.Visibility = item.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
+                manager.Instances[0].SetElementVisible(item.Tag, item.IsChecked ?? false);
                 //if (item.IsChecked == true)
                 //    modelGroup.Children.Add(group);
                 //else
@@ -431,9 +429,8 @@ namespace Reclaimer.Controls
             {
                 foreach (TreeItemModel i in item.Items)
                 {
-                    var group = i.Tag as Helix.GroupModel3D;
                     i.IsChecked = item.IsChecked;
-                    group.Visibility = item.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
+                    manager.Instances[0].SetElementVisible(i.Tag, item.IsChecked ?? false);
                     //if (i.IsChecked == true)
                     //    modelGroup.Children.Add(group);
                     //else

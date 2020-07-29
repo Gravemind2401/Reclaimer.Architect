@@ -34,10 +34,12 @@ namespace Reclaimer.Geometry
                 templates.Add(i, MeshTemplate.FromModel(model, i));
         }
 
-        public ModelInstance CreateInstance()
+        public ModelInstance GenerateModel()
         {
             var element = new Helix.GroupModel3D();
             var modelInstance = new ModelInstance(element);
+
+            var instanceTemp = new Dictionary<int, MeshTemplate>();
 
             foreach (var region in Model.Regions)
             {
@@ -64,15 +66,19 @@ namespace Reclaimer.Geometry
                         tGroup.Children.Add(tform);
                     }
 
-                    var it = template as InstancedMeshTemplate;
-                    if (it != null)
+                    if (template.IsInstancing)
                     {
-                        var root = it.GenerateModel(Scene, Model);
-                        if (it.InstanceCount == 0)
+                        var inst = instanceTemp.ValueOrDefault(perm.MeshIndex);
+                        if (inst == null)
+                        {
+                            inst = template.Copy();
+                            var root = inst.GenerateModel(Scene, Model);
                             element.Children.Add(root);
+                            instanceTemp.Add(perm.MeshIndex, inst);
+                        }
 
-                        var id = it.AddInstance(tGroup.ToMatrix());
-                        modelInstance.AddKey(perm, root);
+                        var id = inst.AddInstance(tGroup.ToMatrix());
+                        modelInstance.AddInstanceKey(perm, id, inst);
                         continue;
                     }
 
@@ -104,8 +110,7 @@ namespace Reclaimer.Geometry
                 }
             }
 
-            foreach (var inst in templates.OfType<InstancedMeshTemplate>())
-                inst.UpdateInstances();
+            modelInstance.InitInstances();
 
             instances.Add(modelInstance);
             return modelInstance;
@@ -131,8 +136,9 @@ namespace Reclaimer.Geometry
 
     public class ModelInstance
     {
+        private readonly List<MeshTemplate> instanceTemplates = new List<MeshTemplate>();
         private readonly Dictionary<object, Helix.Element3D> tagLookup = new Dictionary<object, Helix.Element3D>();
-        private readonly Dictionary<object, Guid> instanceLookup = new Dictionary<object, Guid>();
+        private readonly Dictionary<object, Tuple<Guid, MeshTemplate>> instanceLookup = new Dictionary<object, Tuple<Guid, MeshTemplate>>();
 
         public Helix.GroupModel3D Element { get; }
 
@@ -141,15 +147,33 @@ namespace Reclaimer.Geometry
             Element = element;
         }
 
+        internal void InitInstances()
+        {
+            foreach (var inst in instanceTemplates)
+                inst.UpdateInstances();
+        }
+
         internal void AddKey(object key, Helix.Element3D value) => tagLookup.Add(key, value);
 
-        internal void AddInstanceKey(object key, Guid value) => instanceLookup.Add(key, value);
+        internal void AddInstanceKey(object key, Guid value, MeshTemplate template)
+        {
+            if (!instanceTemplates.Contains(template))
+                instanceTemplates.Add(template);
 
-        public Helix.Element3D FindElement(object key) => tagLookup.ValueOrDefault(key);
+            instanceLookup.Add(key, Tuple.Create(value, template));
+        }
+
+        public bool ContainsElement(object key) => tagLookup.ContainsKey(key) || instanceLookup.ContainsKey(key);
 
         public void SetElementVisible(object key, bool visible)
         {
-            var instanceId = instanceLookup.ValueOrDefault(key);
+            var instance = instanceLookup.ValueOrDefault(key);
+            if (instance != null)
+            {
+                instance.Item2.SetInstanceVisible(instance.Item1, visible);
+                instance.Item2.UpdateInstances();
+                return;
+            }
 
             var element = tagLookup.ValueOrDefault(key);
             element.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
