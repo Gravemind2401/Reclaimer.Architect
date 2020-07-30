@@ -66,6 +66,16 @@ namespace Reclaimer.Utilities
             };
         }
 
+        public static Numerics.Vector3 ToNumericsVector3(this Media3D.Point3D point)
+        {
+            return new Numerics.Vector3((float)point.X, (float)point.Y, (float)point.Z);
+        }
+
+        public static Numerics.Vector3 ToNumericsVector3(this Media3D.Vector3D vector)
+        {
+            return new Numerics.Vector3((float)vector.X, (float)vector.Y, (float)vector.Z);
+        }
+
         public static IEnumerable<Helix.Element3D> EnumerateDescendents(this Helix.GroupElement3D group)
         {
             if (group.Children.Count == 0)
@@ -76,6 +86,43 @@ namespace Reclaimer.Utilities
                 descendents = descendents.Concat(branch.EnumerateDescendents());
 
             return descendents;
+        }
+
+        public static SharpDX.BoundingBox GetTotalBounds(this Helix.Element3D element, bool original = false)
+        {
+            return GetTotalBounds(Enumerable.Repeat(element, 1), original);
+        }
+
+        public static SharpDX.BoundingBox GetTotalBounds(this IEnumerable<Helix.Element3D> elements, bool original = false)
+        {
+            var boundsList = new List<SharpDX.BoundingBox>();
+            foreach (var element in elements)
+                CollectChildBounds(element.SceneNode, boundsList, original);
+
+            var min = new SharpDX.Vector3(
+                boundsList.Min(b => b.Minimum.X),
+                boundsList.Min(b => b.Minimum.Y),
+                boundsList.Min(b => b.Minimum.Z)
+            );
+
+            var max = new SharpDX.Vector3(
+                boundsList.Max(b => b.Maximum.X),
+                boundsList.Max(b => b.Maximum.Y),
+                boundsList.Max(b => b.Maximum.Z)
+            );
+
+            return new SharpDX.BoundingBox(min, max);
+        }
+
+        private static void CollectChildBounds(Helix.Model.Scene.SceneNode node, List<SharpDX.BoundingBox> boundsList, bool original)
+        {
+            if (node.HasBound)
+                boundsList.Add(original ? node.OriginalBounds : node.BoundsWithTransform);
+            else if (node.ItemsCount > 0)
+            {
+                foreach (var child in node.Items)
+                    CollectChildBounds(child, boundsList, original);
+            }
         }
 
         public static T[] ToArray<T>(this IEnumerable<T> source, int size)

@@ -243,6 +243,16 @@ namespace Reclaimer.Geometry
             }
         }
 
+        public SharpDX.BoundingBox GetInstanceBounds(Guid id)
+        {
+            var bounds = group.GetTotalBounds(true);
+            var instance = instances.FirstOrDefault(i => i.Id == id);
+
+            var newMin = SharpDX.Vector3.TransformCoordinate(bounds.Minimum, instance.Transform);
+            var newMax = SharpDX.Vector3.TransformCoordinate(bounds.Maximum, instance.Transform);
+            return new SharpDX.BoundingBox(newMin, newMax);
+        }
+
         private class InstanceDetails
         {
             public Guid Id { get; set; }

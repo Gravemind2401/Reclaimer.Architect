@@ -21,6 +21,7 @@
                             IsInertiaEnabled="True"
                             FixedRotationPointEnabled="True"
                             FixedRotationPoint="0,0,0"
+                            IsMoveEnabled="False"
                             ModelUpDirection="0,0,1">
                             <hx:Viewport3DX.InputBindings>
                                 <!--<KeyBinding Command="hx:ViewportCommands.ZoomExtents" Gesture="Control+E" />-->

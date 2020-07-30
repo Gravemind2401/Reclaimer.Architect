@@ -178,5 +178,17 @@ namespace Reclaimer.Geometry
             var element = tagLookup.ValueOrDefault(key);
             element.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
         }
+
+        public SharpDX.BoundingBox GetElementBounds(object key)
+        {
+            if (tagLookup.ContainsKey(key))
+                return tagLookup[key].GetTotalBounds();
+            else if (instanceLookup.ContainsKey(key))
+            {
+                var pair = instanceLookup[key];
+                return (pair.Item2 as InstancedMeshTemplate).GetInstanceBounds(pair.Item1);
+            }
+            else return default(SharpDX.BoundingBox);
+        }
     }
 }

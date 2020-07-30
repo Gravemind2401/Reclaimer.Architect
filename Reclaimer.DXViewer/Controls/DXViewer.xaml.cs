@@ -390,9 +390,8 @@ namespace Reclaimer.Controls
             if (item != tv.SelectedItem)
                 return; //because this event bubbles to the parent node
 
-            var mesh = item.Tag as Helix.GroupModel3D;
-            if (mesh != null)
-                renderer.LocateObject(mesh);
+            if (item.Tag != null)
+                renderer.ZoomToBounds(manager.Instances[0].GetElementBounds(item.Tag), 500);
         }
 
         private bool isWorking = false;
