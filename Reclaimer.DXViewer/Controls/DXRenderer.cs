@@ -49,10 +49,10 @@ namespace Reclaimer.Controls
             DependencyProperty.Register(nameof(CameraMode), typeof(Helix.CameraMode), typeof(DXRenderer), new PropertyMetadata(Helix.CameraMode.WalkAround));
 
         public static readonly DependencyProperty CameraSpeedProperty =
-            DependencyProperty.Register(nameof(CameraSpeed), typeof(double), typeof(Renderer), new PropertyMetadata(0.015));
+            DependencyProperty.Register(nameof(CameraSpeed), typeof(double), typeof(DXRenderer), new PropertyMetadata(0.015));
 
         private static readonly DependencyPropertyKey MaxCameraSpeedPropertyKey =
-            DependencyProperty.RegisterReadOnly(nameof(MaxCameraSpeed), typeof(double), typeof(Renderer), new PropertyMetadata(1.5));
+            DependencyProperty.RegisterReadOnly(nameof(MaxCameraSpeed), typeof(double), typeof(DXRenderer), new PropertyMetadata(1.5));
 
         public static readonly DependencyProperty MaxCameraSpeedProperty = MaxCameraSpeedPropertyKey.DependencyProperty;
 

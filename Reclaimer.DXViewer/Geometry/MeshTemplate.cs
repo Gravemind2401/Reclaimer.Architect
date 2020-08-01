@@ -18,12 +18,9 @@ namespace Reclaimer.Geometry
     {
         protected readonly int submeshCount;
         protected readonly int[] matIndex;
-        protected readonly Helix.IntCollection[] indices;
-        protected readonly Helix.Vector3Collection[] positions;
-        protected readonly Helix.Vector3Collection[] normals;
-        protected readonly Helix.Vector2Collection[] texcoords;
+        protected readonly Helix.MeshGeometry3D[] submeshes;
 
-        public bool IsEmpty => submeshCount < 1;
+        public bool IsEmpty => submeshes.Length < 1;
 
         public virtual bool IsInstancing => false;
 
@@ -40,20 +37,14 @@ namespace Reclaimer.Geometry
         {
             submeshCount = copy.submeshCount;
             matIndex = copy.matIndex;
-            indices = copy.indices;
-            positions = copy.positions;
-            normals = copy.normals;
-            texcoords = copy.texcoords;
+            submeshes = copy.submeshes;
         }
 
         internal MeshTemplate(IGeometryModel model, IGeometryMesh mesh)
         {
             submeshCount = mesh.Submeshes.Count;
             matIndex = new int[submeshCount];
-            indices = new Helix.IntCollection[submeshCount];
-            positions = new Helix.Vector3Collection[submeshCount];
-            normals = new Helix.Vector3Collection[submeshCount];
-            texcoords = new Helix.Vector2Collection[submeshCount];
+            submeshes = new Helix.MeshGeometry3D[submeshCount];
 
             var texMatrix = SharpDX.Matrix.Identity;
             var boundsMatrix = SharpDX.Matrix.Identity;
@@ -89,15 +80,20 @@ namespace Reclaimer.Geometry
                 else
                     subTexcoords = subVerts.Select(v => SharpDX.Vector2.TransformCoordinate(v.TexCoords[0].ToVector2(), texMatrix));
 
-                indices[i] = new Helix.IntCollection(subIndices.Select(j => j - vertStart));
-                positions[i] = new Helix.Vector3Collection(subPositions);
-                texcoords[i] = new Helix.Vector2Collection(subTexcoords);
+                submeshes[i] = new Helix.MeshGeometry3D
+                {
+                    Indices = new Helix.IntCollection(subIndices.Select(j => j - vertStart)),
+                    Positions = new Helix.Vector3Collection(subPositions),
+                    TextureCoordinates = new Helix.Vector2Collection(subTexcoords)
+                };
 
                 if (mesh.Vertices[0].Normal.Count > 0)
                 {
                     var subNormals = subVerts.Select(v => new SharpDX.Vector3(v.Normal[0].X, v.Normal[0].Y, v.Normal[0].Z));
-                    normals[i] = new Helix.Vector3Collection(subNormals);
+                    submeshes[i].Normals = new Helix.Vector3Collection(subNormals);
                 }
+
+                submeshes[i].UpdateOctree();
             }
         }
 
@@ -107,17 +103,9 @@ namespace Reclaimer.Geometry
 
             for (int i = 0; i < submeshCount; i++)
             {
-                var geom = new Helix.MeshGeometry3D
-                {
-                    Indices = indices[i],
-                    Positions = positions[i],
-                    Normals = normals[i],
-                    TextureCoordinates = texcoords[i]
-                };
-
                 group.Children.Add(new Helix.MeshGeometryModel3D
                 {
-                    Geometry = geom,
+                    Geometry = submeshes[i],
                     Material = manager.LoadMaterial(model, matIndex[i])
                 });
             }
@@ -181,19 +169,10 @@ namespace Reclaimer.Geometry
 
             for (int i = 0; i < submeshCount; i++)
             {
-                var geom = new Helix.MeshGeometry3D
-                {
-                    Indices = indices[i],
-                    Positions = positions[i],
-                    Normals = normals[i],
-                    TextureCoordinates = texcoords[i]
-                };
-
                 group.Children.Add(rootMeshes[i] = new Helix.InstancingMeshGeometryModel3D
                 {
-                    Geometry = geom,
-                    Material = manager.LoadMaterial(model, matIndex[i]),
-                    OctreeManager = new Helix.InstancingModel3DOctreeManager()
+                    Geometry = submeshes[i],
+                    Material = manager.LoadMaterial(model, matIndex[i])
                 });
             }
 

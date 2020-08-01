@@ -187,7 +187,9 @@
                 <ToggleButton Style="{StaticResource showHideStyle}"
                               HorizontalAlignment="Left" VerticalAlignment="Center"
                               Padding="2,20" Click="btnToggleDetails_Click">
-
+                    <ToggleButton.CacheMode>
+                        <BitmapCache />
+                    </ToggleButton.CacheMode>
                 </ToggleButton>
             </Grid>
         </s:SplitPanel>
