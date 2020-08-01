@@ -18,6 +18,10 @@ namespace Reclaimer.Utilities
 
         public static SharpDX.Vector3 ToVector3(this IXMVector v) => new SharpDX.Vector3(v.X, v.Y, v.Z);
 
+        public static SharpDX.Vector3 ToVector3(this IRealVector3D v) => new SharpDX.Vector3(v.X, v.Y, v.Z);
+
+        public static SharpDX.Quaternion ToQuaternion(this IRealVector4D v) => new SharpDX.Quaternion(v.X, v.Y, v.Z, v.W);
+
         public static SharpDX.Matrix ToMatrix3(this IRealBounds5D bounds)
         {
             return new SharpDX.Matrix
@@ -98,6 +102,9 @@ namespace Reclaimer.Utilities
             var boundsList = new List<SharpDX.BoundingBox>();
             foreach (var element in elements)
                 CollectChildBounds(element.SceneNode, boundsList, original);
+
+            if (!boundsList.Any())
+                return default(SharpDX.BoundingBox);
 
             var min = new SharpDX.Vector3(
                 boundsList.Min(b => b.Minimum.X),

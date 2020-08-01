@@ -119,9 +119,11 @@
     </Compile>
     <Compile Include="Controls\DXRenderer.cs" />
     <Compile Include="Geometry\CompositeGeometryModel.cs" />
+    <Compile Include="Geometry\CompositeModelManager.cs" />
     <Compile Include="Geometry\MeshTemplate.cs" />
     <Compile Include="Geometry\ModelManager.cs" />
     <Compile Include="Geometry\SceneManager.cs" />
+    <Compile Include="Utilities\CompositeModelFactory.cs" />
     <Compile Include="Utilities\Extensions.cs" />
     <Compile Include="Utilities\NativeMethods.cs" />
     <Compile Include="Plugins\DXViewerPlugin.cs" />

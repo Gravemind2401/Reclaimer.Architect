@@ -1,5 +1,4 @@
-﻿using Adjutant.Blam.Common;
-using Adjutant.Geometry;
+﻿using Adjutant.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,17 +7,29 @@ using System.Threading.Tasks;
 
 namespace Reclaimer.Geometry
 {
-    public class CompositeGeometryModel
+    public class CompositeGeometryModel : IDisposable
     {
         public IGeometryModel BaseModel { get; set; }
-        public List<GeometryModelVariant> Variants { get; set; }
+        public List<GeometryModelVariant> Variants { get; set; } = new List<GeometryModelVariant>();
+
+        public override string ToString() => BaseModel.Name;
+
+        public void Dispose()
+        {
+            BaseModel.Dispose();
+            foreach (var att in Variants.SelectMany(v => v.Attachments))
+                att.ChildModel.Dispose();
+        }
     }
 
     public class GeometryModelVariant
     {
         public string Name { get; set; }
-        public List<VariantRegion> Regions { get; set; }
-        public List<GeometryModelAttachment> Attachments { get; set; }
+        public byte[] RegionLookup { get; set; }
+        public List<VariantRegion> Regions { get; set; } = new List<VariantRegion>();
+        public List<GeometryModelAttachment> Attachments { get; set; } = new List<GeometryModelAttachment>();
+
+        public override string ToString() => Name;
     }
 
     public class VariantRegion
@@ -26,13 +37,17 @@ namespace Reclaimer.Geometry
         public string Name { get; set; }
         public int BaseRegionIndex { get; set; }
         public int ParentVariantIndex { get; set; }
-        public List<VariantPermutation> Permutations { get; set; }
+        public List<VariantPermutation> Permutations { get; set; } = new List<VariantPermutation>();
+
+        public override string ToString() => Name;
     }
 
     public class VariantPermutation
     {
         public string Name { get; set; }
         public int BasePermutationIndex { get; set; }
+
+        public override string ToString() => Name;
     }
 
     public class GeometryModelAttachment
@@ -41,18 +56,7 @@ namespace Reclaimer.Geometry
         public string ChildMarker { get; set; }
         public string ChildVariant { get; set; }
         public CompositeGeometryModel ChildModel { get; set; }
-    }
 
-    public static class CompositeModelFactory
-    {
-        private static readonly string[] SupportedTags = new[] { "hlmt", "weap", "vehi", "bipd", "scen" };
-
-        public static bool IsTagSupported(IIndexItem tag) => SupportedTags.Any(s => tag.ClassCode.ToLower() == s);
-
-        public static bool TryGetModel(IIndexItem item, out CompositeGeometryModel model)
-        {
-            model = null;
-            return false;
-        }
+        public override string ToString() => ChildModel.BaseModel.Name;
     }
 }

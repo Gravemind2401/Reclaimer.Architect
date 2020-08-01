@@ -36,119 +36,119 @@ namespace Reclaimer.Blam.Halo3
         [Offset(0)]
         public StringId Name { get; set; }
 
-        public byte[] RuntimeRegionIndexes { get; } = new byte[16];
+        public byte[] RuntimeModelRegions { get; } = new byte[16];
 
         #region Runtime Region Indexes
         [Offset(4)]
         public byte RuntimeRegionIndex00
         {
-            get { return RuntimeRegionIndexes[0]; }
-            set { RuntimeRegionIndexes[0] = value; }
+            get { return RuntimeModelRegions[0]; }
+            set { RuntimeModelRegions[0] = value; }
         }
 
         [Offset(5)]
         public byte RuntimeRegionIndex01
         {
-            get { return RuntimeRegionIndexes[1]; }
-            set { RuntimeRegionIndexes[1] = value; }
+            get { return RuntimeModelRegions[1]; }
+            set { RuntimeModelRegions[1] = value; }
         }
 
         [Offset(6)]
         public byte RuntimeRegionIndex02
         {
-            get { return RuntimeRegionIndexes[2]; }
-            set { RuntimeRegionIndexes[2] = value; }
+            get { return RuntimeModelRegions[2]; }
+            set { RuntimeModelRegions[2] = value; }
         }
 
         [Offset(7)]
         public byte RuntimeRegionIndex03
         {
-            get { return RuntimeRegionIndexes[3]; }
-            set { RuntimeRegionIndexes[3] = value; }
+            get { return RuntimeModelRegions[3]; }
+            set { RuntimeModelRegions[3] = value; }
         }
 
         [Offset(8)]
         public byte RuntimeRegionIndex04
         {
-            get { return RuntimeRegionIndexes[4]; }
-            set { RuntimeRegionIndexes[4] = value; }
+            get { return RuntimeModelRegions[4]; }
+            set { RuntimeModelRegions[4] = value; }
         }
 
         [Offset(9)]
         public byte RuntimeRegionIndex05
         {
-            get { return RuntimeRegionIndexes[5]; }
-            set { RuntimeRegionIndexes[5] = value; }
+            get { return RuntimeModelRegions[5]; }
+            set { RuntimeModelRegions[5] = value; }
         }
 
         [Offset(10)]
         public byte RuntimeRegionIndex06
         {
-            get { return RuntimeRegionIndexes[6]; }
-            set { RuntimeRegionIndexes[6] = value; }
+            get { return RuntimeModelRegions[6]; }
+            set { RuntimeModelRegions[6] = value; }
         }
 
         [Offset(11)]
         public byte RuntimeRegionIndex07
         {
-            get { return RuntimeRegionIndexes[7]; }
-            set { RuntimeRegionIndexes[7] = value; }
+            get { return RuntimeModelRegions[7]; }
+            set { RuntimeModelRegions[7] = value; }
         }
 
         [Offset(12)]
         public byte RuntimeRegionIndex08
         {
-            get { return RuntimeRegionIndexes[8]; }
-            set { RuntimeRegionIndexes[8] = value; }
+            get { return RuntimeModelRegions[8]; }
+            set { RuntimeModelRegions[8] = value; }
         }
 
         [Offset(13)]
         public byte RuntimeRegionIndex09
         {
-            get { return RuntimeRegionIndexes[9]; }
-            set { RuntimeRegionIndexes[9] = value; }
+            get { return RuntimeModelRegions[9]; }
+            set { RuntimeModelRegions[9] = value; }
         }
 
         [Offset(14)]
         public byte RuntimeRegionIndex10
         {
-            get { return RuntimeRegionIndexes[10]; }
-            set { RuntimeRegionIndexes[10] = value; }
+            get { return RuntimeModelRegions[10]; }
+            set { RuntimeModelRegions[10] = value; }
         }
 
         [Offset(15)]
         public byte RuntimeRegionIndex11
         {
-            get { return RuntimeRegionIndexes[11]; }
-            set { RuntimeRegionIndexes[11] = value; }
+            get { return RuntimeModelRegions[11]; }
+            set { RuntimeModelRegions[11] = value; }
         }
 
         [Offset(16)]
         public byte RuntimeRegionIndex12
         {
-            get { return RuntimeRegionIndexes[12]; }
-            set { RuntimeRegionIndexes[12] = value; }
+            get { return RuntimeModelRegions[12]; }
+            set { RuntimeModelRegions[12] = value; }
         }
 
         [Offset(17)]
         public byte RuntimeRegionIndex13
         {
-            get { return RuntimeRegionIndexes[13]; }
-            set { RuntimeRegionIndexes[13] = value; }
+            get { return RuntimeModelRegions[13]; }
+            set { RuntimeModelRegions[13] = value; }
         }
 
         [Offset(18)]
         public byte RuntimeRegionIndex14
         {
-            get { return RuntimeRegionIndexes[14]; }
-            set { RuntimeRegionIndexes[14] = value; }
+            get { return RuntimeModelRegions[14]; }
+            set { RuntimeModelRegions[14] = value; }
         }
 
         [Offset(19)]
         public byte RuntimeRegionIndex15
         {
-            get { return RuntimeRegionIndexes[15]; }
-            set { RuntimeRegionIndexes[15] = value; }
+            get { return RuntimeModelRegions[15]; }
+            set { RuntimeModelRegions[15] = value; }
         } 
         #endregion
 

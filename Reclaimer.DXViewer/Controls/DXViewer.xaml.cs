@@ -65,7 +65,10 @@ namespace Reclaimer.Controls
         public static void SelectedLodChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var control = (DXViewer)d;
-            control.SetLod((int)e.NewValue);
+            if (control.manager != null)
+                control.SetLod((int)e.NewValue);
+            else if (control.compositeManager != null)
+                control.SetVariant((int)e.NewValue);
         }
         #endregion
 
@@ -75,9 +78,14 @@ namespace Reclaimer.Controls
 
         private IRenderGeometry geometry;
         private IGeometryModel model;
+        private ModelInstance modelInstance;
+
+        private CompositeGeometryModel composite;
+        private CompositeModelInstance compositeInstance;
 
         private SceneManager scene;
         private ModelManager manager;
+        private CompositeModelManager compositeManager;
 
         public TabModel TabModel { get; }
         public ObservableCollection<TreeItemModel> TreeViewItems { get; }
@@ -92,6 +100,8 @@ namespace Reclaimer.Controls
             InitializeComponent();
             TabModel = new TabModel(this, TabItemType.Document);
             TreeViewItems = new ObservableCollection<TreeItemModel>();
+            scene = new SceneManager();
+
             DataContext = this;
 
             renderer.AddChild(modelGroup);
@@ -104,6 +114,7 @@ namespace Reclaimer.Controls
             this.geometry = geometry;
 
             AvailableLods = AllLods.Take(geometry.LodCount);
+            modelGroup.Children.Clear();
             SetLod(0);
         }
 
@@ -119,20 +130,37 @@ namespace Reclaimer.Controls
                     LoadGeometry(geometry, fileName);
                 else throw new ArgumentException($"Could not load geometry from tag", nameof(modelTag));
             }
+
+            string defaultSelection;
+            if (!CompositeModelFactory.TryGetModel(modelTag, out composite, out defaultSelection))
+                throw new ArgumentException($"Could not load geometry from tag", nameof(modelTag));
+
+            TabModel.ToolTip = fileName;
+            TabModel.Header = Utils.GetFileName(fileName);
+
+            var allVariants = composite.Variants.Select(v => v.Name).ToList();
+            if (!allVariants.Any()) allVariants.Add(string.Empty);
+            AvailableLods = allVariants;
+            modelGroup.Children.Clear();
+
+            var index = allVariants.IndexOf(defaultSelection);
+
+            SelectedLod = index;
+            SetVariant(index);
         }
 
         private void SetLod(int index)
         {
-            model = geometry.ReadGeometry(index);
-
             TreeViewItems.Clear();
-            modelGroup.Children.Clear();
+            model?.Dispose();
+            manager?.Dispose();
 
-            scene = new SceneManager();
+            model = geometry.ReadGeometry(index);
             manager = new ModelManager(scene, model);
-            var instance = manager.GenerateModel();
-            instance.Element.IsHitTestVisible = false;
-            modelGroup.Children.Add(instance.Element);
+
+            modelInstance = manager.GenerateModel();
+            modelInstance.Element.IsHitTestVisible = false;
+            modelGroup.Children.Add(modelInstance.Element);
 
             foreach (var region in model.Regions)
             {
@@ -140,7 +168,7 @@ namespace Reclaimer.Controls
 
                 foreach (var perm in region.Permutations)
                 {
-                    if (!instance.ContainsElement(perm))
+                    if (!modelInstance.ContainsElement(perm))
                         continue;
 
                     var permNode = new TreeItemModel { Header = perm.Name, IsChecked = true, Tag = perm };
@@ -150,6 +178,26 @@ namespace Reclaimer.Controls
                 if (regNode.HasItems)
                     TreeViewItems.Add(regNode);
             }
+        }
+
+        private void SetVariant(int index)
+        {
+            TreeViewItems.Clear();
+
+            if (compositeManager == null)
+            {
+                compositeManager = new CompositeModelManager(scene, composite);
+                compositeInstance = compositeManager.GenerateModel();
+                compositeInstance.Element.IsHitTestVisible = false;
+                modelGroup.Children.Add(compositeInstance.Element);
+            }
+
+            if (composite.Variants.Any())
+            {
+                var variant = composite.Variants[index];
+                compositeInstance.SetVariant(variant.Name);
+            }
+            else compositeInstance.SetVariant(string.Empty);
         }
 
         #region Treeview Events
@@ -315,9 +363,12 @@ namespace Reclaimer.Controls
         public void Dispose()
         {
             TreeViewItems.Clear();
-            scene.Dispose();
-            manager.Model.Dispose();
-            manager.Dispose();
+            modelGroup.Children.Clear();
+            manager?.Model.Dispose();
+            manager?.Dispose();
+            compositeManager?.Model?.Dispose();
+            compositeManager?.Dispose();
+            scene?.Dispose();
             renderer.Dispose();
             GC.Collect();
         }

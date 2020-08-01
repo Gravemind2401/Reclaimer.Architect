@@ -14,6 +14,9 @@ namespace Reclaimer.Blam.Halo3
         [Offset(0)]
         public short ObjectType { get; set; }
 
+        [Offset(48)]
+        public StringId DefaultVariant { get; set; }
+
         [Offset(52)]
         public TagReference Model { get; set; }
 

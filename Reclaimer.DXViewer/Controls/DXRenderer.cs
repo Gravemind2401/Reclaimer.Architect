@@ -288,8 +288,9 @@ namespace Reclaimer.Controls
             double vfov = pcam.FieldOfView / Viewport.ActualWidth * Viewport.ActualHeight;
             double distv = radius / Math.Tan(0.5 * vfov * Math.PI / 180);
 
-            double dist = Math.Min(disth, distv);
-            var dir = (bounds.Size.X / 2 > bounds.Size.Y)
+            double adjust = distv > disth ? 0.75 : 1;
+            double dist = Math.Max(disth, distv) * adjust;
+            var dir = (bounds.Size.X > bounds.Size.Y * 1.5)
                 ? new Media3D.Vector3D(0, -1, 0)
                 : new Media3D.Vector3D(-1, 0, 0);
 

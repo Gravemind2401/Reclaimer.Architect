@@ -22,29 +22,49 @@ namespace Reclaimer.Geometry
 
         public SceneManager Scene { get; }
         public IGeometryModel Model { get; }
+        public SharpDX.Matrix Transform { get; }
+        public GeometryModelVariant DefaultVariant { get; }
 
         public IReadOnlyList<ModelInstance> Instances => instances;
 
         public ModelManager(SceneManager scene, IGeometryModel model)
+            : this(scene, model, SharpDX.Matrix.Identity, null) { }
+
+        public ModelManager(SceneManager scene, IGeometryModel model, SharpDX.Matrix transform, GeometryModelVariant variant)
         {
             Scene = scene;
             Model = model;
+            Transform = transform;
 
             for (int i = 0; i < model.Meshes.Count; i++)
                 templates.Add(i, MeshTemplate.FromModel(model, i));
         }
 
-        public ModelInstance GenerateModel()
+        public ModelInstance GenerateModel() => GenerateModel(DefaultVariant);
+
+        public ModelInstance GenerateModel(GeometryModelVariant variant)
         {
             var element = new Helix.GroupModel3D();
+            element.Transform = new Media3D.MatrixTransform3D(Transform.ToMatrix3D());
             var modelInstance = new ModelInstance(element);
 
             var instanceTemp = new Dictionary<int, MeshTemplate>();
 
-            foreach (var region in Model.Regions)
+            for (int r = 0; r < Model.Regions.Count; r++)
             {
-                foreach (var perm in region.Permutations)
+                var region = Model.Regions[r];
+                var vRegionIndex = variant?.RegionLookup[r] ?? byte.MaxValue;
+
+                for (int p = 0; p < region.Permutations.Count; p++)
                 {
+                    if (vRegionIndex != byte.MaxValue)
+                    {
+                        var vRegion = variant.Regions[vRegionIndex];
+                        if (!vRegion.Permutations.Any(vp => vp.BasePermutationIndex == p))
+                            continue;
+                    }
+
+                    var perm = region.Permutations[p];
                     var template = templates.ValueOrDefault(perm.MeshIndex);
                     if (template == null || template.IsEmpty)
                         continue;
