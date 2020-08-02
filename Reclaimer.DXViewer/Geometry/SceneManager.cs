@@ -23,19 +23,25 @@ namespace Reclaimer.Geometry
 
         private readonly Dictionary<string, Helix.TextureModel> sceneTextures = new Dictionary<string, Helix.TextureModel>();
 
-        public Helix.Material LoadMaterial(IGeometryModel model, int matIndex)
+        public Helix.Material LoadMaterial(IGeometryModel model, int matIndex, out bool isTransparent)
         {
             if (matIndex < 0 || matIndex >= model.Materials.Count)
+            {
+                isTransparent = false;
                 return ErrorMaterial;
+            }
 
-            return LoadMaterial(model.Materials[matIndex]);
+            return LoadMaterial(model.Materials[matIndex], out isTransparent);
         }
 
-        public Helix.Material LoadMaterial(IGeometryMaterial mat)
+        public Helix.Material LoadMaterial(IGeometryMaterial mat, out bool isTransparent)
         {
             var diffuseTexture = GetTexture(mat, MaterialUsage.Diffuse);
             if (diffuseTexture == null)
+            {
+                isTransparent = false;
                 return ErrorMaterial;
+            }
 
             var material = new Helix.DiffuseMaterial
             {
@@ -43,6 +49,7 @@ namespace Reclaimer.Geometry
             };
 
             material.Freeze();
+            isTransparent = mat.Flags.HasFlag(MaterialFlags.Transparent);
             return material;
         }
 
@@ -52,12 +59,14 @@ namespace Reclaimer.Geometry
             if (string.IsNullOrEmpty(sub?.Bitmap?.Name))
                 return null;
 
-            var key = sub.Bitmap.Name;
+            var key = $"{sub.Bitmap.Name}::{(int)mat.Flags}";
             var tex = sceneTextures.ValueOrDefault(key);
             if (tex == null)
             {
                 var stream = new System.IO.MemoryStream();
-                sub.Bitmap.ToDds(0).WriteToStream(stream, System.Drawing.Imaging.ImageFormat.Png, DecompressOptions.Bgr24);
+                if (mat.Flags.HasFlag(MaterialFlags.Transparent))
+                    sub.Bitmap.ToDds(0).WriteToStream(stream, System.Drawing.Imaging.ImageFormat.Png, DecompressOptions.Default);
+                else sub.Bitmap.ToDds(0).WriteToStream(stream, System.Drawing.Imaging.ImageFormat.Png, DecompressOptions.Bgr24);
                 tex = new Helix.TextureModel(stream);
                 sceneTextures.Add(key, tex);
             }

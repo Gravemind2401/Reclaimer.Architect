@@ -35,6 +35,7 @@ namespace Reclaimer.Geometry
             Scene = scene;
             Model = model;
             Transform = transform;
+            DefaultVariant = variant;
 
             for (int i = 0; i < model.Meshes.Count; i++)
                 templates.Add(i, MeshTemplate.FromModel(model, i));
@@ -60,7 +61,7 @@ namespace Reclaimer.Geometry
                     if (vRegionIndex != byte.MaxValue)
                     {
                         var vRegion = variant.Regions[vRegionIndex];
-                        if (!vRegion.Permutations.Any(vp => vp.BasePermutationIndex == p))
+                        if (vRegion.Permutations.Count > 0 && !vRegion.Permutations.Any(vp => vp.BasePermutationIndex == p))
                             continue;
                     }
 

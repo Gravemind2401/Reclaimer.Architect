@@ -103,10 +103,12 @@ namespace Reclaimer.Geometry
 
             for (int i = 0; i < submeshCount; i++)
             {
+                bool isTransparent;
                 group.Children.Add(new Helix.MeshGeometryModel3D
                 {
                     Geometry = submeshes[i],
-                    Material = manager.LoadMaterial(model, matIndex[i])
+                    Material = manager.LoadMaterial(model, matIndex[i], out isTransparent),
+                    IsTransparent = isTransparent
                 });
             }
 
@@ -169,10 +171,12 @@ namespace Reclaimer.Geometry
 
             for (int i = 0; i < submeshCount; i++)
             {
+                bool isTransparent;
                 group.Children.Add(rootMeshes[i] = new Helix.InstancingMeshGeometryModel3D
                 {
                     Geometry = submeshes[i],
-                    Material = manager.LoadMaterial(model, matIndex[i])
+                    Material = manager.LoadMaterial(model, matIndex[i], out isTransparent),
+                    IsTransparent = isTransparent
                 });
             }
 

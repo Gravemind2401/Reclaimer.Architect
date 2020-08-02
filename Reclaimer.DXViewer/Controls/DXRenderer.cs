@@ -290,9 +290,10 @@ namespace Reclaimer.Controls
 
             double adjust = distv > disth ? 0.75 : 1;
             double dist = Math.Max(disth, distv) * adjust;
+
             var dir = (bounds.Size.X > bounds.Size.Y * 1.5)
-                ? new Media3D.Vector3D(0, -1, 0)
-                : new Media3D.Vector3D(-1, 0, 0);
+                ? new Media3D.Vector3D(0, -Math.Sign(center.Y), 0)
+                : new Media3D.Vector3D(-Math.Sign(center.X), 0, 0);
 
             pcam.LookAt(center, dir * dist, Viewport.ModelUpDirection, animationTime);
         }

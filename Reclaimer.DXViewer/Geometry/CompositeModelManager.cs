@@ -47,14 +47,11 @@ namespace Reclaimer.Geometry
 
             var mat = SharpDX.Matrix.Identity;
             if (parentMarker != null)
-            {
-                mat *= SharpDX.Matrix.RotationQuaternion(parentMarker.Rotation.ToQuaternion());
-                mat *= SharpDX.Matrix.Translation(parentMarker.Position.ToVector3());
-            }
+                mat *= GetMatrix(parentMarker, Model.BaseModel);
+
             if (childMarker != null)
             {
-                var mat2 = SharpDX.Matrix.RotationQuaternion(childMarker.Rotation.ToQuaternion());
-                mat2.TranslationVector = childMarker.Position.ToVector3();
+                var mat2 = GetMatrix(childMarker, attached.ChildModel.BaseModel);
                 mat2.Invert();
                 mat *= mat2;
             }
@@ -67,6 +64,30 @@ namespace Reclaimer.Geometry
                 foreach (var att in defaultVariant.Attachments)
                     AddDefaults(att, collection);
             }
+        }
+
+        private SharpDX.Matrix GetMatrix(IGeometryMarker marker, IGeometryModel source)
+        {
+            var transfoms = new List<SharpDX.Matrix>();
+
+            if (marker.NodeIndex != byte.MaxValue)
+            {
+                int parentIndex = marker.NodeIndex;
+                while (parentIndex >= 0)
+                {
+                    var node = source.Nodes[parentIndex];
+                    var t = SharpDX.Matrix.RotationQuaternion(node.Rotation.ToQuaternion());
+                    t.TranslationVector = node.Position.ToVector3();
+                    transfoms.Insert(0, t);
+                    parentIndex = node.ParentIndex;
+                }
+            }
+
+            var mat = SharpDX.Matrix.RotationQuaternion(marker.Rotation.ToQuaternion());
+            mat.TranslationVector = marker.Position.ToVector3();
+            transfoms.Add(mat);
+
+            return transfoms.Aggregate((m1, m2) => m1 * m2);
         }
 
         public CompositeModelInstance GenerateModel()
@@ -116,6 +137,7 @@ namespace Reclaimer.Geometry
         private readonly Dictionary<string, List<ModelInstance>> lookup = new Dictionary<string, List<ModelInstance>>();
 
         public Helix.GroupModel3D Element { get; }
+        public string CurrentVariant { get; private set; }
 
         internal CompositeModelInstance(Dictionary<string, List<ModelInstance>> variants)
         {
@@ -131,11 +153,24 @@ namespace Reclaimer.Geometry
 
         public void SetVariant(string variant)
         {
+            CurrentVariant = variant;
             foreach (var pair in lookup)
             {
                 foreach (var inst in pair.Value)
                     inst.Element.Visibility = pair.Key == variant ? Visibility.Visible : Visibility.Collapsed;
             }
+        }
+
+        public void SetElementVisible(object key, bool visible)
+        {
+            var inst = lookup.ValueOrDefault(CurrentVariant)?[0];
+            inst?.SetElementVisible(key, visible);
+        }
+
+        public SharpDX.BoundingBox GetElementBounds(object key)
+        {
+            var inst = lookup.ValueOrDefault(CurrentVariant)?[0];
+            return inst?.GetElementBounds(key) ?? default(SharpDX.BoundingBox);
         }
     }
 }

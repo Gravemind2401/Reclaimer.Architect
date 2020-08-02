@@ -144,6 +144,7 @@ namespace Reclaimer.Controls
             modelGroup.Children.Clear();
 
             var index = allVariants.IndexOf(defaultSelection);
+            index = Math.Max(0, index);
 
             SelectedLod = index;
             SetVariant(index);
@@ -192,12 +193,34 @@ namespace Reclaimer.Controls
                 modelGroup.Children.Add(compositeInstance.Element);
             }
 
-            if (composite.Variants.Any())
+            var variant = composite.Variants.Any() ? composite.Variants[index] : null;
+            compositeInstance.SetVariant(variant?.Name ?? string.Empty);
+
+            var model = composite.BaseModel;
+            for (int r = 0; r < model.Regions.Count; r++)
             {
-                var variant = composite.Variants[index];
-                compositeInstance.SetVariant(variant.Name);
+                var region = model.Regions[r];
+                var vRegionIndex = variant?.RegionLookup[r] ?? byte.MaxValue;
+
+                var regNode = new TreeItemModel { Header = region.Name, IsChecked = true };
+
+                for (int p = 0; p < region.Permutations.Count; p++)
+                {
+                    if (vRegionIndex != byte.MaxValue)
+                    {
+                        var vRegion = variant.Regions[vRegionIndex];
+                        if (vRegion.Permutations.Count > 0 && !vRegion.Permutations.Any(vp => vp.BasePermutationIndex == p))
+                            continue;
+                    }
+
+                    var perm = region.Permutations[p];
+                    var permNode = new TreeItemModel { Header = perm.Name, IsChecked = true, Tag = perm };
+                    regNode.Items.Add(permNode);
+                }
+
+                if (regNode.HasItems)
+                    TreeViewItems.Add(regNode);
             }
-            else compositeInstance.SetVariant(string.Empty);
         }
 
         #region Treeview Events
@@ -208,7 +231,12 @@ namespace Reclaimer.Controls
                 return; //because this event bubbles to the parent node
 
             if (item.Tag != null)
-                renderer.ZoomToBounds(manager.Instances[0].GetElementBounds(item.Tag), 500);
+            {
+                if (modelInstance != null)
+                    renderer.ZoomToBounds(modelInstance.GetElementBounds(item.Tag), 500);
+                else if (compositeInstance != null)
+                    renderer.ZoomToBounds(compositeInstance.GetElementBounds(item.Tag), 500);
+            }
         }
 
         private bool isWorking = false;
@@ -235,22 +263,20 @@ namespace Reclaimer.Controls
                     parent.IsChecked = false;
                 else parent.IsChecked = null;
 
-                manager.Instances[0].SetElementVisible(item.Tag, item.IsChecked ?? false);
-                //if (item.IsChecked == true)
-                //    modelGroup.Children.Add(group);
-                //else
-                //    modelGroup.Children.Remove(group);
+                if (modelInstance != null)
+                    modelInstance.SetElementVisible(item.Tag, item.IsChecked ?? false);
+                else if (compositeManager != null)
+                    compositeInstance.SetElementVisible(item.Tag, item.IsChecked ?? false);
             }
             else
             {
                 foreach (TreeItemModel i in item.Items)
                 {
                     i.IsChecked = item.IsChecked;
-                    manager.Instances[0].SetElementVisible(i.Tag, item.IsChecked ?? false);
-                    //if (i.IsChecked == true)
-                    //    modelGroup.Children.Add(group);
-                    //else
-                    //    modelGroup.Children.Remove(group);
+                    if (modelInstance != null)
+                        modelInstance.SetElementVisible(i.Tag, item.IsChecked ?? false);
+                    else if (compositeManager != null)
+                        compositeInstance.SetElementVisible(i.Tag, item.IsChecked ?? false);
                 }
             }
         }
