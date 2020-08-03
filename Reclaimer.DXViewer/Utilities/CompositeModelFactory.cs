@@ -38,13 +38,16 @@ namespace Reclaimer.Utilities
             if (item == null)
                 return false;
 
-
-            switch (item.CacheFile.CacheType)
+            try
             {
-                case CacheType.Halo3Retail:
-                    model = item.ReadMetadata<Blam.Halo3.model>().ToCompositeModel();
-                    break;
+                switch (item.CacheFile.CacheType)
+                {
+                    case CacheType.Halo3Retail:
+                        model = item.ReadMetadata<Blam.Halo3.model>().ToCompositeModel();
+                        break;
+                }
             }
+            catch { }
 
             return model != null;
         }

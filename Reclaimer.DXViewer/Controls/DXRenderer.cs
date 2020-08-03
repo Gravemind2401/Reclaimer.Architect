@@ -280,6 +280,9 @@ namespace Reclaimer.Controls
 
         public void ZoomToBounds(SharpDX.BoundingBox bounds, double animationTime = 0)
         {
+            if (bounds.Size.IsZero)
+                return;
+
             var pcam = Viewport.Camera as Helix.PerspectiveCamera;
             var center = bounds.Center.ToPoint3D();
             var radius = bounds.Size.Length() / 2;
@@ -398,9 +401,10 @@ namespace Reclaimer.Controls
             var deltaY = (float)(mousePos.Y - lastPoint.Y) * 0.002f;
 
             var upAnchor = Viewport.ModelUpDirection.ToNumericsVector3();
-            var upVector = Viewport.Camera.UpDirection.ToNumericsVector3();
-            var forwardVector = Viewport.Camera.LookDirection.ToNumericsVector3();
-            var rightVector = Numerics.Vector3.Cross(forwardVector, upVector);
+            var upVector = Numerics.Vector3.Normalize(Viewport.Camera.UpDirection.ToNumericsVector3());
+            var forwardVector = Numerics.Vector3.Normalize(Viewport.Camera.LookDirection.ToNumericsVector3());
+            var rightVector = Numerics.Vector3.Normalize(Numerics.Vector3.Cross(forwardVector, upVector));
+            
 
             var yaw = Numerics.Matrix4x4.CreateFromAxisAngle(upAnchor, -deltaX);
 

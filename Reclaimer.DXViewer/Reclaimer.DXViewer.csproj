@@ -114,6 +114,10 @@
   <ItemGroup>
     <Compile Include="Blam\Halo3\model.cs" />
     <Compile Include="Blam\Halo3\object.cs" />
+    <Compile Include="Blam\Halo3\scenario.cs" />
+    <Compile Include="Controls\DXEditor.xaml.cs">
+      <DependentUpon>DXEditor.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\DXViewer.xaml.cs">
       <DependentUpon>DXViewer.xaml</DependentUpon>
     </Compile>
@@ -175,6 +179,10 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Page Include="Controls\DXEditor.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Controls\DXViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

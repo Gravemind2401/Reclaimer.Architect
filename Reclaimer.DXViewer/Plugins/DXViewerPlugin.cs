@@ -15,7 +15,9 @@ namespace Reclaimer.Plugins
 
         public override bool CanOpenFile(OpenFileArgs args)
         {
-            return args.File.Any(i => i is IRenderGeometry) || args.File.OfType<IIndexItem>().Any(i => Controls.DXViewer.CanOpenTag(i));
+            return args.File.Any(i => i is IRenderGeometry) 
+                || args.File.OfType<IIndexItem>().Any(i => Controls.DXViewer.CanOpenTag(i))
+                || args.File.OfType<IIndexItem>().Any(i => Controls.DXEditor.CanOpenTag(i));
         }
 
         public override void OpenFile(OpenFileArgs args)
@@ -69,17 +71,34 @@ namespace Reclaimer.Plugins
 
             try
             {
-                var viewer = new Controls.DXViewer
+                if (Controls.DXEditor.CanOpenTag(modelTag))
                 {
-                    LogOutput = LogOutput,
-                    LogError = LogError,
-                    SetStatus = SetWorkingStatus,
-                    ClearStatus = ClearWorkingStatus
-                };
+                    var viewer = new Controls.DXEditor
+                    {
+                        LogOutput = LogOutput,
+                        LogError = LogError,
+                        SetStatus = SetWorkingStatus,
+                        ClearStatus = ClearWorkingStatus
+                    };
 
-                viewer.LoadGeometry(modelTag, $"{fileName}");
+                    viewer.LoadGeometry(modelTag, $"{fileName}");
 
-                container.AddItem(viewer.TabModel);
+                    container.AddItem(viewer.TabModel);
+                }
+                else
+                {
+                    var viewer = new Controls.DXViewer
+                    {
+                        LogOutput = LogOutput,
+                        LogError = LogError,
+                        SetStatus = SetWorkingStatus,
+                        ClearStatus = ClearWorkingStatus
+                    };
+
+                    viewer.LoadGeometry(modelTag, $"{fileName}");
+
+                    container.AddItem(viewer.TabModel);
+                }
 
                 LogOutput($"Loaded model: {fileName}");
             }

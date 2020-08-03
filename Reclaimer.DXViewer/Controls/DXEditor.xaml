@@ -1,0 +1,193 @@
+﻿<UserControl x:Class="Reclaimer.Controls.DXEditor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Reclaimer.Controls"
+             xmlns:c="clr-namespace:Reclaimer.Controls;assembly=Reclaimer"
+             xmlns:s="clr-namespace:Studio.Controls;assembly=Studio"
+             xmlns:u="clr-namespace:Reclaimer.Utilities;assembly=Reclaimer"
+             mc:Ignorable="d" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+             d:DesignHeight="500" d:DesignWidth="900">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Reclaimer;component/Resources/Templates.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <u:ToStringConverter x:Key="stringConverter" />
+            <u:RadToDegConverter x:Key="radToDegConverter" />
+
+            <Style x:Key="showHideStyle" TargetType="ToggleButton">
+                <Setter Property="Background" Value="LightGray" />
+                <Setter Property="Opacity" Value="0.5" />
+
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ToggleButton">
+                            <Border Background="{TemplateBinding Background}"
+                                    Opacity="{TemplateBinding Opacity}">
+                                <ContentControl x:Name="cc" Margin="{TemplateBinding Padding}"
+                                                Template="{StaticResource ic_ChevronLeft_16x}" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <DataTrigger Binding="{Binding IsChecked, RelativeSource={RelativeSource Self}}" Value="True">
+                                    <Setter TargetName="cc" Property="Template" Value="{StaticResource ic_ChevronRight_16x}" />
+                                </DataTrigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Background" Value="White" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <DockPanel>
+        <ToolBarTray DockPanel.Dock="Top" IsLocked="True">
+            <ToolBar Margin="3,1">
+                <Button Click="btnCollapseAll_Click"
+                        ToolTip="Collapse all">
+                    <ContentControl Template="{StaticResource ic_CollapseGroup_16x}" />
+                </Button>
+                <Button Click="btnExpandAll_Click"
+                        ToolTip="Expand all">
+                    <ContentControl Template="{StaticResource ic_ExpandAll_16x}" />
+                </Button>
+                <Button Click="btnSelectAll_Click"
+                        ToolTip="Select all">
+                    <ContentControl Template="{StaticResource ic_Checklist_16x}" />
+                </Button>
+                <Button Click="btnSelectNone_Click"
+                        ToolTip="Select none">
+                    <ContentControl Template="{StaticResource ic_CheckboxList_16x}" />
+                </Button>
+                <Separator />
+                <Button Click="btnSave_Click"
+                        ToolTip="Save Model">
+                    <ContentControl Template="{StaticResource ic_Save_16x}" />
+                </Button>
+            </ToolBar>
+        </ToolBarTray>
+        <ToolBarTray DockPanel.Dock="Bottom" IsLocked="True">
+            <ToolBar Margin="3,1">
+                <ToolBar.Resources>
+                    <Style TargetType="Label">
+                        <Setter Property="Padding" Value="4,0,6,2" />
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                    </Style>
+                </ToolBar.Resources>
+                <ComboBox ItemsSource="{Binding AvailableLods}"
+                          SelectedIndex="{Binding SelectedLod}" />
+                <Separator />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition MinWidth="65" />
+                        <ColumnDefinition MinWidth="65" />
+                        <ColumnDefinition MinWidth="65" />
+                    </Grid.ColumnDefinitions>
+                    <Label Content="Position:" />
+                    <Label Grid.Column="1" HorizontalAlignment="Right" 
+                           Content="{Binding Camera.Position.X, ElementName=renderer, Converter={StaticResource stringConverter}, ConverterParameter='F2'}" />
+                    <Label Grid.Column="2" HorizontalAlignment="Right" 
+                           Content="{Binding Camera.Position.Y, ElementName=renderer, Converter={StaticResource stringConverter}, ConverterParameter='F2'}" />
+                    <Label Grid.Column="3" HorizontalAlignment="Right" 
+                           Content="{Binding Camera.Position.Z, ElementName=renderer, Converter={StaticResource stringConverter}, ConverterParameter='F2'}" />
+                </Grid>
+                <Separator />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition MinWidth="50" />
+                        <ColumnDefinition MinWidth="50" />
+                    </Grid.ColumnDefinitions>
+                    <Label Content="Angle:" />
+                    <Label Grid.Column="1" HorizontalAlignment="Right" 
+                           Content="{Binding Yaw, ElementName=renderer, Converter={StaticResource radToDegConverter}, ConverterParameter='F2'}" />
+                    <Label Grid.Column="2" HorizontalAlignment="Right" 
+                           Content="{Binding Pitch, ElementName=renderer, Converter={StaticResource radToDegConverter}, ConverterParameter='F2'}" />
+                </Grid>
+                <Separator />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition MinWidth="60" />
+                    </Grid.ColumnDefinitions>
+                    <Label Content="Speed:" />
+                    <Label Grid.Column="1" HorizontalAlignment="Right" 
+                           Content="{Binding CameraSpeed, ElementName=renderer, Converter={StaticResource stringConverter}, ConverterParameter='F2'}" />
+                </Grid>
+                <Separator />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition MinWidth="35" />
+                    </Grid.ColumnDefinitions>
+                    <Label Content="FOV:" />
+                    <Label Grid.Column="1" HorizontalAlignment="Right" 
+                           Content="{Binding Camera.FieldOfView, ElementName=renderer, Converter={StaticResource stringConverter}, ConverterParameter='F0'}" />
+                </Grid>
+                <Separator />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition MinWidth="45" />
+                    </Grid.ColumnDefinitions>
+                    <Label Content="Far Plane:" />
+                    <Label Grid.Column="1" HorizontalAlignment="Right" 
+                           Content="{Binding FarPlaneDistance, ElementName=renderer, Converter={StaticResource stringConverter}, ConverterParameter='F0'}" />
+                </Grid>
+                <Separator />
+            </ToolBar>
+        </ToolBarTray>
+        <s:SplitPanel x:Name="splitPanel" x:FieldModifier="private" SplitterThickness="3">
+            <s:SplitPanel.Resources>
+                <Style TargetType="s:SplitPanelSplitter" BasedOn="{StaticResource {x:Type s:SplitPanelSplitter}}">
+                    <Setter Property="Background" Value="LightGray" />
+                </Style>
+            </s:SplitPanel.Resources>
+            <TreeView x:Name="tv" s:SplitPanel.DesiredSize="250"
+                    ItemsSource="{Binding TreeViewItems}"
+                    VerticalContentAlignment="Center">
+                <TreeView.ItemContainerStyle>
+                    <Style TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+                        <Setter Property="IsExpanded" Value="{Binding IsExpanded}" />
+                        <Setter Property="ItemsSource" Value="{Binding Items}" />
+                        <EventSetter Event="MouseDoubleClick" Handler="TreeViewItem_MouseDoubleClick" />
+                    </Style>
+                </TreeView.ItemContainerStyle>
+                <TreeView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox IsChecked="{Binding IsChecked}"
+                                      VerticalAlignment="Center"
+                                      Checked="TreeViewItem_Checked"
+                                      Unchecked="TreeViewItem_Checked" />
+                            <TextBlock Text="{Binding Header}" Margin="5,0,0,0"
+                                       VerticalAlignment="Center" />
+                        </StackPanel>
+                    </DataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
+            <Grid>
+                <local:DXRenderer x:Name="renderer"
+                            x:FieldModifier="private" 
+                            Background="CornflowerBlue" />
+                <ToggleButton Style="{StaticResource showHideStyle}"
+                              HorizontalAlignment="Left" VerticalAlignment="Center"
+                              Padding="2,20" Click="btnToggleDetails_Click">
+                    <ToggleButton.CacheMode>
+                        <BitmapCache />
+                    </ToggleButton.CacheMode>
+                </ToggleButton>
+            </Grid>
+        </s:SplitPanel>
+    </DockPanel>
+</UserControl>

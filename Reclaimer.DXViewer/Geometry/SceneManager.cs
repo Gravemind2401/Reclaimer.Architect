@@ -55,7 +55,7 @@ namespace Reclaimer.Geometry
 
         private Helix.TextureModel GetTexture(IGeometryMaterial mat, MaterialUsage usage)
         {
-            var sub = mat.Submaterials.FirstOrDefault(s => s.Usage == MaterialUsage.Diffuse);
+            var sub = mat?.Submaterials.FirstOrDefault(s => s.Usage == MaterialUsage.Diffuse);
             if (string.IsNullOrEmpty(sub?.Bitmap?.Name))
                 return null;
 
