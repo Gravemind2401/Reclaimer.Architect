@@ -21,7 +21,7 @@ namespace Reclaimer.Geometry
     {
         private static readonly Helix.Material ErrorMaterial = Helix.DiffuseMaterials.Gold;
 
-        private readonly Dictionary<string, Helix.TextureModel> sceneTextures = new Dictionary<string, Helix.TextureModel>();
+        private readonly Dictionary<int, Helix.TextureModel> sceneTextures = new Dictionary<int, Helix.TextureModel>();
 
         public Helix.Material LoadMaterial(IGeometryModel model, int matIndex, out bool isTransparent)
         {
@@ -59,7 +59,7 @@ namespace Reclaimer.Geometry
             if (string.IsNullOrEmpty(sub?.Bitmap?.Name))
                 return null;
 
-            var key = $"{sub.Bitmap.Name}::{(int)mat.Flags}";
+            var key = mat.Flags.HasFlag(MaterialFlags.Transparent) ? -sub.Bitmap.Id : sub.Bitmap.Id;
             var tex = sceneTextures.ValueOrDefault(key);
             if (tex == null)
             {

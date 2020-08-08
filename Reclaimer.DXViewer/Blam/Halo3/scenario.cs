@@ -56,6 +56,12 @@ namespace Reclaimer.Blam.Halo3
         [Offset(296)]
         public BlockCollection<PaletteItem> WeaponPalette { get; set; }
 
+        [Offset(320)]
+        public BlockCollection<MachinePlacement> MachinePlacements { get; set; }
+
+        [Offset(332)]
+        public BlockCollection<PaletteItem> MachinePalette { get; set; }
+
         [Offset(596)]
         public BlockCollection<StartingLocation> StartingLocations { get; set; }
 
@@ -181,6 +187,12 @@ namespace Reclaimer.Blam.Halo3
 
         [Offset(108)]
         public WeaponPlacementData WeaponData { get; set; }
+    }
+
+    [FixedSize(112)]
+    public class MachinePlacement : ObjectPlacement
+    {
+
     }
 
     [FixedSize(176)]

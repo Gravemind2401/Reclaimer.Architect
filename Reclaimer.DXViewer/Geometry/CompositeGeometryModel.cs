@@ -9,10 +9,11 @@ namespace Reclaimer.Geometry
 {
     public class CompositeGeometryModel : IDisposable
     {
+        public string Name { get; set; }
         public IGeometryModel BaseModel { get; set; }
         public List<GeometryModelVariant> Variants { get; set; } = new List<GeometryModelVariant>();
 
-        public override string ToString() => BaseModel.Name;
+        public override string ToString() => Name;
 
         public void Dispose()
         {

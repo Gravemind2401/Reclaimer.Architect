@@ -38,16 +38,12 @@ namespace Reclaimer.Utilities
             if (item == null)
                 return false;
 
-            try
+            switch (item.CacheFile.CacheType)
             {
-                switch (item.CacheFile.CacheType)
-                {
-                    case CacheType.Halo3Retail:
-                        model = item.ReadMetadata<Blam.Halo3.model>().ToCompositeModel();
-                        break;
-                }
+                case CacheType.Halo3Retail:
+                    model = item.ReadMetadata<Blam.Halo3.model>().ToCompositeModel(item);
+                    break;
             }
-            catch { }
 
             return model != null;
         }
@@ -68,15 +64,19 @@ namespace Reclaimer.Utilities
             }
         }
 
-        public static CompositeGeometryModel ToCompositeModel(this Blam.Halo3.model hlmt)
+        public static CompositeGeometryModel ToCompositeModel(this Blam.Halo3.model hlmt, IIndexItem sourceTag)
         {
-            var result = new CompositeGeometryModel();
+            var result = new CompositeGeometryModel { Name = sourceTag.FileName() };
 
             IRenderGeometry baseModel;
             if (!ContentFactory.TryGetGeometryContent(hlmt.RenderModel.Tag, out baseModel))
                 return null;
 
-            result.BaseModel = baseModel.ReadGeometry(0);
+            try
+            {
+                result.BaseModel = baseModel.ReadGeometry(0);
+            }
+            catch { return null; } // "Data not found" for invalid models
 
             foreach (var v in hlmt.Variants)
             {

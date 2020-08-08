@@ -52,6 +52,7 @@ namespace Reclaimer.Controls
         private readonly List<CompositeModelManager> vehiclePalette;
         private readonly List<CompositeModelManager> equipmentPalette;
         private readonly List<CompositeModelManager> weaponPalette;
+        private readonly List<CompositeModelManager> machinePalette;
         private readonly List<CompositeModelManager> cratePalette;
 
         private readonly List<ModelInstance> bspInstances;
@@ -78,6 +79,7 @@ namespace Reclaimer.Controls
             vehiclePalette = new List<CompositeModelManager>();
             equipmentPalette = new List<CompositeModelManager>();
             weaponPalette = new List<CompositeModelManager>();
+            machinePalette = new List<CompositeModelManager>();
             cratePalette = new List<CompositeModelManager>();
 
             bspInstances = new List<ModelInstance>();
@@ -109,9 +111,10 @@ namespace Reclaimer.Controls
             LoadPalette(scenario.SceneryPalette, sceneryPalette);
             //LoadPalette(scenario.BipedPalette, bipedPalette);
             //LoadPalette(scenario.VehiclePalette, vehiclePalette);
-            //LoadPalette(scenario.WeaponPalette, weaponPalette);
             //LoadPalette(scenario.EquipmentPalette, equipmentPalette);
-            //LoadPalette(scenario.CratePalette, cratePalette);
+            //LoadPalette(scenario.WeaponPalette, weaponPalette);
+            LoadPalette(scenario.MachinePalette, machinePalette);
+            LoadPalette(scenario.CratePalette, cratePalette);
 
             var bspNode = new TreeItemModel { Header = "sbsp", IsChecked = true };
 
@@ -139,9 +142,10 @@ namespace Reclaimer.Controls
             LoadInstances("scen", scenario.SceneryPlacements, sceneryPalette);
             //LoadInstances("bipd", scenario.BipedPlacements, bipedPalette);
             //LoadInstances("vehi", scenario.VehiclePlacements, vehiclePalette);
-            //LoadInstances("weap", scenario.WeaponPlacements, weaponPalette);
             //LoadInstances("eqip", scenario.EquipmentPlacements, equipmentPalette);
-            //LoadInstances("bloc", scenario.CratePlacements, cratePalette);
+            //LoadInstances("weap", scenario.WeaponPlacements, weaponPalette);
+            LoadInstances("mach", scenario.MachinePlacements, machinePalette);
+            LoadInstances("bloc", scenario.CratePlacements, cratePalette);
 
             foreach (var m in bspInstances.Where(i => i != null))
                 modelGroup.Children.Add(m.Element);
@@ -180,7 +184,7 @@ namespace Reclaimer.Controls
                 var inst = manager.GenerateModel();
                 instances.Add(inst);
 
-                var mat = SharpDX.Matrix.Scaling(item.Scale)
+                var mat = SharpDX.Matrix.Scaling(item.Scale == 0 ? 1 : item.Scale)
                     * SharpDX.Matrix.RotationYawPitchRoll(item.Rotation.Z, item.Rotation.Y, item.Rotation.X)
                     * SharpDX.Matrix.Translation(((IRealVector3D)item.Position).ToVector3());
 
@@ -192,7 +196,10 @@ namespace Reclaimer.Controls
 
                 inst.Element.Transform = new MatrixTransform3D(mat.ToMatrix3D());
 
-                var itemName = item.NameIndex >= 0 ? scenario.ObjectNames[item.NameIndex].Name : "unnamed";
+                var itemName = manager.Model.Name;
+                if (item.NameIndex >= 0)
+                    itemName += string.Format(" {{{0}}}", scenario.ObjectNames[item.NameIndex].Name);
+
                 var permNode = new TreeItemModel { Header = itemName, IsChecked = true, Tag = inst };
                 regNode.Items.Add(permNode);
             }
