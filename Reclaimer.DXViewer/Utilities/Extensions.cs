@@ -109,13 +109,15 @@ namespace Reclaimer.Utilities
             }
         }
 
-        public static IEnumerable<Helix.Element3D> EnumerateDescendents(this Helix.GroupElement3D group)
+        public static IEnumerable<Helix.Element3D> EnumerateDescendents(this Helix.GroupElement3D group, bool invisible = false)
         {
             if (group.Children.Count == 0)
                 return Enumerable.Empty<Helix.Element3D>();
 
-            var descendents = group.Children.AsEnumerable();
-            foreach (var branch in group.Children.OfType<Helix.GroupElement3D>())
+            var validChildren = group.Children.Where(e => invisible || e.Visible);
+
+            var descendents = validChildren;
+            foreach (var branch in validChildren.OfType<Helix.GroupElement3D>())
                 descendents = descendents.Concat(branch.EnumerateDescendents());
 
             return descendents;

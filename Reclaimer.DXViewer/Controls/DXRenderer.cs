@@ -32,16 +32,13 @@ namespace Reclaimer.Controls
     public class DXRenderer : Control, IDisposable
     {
         private const string PART_Viewport = "PART_Viewport";
-
-        private const double RAD_089 = 1.5706217940;
-        private const double RAD_090 = 1.5707963268;
-        private const double RAD_360 = 6.2831853072;
         private const double SpeedMultipler = 0.001;
 
         private static readonly Helix.EffectsManager effectsManager = new Helix.DefaultEffectsManager();
 
         #region Dependency Properties
 
+        #region Camera
         public static readonly DependencyProperty CameraProperty =
             DependencyProperty.Register(nameof(Camera), typeof(Helix.PerspectiveCamera), typeof(DXRenderer), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
@@ -101,18 +98,36 @@ namespace Reclaimer.Controls
             get { return (double)GetValue(PitchProperty); }
             private set { SetValue(PitchPropertyKey, value); }
         }
+        #endregion
 
-        public Media3D.Point3D Position
+        #region Manipulation
+        public static readonly DependencyProperty ManipulationEnabledProperty =
+            DependencyProperty.Register(nameof(ManipulationEnabled), typeof(bool), typeof(DXRenderer), new PropertyMetadata(false));
+
+        public static readonly DependencyProperty HighlightMaterialProperty =
+            DependencyProperty.Register(nameof(HighlightMaterial), typeof(Helix.Material), typeof(DXRenderer), new PropertyMetadata(Helix.DiffuseMaterials.Yellow));
+
+        public static readonly DependencyProperty SelectionMaterialProperty =
+            DependencyProperty.Register(nameof(SelectionMaterial), typeof(Helix.Material), typeof(DXRenderer), new PropertyMetadata(Helix.DiffuseMaterials.Jade));
+
+        public bool ManipulationEnabled
         {
-            get { return Viewport.Camera.Position; }
-            set { Viewport.Camera.Position = value; }
+            get { return (bool)GetValue(ManipulationEnabledProperty); }
+            set { SetValue(ManipulationEnabledProperty, value); }
         }
 
-        public Media3D.Vector3D LookDirection
+        public Helix.Material HighlightMaterial
         {
-            get { return Viewport.Camera.LookDirection; }
-            set { Viewport.Camera.LookDirection = value; }
+            get { return (Helix.Material)GetValue(HighlightMaterialProperty); }
+            set { SetValue(HighlightMaterialProperty, value); }
         }
+
+        public Helix.Material SelectionMaterial
+        {
+            get { return (Helix.Material)GetValue(SelectionMaterialProperty); }
+            set { SetValue(SelectionMaterialProperty, value); }
+        }
+        #endregion
 
         #endregion
 
@@ -129,6 +144,12 @@ namespace Reclaimer.Controls
         private Helix.Viewport3DX Viewport { get; set; }
         private readonly List<Helix.Element3D> children = new List<Helix.Element3D>();
 
+        private readonly Helix.GroupModel3D highlightedGeometry = new Helix.GroupModel3D
+        {
+            IsHitTestVisible = false,
+            Visibility = Visibility.Collapsed
+        };
+
         private readonly Helix.GroupModel3D selectedGeometry = new Helix.GroupModel3D
         {
             IsHitTestVisible = false,
@@ -137,7 +158,8 @@ namespace Reclaimer.Controls
 
         private readonly Helix.TransformManipulator3D manipulator = new Helix.TransformManipulator3D
         {
-            SizeScale = 1.5,
+            EnableScaling = false,
+            SizeScale = 1,
             Visibility = Visibility.Collapsed
         };
 
@@ -196,42 +218,14 @@ namespace Reclaimer.Controls
             e.Handled = true;
         }
 
-        private static readonly Helix.Material highlightMaterial = Helix.DiffuseMaterials.Yellow;
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);
 
-            if (IsMouseCaptured)
+            if (!ManipulationEnabled || IsMouseCaptured)
                 return;
 
-            var hits = Viewport.FindHits(e.GetPosition(this));
-            if (!hits.Any())
-                return;
-
-            var hovered = hits.Select(h => (h.ModelHit as Helix.Element3D)?.FindInstanceParent())
-                .Where(i => i != null)
-                .FirstOrDefault() as Helix.GroupElement3D;
-
-            if (hovered == null)
-                return;
-
-            var allMeshes = hovered.EnumerateDescendents().OfType<Helix.MeshGeometryModel3D>();
-            selectedGeometry.Children.Clear();
-
-            foreach (var m in allMeshes)
-            {
-                selectedGeometry.Children.Add(new Helix.MeshGeometryModel3D
-                {
-                    CullMode = SharpDX.Direct3D11.CullMode.Back,
-                    DepthBias = -100,
-                    IsHitTestVisible = false,
-                    Geometry = m.Geometry,
-                    Material = highlightMaterial
-                });
-            }
-
-            selectedGeometry.Transform = hovered.Transform;
-            selectedGeometry.Visibility = Visibility.Visible;
+            SetHighlightedElement(Viewport.FindHits(e.GetPosition(this)));
         }
 
         protected override void OnPreviewMouseWheel(MouseWheelEventArgs e)
@@ -253,6 +247,7 @@ namespace Reclaimer.Controls
             Viewport.OnRendered -= Viewport_OnRendered;
 
             Viewport.Items.Remove(manipulator);
+            Viewport.Items.Remove(highlightedGeometry);
             Viewport.Items.Remove(selectedGeometry);
             foreach (var c in children)
                 Viewport.Items.Remove(c);
@@ -265,6 +260,7 @@ namespace Reclaimer.Controls
             if (Viewport == null) return;
 
             Viewport.Items.Add(manipulator);
+            Viewport.Items.Add(highlightedGeometry);
             Viewport.Items.Add(selectedGeometry);
             foreach (var c in children)
                 Viewport.Items.Add(c);
@@ -280,43 +276,10 @@ namespace Reclaimer.Controls
             ScaleToContent();
         }
 
-        private void Viewport_MouseDown3D(object sender, RoutedEventArgs x)
+        private void Viewport_MouseDown3D(object sender, RoutedEventArgs e)
         {
-            var e = x as Helix.MouseDown3DEventArgs;
-
-            var model = (e.HitTestResult?.ModelHit as Helix.Element3D);
-
-            if (model != null && model.IsDescendentOf(manipulator))
-                return;
-            else model = model?.FindInstanceParent();
-
-            if (model == null)
-            {
-                manipulator.Target = null;
-                manipulator.Visibility = Visibility.Collapsed;
-                return;
-            }
-
-            var bounds = model.GetTotalBounds(true);
-            var center = bounds.Center;
-            manipulator.Target = null;
-            manipulator.CenterOffset = center;
-            manipulator.Target = model;
-            manipulator.Visibility = Visibility.Visible;
-        }
-
-        private static Helix.MeshGeometryModel3D box = new Helix.MeshGeometryModel3D { Material = Helix.DiffuseMaterials.Red };
-        public void HighlightBounds(SharpDX.BoundingBox bounds)
-        {
-            var r3d = new Media3D.Rect3D(bounds.Minimum.ToPoint3D(), bounds.Size.ToSize3D());
-            var b = new Helix.MeshBuilder();
-            b.AddBoundingBox(r3d, 0.1);
-            b.AddSphere(bounds.Center, 0.1);
-            var geom = b.ToMeshGeometry3D();
-
-            box.Geometry = geom;
-            if (!Viewport.Items.Contains(box))
-                Viewport.Items.Add(box);
+            if (ManipulationEnabled)
+                SetSelectedElement((e as Helix.Mouse3DEventArgs)?.HitTestResult);
         }
         #endregion
 
@@ -339,6 +302,120 @@ namespace Reclaimer.Controls
 
             UpdateCameraPosition();
             UpdateCameraDirection(new Point(cursorPos.X, cursorPos.Y));
+        }
+
+        #endregion
+
+        #region Manipulation
+
+        //for debug purposes
+        private static Helix.MeshGeometryModel3D box = new Helix.MeshGeometryModel3D { Material = Helix.DiffuseMaterials.Red };
+        public void HighlightBounds(SharpDX.BoundingBox bounds)
+        {
+            var r3d = new Media3D.Rect3D(bounds.Minimum.ToPoint3D(), bounds.Size.ToSize3D());
+            var b = new Helix.MeshBuilder();
+            b.AddBoundingBox(r3d, 0.1);
+            b.AddSphere(bounds.Center, 0.1);
+            var geom = b.ToMeshGeometry3D();
+
+            box.Geometry = geom;
+            if (!Viewport.Items.Contains(box))
+                Viewport.Items.Add(box);
+        }
+
+        private void EmptyMimicGeometry(Helix.GroupModel3D model)
+        {
+            foreach (var e in model.Children)
+                e.Dispose();
+
+            model.Children.Clear();
+            model.Visibility = Visibility.Collapsed;
+        }
+
+        private IEnumerable<Helix.MeshGeometryModel3D> MimicGeometry(Helix.GroupElement3D element, Helix.Material material)
+        {
+            var allMeshes = element.EnumerateDescendents().OfType<Helix.MeshGeometryModel3D>();
+            foreach (var m in allMeshes)
+            {
+                var transform = m.Transform.Value;
+                transform *= m.EnumerateAncestors()
+                    .Select(e => e.Transform.Value)
+                    .Aggregate((a, b) => a * b);
+
+                yield return new Helix.MeshGeometryModel3D
+                {
+                    CullMode = SharpDX.Direct3D11.CullMode.Back,
+                    DepthBias = -100,
+                    Geometry = m.Geometry,
+                    Material = material,
+                    Transform = new Media3D.MatrixTransform3D(transform)
+                };
+            }
+        }
+
+        private Helix.Element3D highlightedElement;
+        private void SetHighlightedElement(IList<Helix.HitTestResult> hits)
+        {
+            if (HighlightMaterial == null)
+                return;
+
+            var targeted = hits?.Select(h => (h.ModelHit as Helix.Element3D)?.FindInstanceParent())
+                .Where(i => i != null)
+                .FirstOrDefault() as Helix.GroupElement3D;
+
+            if (targeted == null)
+            {
+                highlightedElement = null;
+                EmptyMimicGeometry(highlightedGeometry);
+                return;
+            }
+            else if (targeted == highlightedElement || targeted == selectedElement)
+                return;
+
+            EmptyMimicGeometry(highlightedGeometry);
+            foreach (var m in MimicGeometry(targeted, HighlightMaterial))
+                highlightedGeometry.Children.Add(m);
+
+            highlightedElement = targeted;
+            highlightedGeometry.Visibility = Visibility.Visible;
+        }
+
+        private Helix.Element3D selectedElement;
+        private void SetSelectedElement(Helix.HitTestResult hit)
+        {
+            var model = hit?.ModelHit as Helix.Element3D;
+
+            if (model != null && model.IsDescendentOf(manipulator))
+                return;
+            else model = model?.FindInstanceParent();
+
+            if (model == null)
+            {
+                selectedElement = null;
+                manipulator.Target = null;
+                manipulator.Visibility = Visibility.Collapsed;
+                EmptyMimicGeometry(selectedGeometry);
+                return;
+            }
+            else if (model == selectedElement)
+                return;
+
+            manipulator.Target = null;
+            manipulator.CenterOffset = model.GetTotalBounds(true).Center;
+            manipulator.Target = model;
+
+            if (SelectionMaterial != null)
+            {
+                EmptyMimicGeometry(selectedGeometry);
+                foreach (var m in MimicGeometry(model as Helix.GroupElement3D, SelectionMaterial))
+                    selectedGeometry.Children.Add(m);
+
+                selectedGeometry.Visibility = Visibility.Visible;
+            }
+
+            selectedElement = model;
+            EmptyMimicGeometry(highlightedGeometry);
+            manipulator.Visibility = Visibility.Visible;
         }
 
         #endregion

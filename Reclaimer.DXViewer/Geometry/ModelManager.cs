@@ -152,7 +152,7 @@ namespace Reclaimer.Geometry
         {
             foreach (var instance in instances)
             {
-                foreach (var element in instance.Element.EnumerateDescendents().Reverse().ToList())
+                foreach (var element in instance.Element.EnumerateDescendents(true).Reverse().ToList())
                 {
                     (element as Helix.GroupElement3D)?.Children.Clear();
                     element.Dispose();

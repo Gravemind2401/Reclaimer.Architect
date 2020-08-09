@@ -179,7 +179,8 @@
             <Grid>
                 <local:DXRenderer x:Name="renderer"
                             x:FieldModifier="private" 
-                            Background="CornflowerBlue" />
+                            Background="CornflowerBlue"
+                            ManipulationEnabled="True"/>
                 <ToggleButton Style="{StaticResource showHideStyle}"
                               HorizontalAlignment="Left" VerticalAlignment="Center"
                               Padding="2,20" Click="btnToggleDetails_Click">
