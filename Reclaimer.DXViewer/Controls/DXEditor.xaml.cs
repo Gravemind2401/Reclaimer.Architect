@@ -87,6 +87,7 @@ namespace Reclaimer.Controls
 
             DataContext = this;
 
+            modelGroup.Visibility = Visibility.Collapsed;
             renderer.AddChild(modelGroup);
         }
 
@@ -98,24 +99,60 @@ namespace Reclaimer.Controls
             TabModel.ToolTip = fileName;
             TabModel.Header = Utils.GetFileName(fileName);
 
-            scenario = scenarioTag.ReadMetadata<Blam.Halo3.scenario>();
+            Task.Run(() =>
+            {
+                scenario = scenarioTag.ReadMetadata<Blam.Halo3.scenario>();
+                ReadGeometry();
 
+                SetStatus("Rendering geometry...");
+                Dispatcher.Invoke(RenderGeometry);
+
+                ClearStatus();
+
+                Dispatcher.Invoke(() =>
+                {
+                    renderer.ScaleToContent();
+
+                    var elements = bspInstances.Where(i => i != null)
+                        .Select(i => i.Element);
+
+                    if (elements.Any())
+                    {
+                        var bounds = elements.GetTotalBounds();
+                        renderer.CameraSpeed = Math.Ceiling(bounds.Size.Length());
+                        renderer.ZoomToBounds(bounds);
+                    }
+
+                    modelGroup.Visibility = Visibility.Visible;
+                });
+            });
+        }
+
+        private void ReadGeometry()
+        {
             foreach (var bsp in scenario.StructureBsps)
             {
+                SetStatus($"Loading bsp palette... ({scenario.StructureBsps.IndexOf(bsp) + 1} of {scenario.StructureBsps.Count})");
+
                 IRenderGeometry geom;
                 if (ContentFactory.TryGetGeometryContent(bsp.BspReference.Tag, out geom))
                     bspPalette.Add(new ModelManager(sceneManager, geom.ReadGeometry(0)));
                 else bspPalette.Add(null);
+
+                bspPalette[bspPalette.Count - 1]?.PreloadTextures();
             }
 
-            LoadPalette(scenario.SceneryPalette, sceneryPalette);
-            //LoadPalette(scenario.BipedPalette, bipedPalette);
-            //LoadPalette(scenario.VehiclePalette, vehiclePalette);
-            //LoadPalette(scenario.EquipmentPalette, equipmentPalette);
-            //LoadPalette(scenario.WeaponPalette, weaponPalette);
-            LoadPalette(scenario.MachinePalette, machinePalette);
-            LoadPalette(scenario.CratePalette, cratePalette);
+            LoadPalette(scenario.SceneryPalette, sceneryPalette, "scenery");
+            LoadPalette(scenario.BipedPalette, bipedPalette, "biped");
+            LoadPalette(scenario.VehiclePalette, vehiclePalette, "vehicle");
+            LoadPalette(scenario.EquipmentPalette, equipmentPalette, "equipment");
+            LoadPalette(scenario.WeaponPalette, weaponPalette, "weapon");
+            LoadPalette(scenario.MachinePalette, machinePalette, "machine");
+            LoadPalette(scenario.CratePalette, cratePalette, "crate");
+        }
 
+        private void RenderGeometry()
+        {
             var bspNode = new TreeItemModel { Header = "sbsp", IsChecked = true };
 
             for (int i = 0; i < scenario.StructureBsps.Count; i++)
@@ -130,6 +167,7 @@ namespace Reclaimer.Controls
                 }
 
                 var inst = manager.GenerateModel();
+                inst.Element.IsHitTestVisible = false;
                 bspInstances.Add(inst);
 
                 var permNode = new TreeItemModel { Header = bsp.BspReference.Tag.FileName(), IsChecked = true, Tag = inst };
@@ -140,10 +178,10 @@ namespace Reclaimer.Controls
                 TreeViewItems.Add(bspNode);
 
             LoadInstances("scen", scenario.SceneryPlacements, sceneryPalette);
-            //LoadInstances("bipd", scenario.BipedPlacements, bipedPalette);
-            //LoadInstances("vehi", scenario.VehiclePlacements, vehiclePalette);
-            //LoadInstances("eqip", scenario.EquipmentPlacements, equipmentPalette);
-            //LoadInstances("weap", scenario.WeaponPlacements, weaponPalette);
+            LoadInstances("bipd", scenario.BipedPlacements, bipedPalette);
+            LoadInstances("vehi", scenario.VehiclePlacements, vehiclePalette);
+            LoadInstances("eqip", scenario.EquipmentPlacements, equipmentPalette);
+            LoadInstances("weap", scenario.WeaponPlacements, weaponPalette);
             LoadInstances("mach", scenario.MachinePlacements, machinePalette);
             LoadInstances("bloc", scenario.CratePlacements, cratePalette);
 
@@ -154,14 +192,18 @@ namespace Reclaimer.Controls
                 modelGroup.Children.Add(m.Element);
         }
 
-        private void LoadPalette(IEnumerable<Blam.Halo3.PaletteItem> items, IList<CompositeModelManager> target)
+        private void LoadPalette(IList<Blam.Halo3.PaletteItem> items, IList<CompositeModelManager> target, string name)
         {
+            var index = 1;
             foreach (var item in items)
             {
+                SetStatus($"Loading {name} palette... ({index++} of {items.Count})");
                 CompositeGeometryModel geom;
                 if (CompositeModelFactory.TryGetModel(item.ObjectReference.Tag, out geom))
                     target.Add(new CompositeModelManager(sceneManager, geom));
                 else target.Add(null);
+
+                target[target.Count - 1]?.PreloadTextures();
             }
         }
 
@@ -215,7 +257,7 @@ namespace Reclaimer.Controls
             if (item != tv.SelectedItem)
                 return; //because this event bubbles to the parent node
 
-            var inst = item.Tag as CompositeModelInstance;
+            var inst = item.Tag as IModelInstance;
             if (inst != null)
                 renderer.ZoomToBounds(inst.Element.GetTotalBounds(), 500);
         }
@@ -244,20 +286,16 @@ namespace Reclaimer.Controls
                     parent.IsChecked = false;
                 else parent.IsChecked = null;
 
-                if (item.Tag is ModelInstance)
-                    (item.Tag as ModelInstance).Element.Visibility = (item.IsChecked ?? false) ? Visibility.Visible : Visibility.Collapsed;
-                if (item.Tag is CompositeModelInstance)
-                    (item.Tag as CompositeModelInstance).Element.Visibility = (item.IsChecked ?? false) ? Visibility.Visible : Visibility.Collapsed;
+                if (item.Tag is IModelInstance)
+                    (item.Tag as IModelInstance).Element.Visibility = (item.IsChecked ?? false) ? Visibility.Visible : Visibility.Collapsed;
             }
             else
             {
                 foreach (TreeItemModel i in item.Items)
                 {
                     i.IsChecked = item.IsChecked;
-                    if (i.Tag is ModelInstance)
-                        (i.Tag as ModelInstance).Element.Visibility = (i.IsChecked ?? false) ? Visibility.Visible : Visibility.Collapsed;
-                    if (i.Tag is CompositeModelInstance)
-                        (i.Tag as CompositeModelInstance).Element.Visibility = (i.IsChecked ?? false) ? Visibility.Visible : Visibility.Collapsed;
+                    if (i.Tag is IModelInstance)
+                        (i.Tag as IModelInstance).Element.Visibility = (i.IsChecked ?? false) ? Visibility.Visible : Visibility.Collapsed;
                 }
             }
         }

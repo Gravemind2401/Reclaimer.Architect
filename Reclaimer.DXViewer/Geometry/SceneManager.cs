@@ -53,6 +53,12 @@ namespace Reclaimer.Geometry
             return material;
         }
 
+        public void LoadTexture(IGeometryMaterial mat)
+        {
+            GetTexture(mat, MaterialUsage.Diffuse);
+            //GetTexture(mat, MaterialUsage.Normal);
+        }
+
         private Helix.TextureModel GetTexture(IGeometryMaterial mat, MaterialUsage usage)
         {
             var sub = mat?.Submaterials.FirstOrDefault(s => s.Usage == MaterialUsage.Diffuse);

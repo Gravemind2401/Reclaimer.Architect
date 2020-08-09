@@ -40,6 +40,13 @@ namespace Reclaimer.Geometry
             }
         }
 
+        public void PreloadTextures()
+        {
+            baseManager.PreloadTextures();
+            foreach (var manager in managersByVariant.Values.SelectMany(v => v))
+                manager.PreloadTextures();
+        }
+
         private void AddDefaults(GeometryModelAttachment attached, List<ModelManager> collection)
         {
             var parentMarker = Model.BaseModel.MarkerGroups.FirstOrDefault(g => g.Name == attached.ParentMarker)?.Markers.First();
@@ -132,7 +139,7 @@ namespace Reclaimer.Geometry
         }
     }
 
-    public class CompositeModelInstance
+    public class CompositeModelInstance : IModelInstance
     {
         private readonly Dictionary<string, List<ModelInstance>> lookup = new Dictionary<string, List<ModelInstance>>();
 

@@ -124,6 +124,7 @@
     <Compile Include="Controls\DXRenderer.cs" />
     <Compile Include="Geometry\CompositeGeometryModel.cs" />
     <Compile Include="Geometry\CompositeModelManager.cs" />
+    <Compile Include="Geometry\IModelInstance.cs" />
     <Compile Include="Geometry\MeshTemplate.cs" />
     <Compile Include="Geometry\ModelManager.cs" />
     <Compile Include="Geometry\SceneManager.cs" />

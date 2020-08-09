@@ -41,6 +41,17 @@ namespace Reclaimer.Geometry
                 templates.Add(i, MeshTemplate.FromModel(model, i));
         }
 
+        public void PreloadTextures()
+        {
+            var matIndexes = Model.Meshes.SelectMany(m => m.Submeshes)
+                .Select(m => m.MaterialIndex)
+                .Where(i => i >= 0)
+                .Distinct();
+
+            foreach (var index in matIndexes)
+                Scene.LoadTexture(Model.Materials[index]);
+        }
+
         public ModelInstance GenerateModel() => GenerateModel(DefaultVariant);
 
         public ModelInstance GenerateModel(GeometryModelVariant variant)
@@ -155,7 +166,7 @@ namespace Reclaimer.Geometry
         }
     }
 
-    public class ModelInstance
+    public class ModelInstance : IModelInstance
     {
         private readonly List<MeshTemplate> instanceTemplates = new List<MeshTemplate>();
         private readonly Dictionary<object, Helix.Element3D> tagLookup = new Dictionary<object, Helix.Element3D>();
