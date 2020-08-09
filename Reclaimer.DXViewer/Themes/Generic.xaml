@@ -15,18 +15,20 @@
                             CameraMode="{Binding CameraMode, RelativeSource={RelativeSource TemplatedParent}}"
                             Background="CornflowerBlue"
                             BackgroundColor="CornflowerBlue"
-                            ShowFrameRate="True"
+                            ShowViewCube="False"
+                            ShowCoordinateSystem="True"
                             ZoomExtentsWhenLoaded="False"
-                            EnableDesignModeRendering="True"
                             IsInertiaEnabled="True"
                             FixedRotationPointEnabled="True"
                             FixedRotationPoint="0,0,0"
                             IsMoveEnabled="False"
-                            ModelUpDirection="0,0,1">
+                            IsRotationEnabled="False"
+                            ModelUpDirection="0,0,1"
+                            UseDefaultGestures="False">
                             <hx:Viewport3DX.InputBindings>
                                 <!--<KeyBinding Command="hx:ViewportCommands.ZoomExtents" Gesture="Control+E" />-->
-                                <MouseBinding Command="hx:ViewportCommands.Rotate" Gesture="LeftClick" />
-                                <MouseBinding Command="hx:ViewportCommands.Zoom" Gesture="MiddleClick" />
+                                <!--<MouseBinding Command="hx:ViewportCommands.Rotate" Gesture="LeftClick" />-->
+                                <!--<MouseBinding Command="hx:ViewportCommands.Zoom" Gesture="MiddleClick" />-->
                                 <!--<MouseBinding Command="hx:ViewportCommands.Pan" Gesture="LeftClick" />-->
                             </hx:Viewport3DX.InputBindings>
                             <hx:DirectionalLight3D Color="White" Direction="{Binding Camera.LookDirection, ElementName=PART_Viewport}" />

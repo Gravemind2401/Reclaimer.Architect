@@ -177,6 +177,7 @@ namespace Reclaimer.Geometry
         internal ModelInstance(Helix.GroupModel3D element)
         {
             Element = element;
+            element.Tag = this;
         }
 
         internal void InitInstances()

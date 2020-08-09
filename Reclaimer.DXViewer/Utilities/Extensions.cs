@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Numerics = System.Numerics;
 using Media3D = System.Windows.Media.Media3D;
 using Helix = HelixToolkit.Wpf.SharpDX;
+using Reclaimer.Geometry;
 
 namespace Reclaimer.Utilities
 {
@@ -80,6 +81,34 @@ namespace Reclaimer.Utilities
             return new Numerics.Vector3((float)vector.X, (float)vector.Y, (float)vector.Z);
         }
 
+        public static bool IsDescendentOf(this Helix.Element3D element, Helix.Element3D target)
+        {
+            var parent = element.Parent as Helix.Element3D;
+            if (parent == null)
+                return false;
+            else if (parent == target)
+                return true;
+            else return IsDescendentOf(parent, target);
+        }
+
+        public static Helix.Element3D FindInstanceParent(this Helix.Element3D element)
+        {
+            return element.EnumerateAncestors().Reverse().FirstOrDefault(e => e.Tag is IModelInstance);
+        }
+
+        public static IEnumerable<Helix.Element3D> EnumerateAncestors(this Helix.Element3D element)
+        {
+            while (element.Parent != null)
+            {
+                var parent = element.Parent as Helix.Element3D;
+                if (parent == null)
+                    break;
+
+                yield return parent;
+                element = parent;
+            }
+        }
+
         public static IEnumerable<Helix.Element3D> EnumerateDescendents(this Helix.GroupElement3D group)
         {
             if (group.Children.Count == 0)
@@ -127,7 +156,7 @@ namespace Reclaimer.Utilities
                 boundsList.Add(original ? node.OriginalBounds : node.BoundsWithTransform);
             else if (node.ItemsCount > 0)
             {
-                foreach (var child in node.Items)
+                foreach (var child in node.Items.Where(i => i.Visible))
                     CollectChildBounds(child, boundsList, original);
             }
         }

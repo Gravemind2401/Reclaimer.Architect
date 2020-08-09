@@ -150,7 +150,7 @@ namespace Reclaimer.Geometry
         {
             lookup = variants;
 
-            Element = new Helix.GroupModel3D();
+            Element = new Helix.GroupModel3D { Tag = this };
 
             foreach (var child in lookup.Values.SelectMany(v => v))
                 Element.Children.Add(child.Element);

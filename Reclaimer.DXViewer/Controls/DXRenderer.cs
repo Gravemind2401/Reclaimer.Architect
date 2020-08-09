@@ -129,6 +129,18 @@ namespace Reclaimer.Controls
         private Helix.Viewport3DX Viewport { get; set; }
         private readonly List<Helix.Element3D> children = new List<Helix.Element3D>();
 
+        private readonly Helix.GroupModel3D selectedGeometry = new Helix.GroupModel3D
+        {
+            IsHitTestVisible = false,
+            Visibility = Visibility.Collapsed
+        };
+
+        private readonly Helix.TransformManipulator3D manipulator = new Helix.TransformManipulator3D
+        {
+            SizeScale = 1.5,
+            Visibility = Visibility.Collapsed
+        };
+
         public DXRenderer() : base()
         {
             Loaded += DXRenderer_Loaded;
@@ -159,7 +171,7 @@ namespace Reclaimer.Controls
         {
             base.OnPreviewMouseLeftButtonDown(e);
 
-            if (!CheckKeyState(Keys.ControlKey))
+            if (CheckKeyState(Keys.ControlKey))
                 return;
 
             Focus();
@@ -175,7 +187,7 @@ namespace Reclaimer.Controls
         {
             base.OnPreviewMouseLeftButtonUp(e);
 
-            if (!CheckKeyState(Keys.Control))
+            if (CheckKeyState(Keys.ControlKey))
                 return;
 
             ReleaseMouseCapture();
@@ -184,12 +196,50 @@ namespace Reclaimer.Controls
             e.Handled = true;
         }
 
+        private static readonly Helix.Material highlightMaterial = Helix.DiffuseMaterials.Yellow;
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            base.OnMouseMove(e);
+
+            if (IsMouseCaptured)
+                return;
+
+            var hits = Viewport.FindHits(e.GetPosition(this));
+            if (!hits.Any())
+                return;
+
+            var hovered = hits.Select(h => (h.ModelHit as Helix.Element3D)?.FindInstanceParent())
+                .Where(i => i != null)
+                .FirstOrDefault() as Helix.GroupElement3D;
+
+            if (hovered == null)
+                return;
+
+            var allMeshes = hovered.EnumerateDescendents().OfType<Helix.MeshGeometryModel3D>();
+            selectedGeometry.Children.Clear();
+
+            foreach (var m in allMeshes)
+            {
+                selectedGeometry.Children.Add(new Helix.MeshGeometryModel3D
+                {
+                    CullMode = SharpDX.Direct3D11.CullMode.Back,
+                    DepthBias = -100,
+                    IsHitTestVisible = false,
+                    Geometry = m.Geometry,
+                    Material = highlightMaterial
+                });
+            }
+
+            selectedGeometry.Transform = hovered.Transform;
+            selectedGeometry.Visibility = Visibility.Visible;
+        }
+
         protected override void OnPreviewMouseWheel(MouseWheelEventArgs e)
         {
             base.OnPreviewMouseWheel(e);
 
-            if (!CheckKeyState(Keys.Control))
-                return;
+            //if (!CheckKeyState(Keys.Control))
+            //    return;
 
             if (e.Delta > 0) CameraSpeed = ClipValue(Math.Ceiling(CameraSpeed * 1050) / 1000, 0.001, MaxCameraSpeed);
             else CameraSpeed = ClipValue(Math.Floor(CameraSpeed * 0950) / 1000, 0.001, MaxCameraSpeed);
@@ -199,8 +249,11 @@ namespace Reclaimer.Controls
         {
             if (Viewport == null) return;
 
+            Viewport.MouseDown3D -= Viewport_MouseDown3D;
             Viewport.OnRendered -= Viewport_OnRendered;
 
+            Viewport.Items.Remove(manipulator);
+            Viewport.Items.Remove(selectedGeometry);
             foreach (var c in children)
                 Viewport.Items.Remove(c);
 
@@ -211,17 +264,59 @@ namespace Reclaimer.Controls
         {
             if (Viewport == null) return;
 
+            Viewport.Items.Add(manipulator);
+            Viewport.Items.Add(selectedGeometry);
             foreach (var c in children)
                 Viewport.Items.Add(c);
 
             Viewport.EffectsManager = effectsManager;
             Viewport.OnRendered += Viewport_OnRendered;
+            Viewport.MouseDown3D += Viewport_MouseDown3D;
         }
 
         private void Viewport_OnRendered(object sender, EventArgs e)
         {
             Viewport.OnRendered -= Viewport_OnRendered;
             ScaleToContent();
+        }
+
+        private void Viewport_MouseDown3D(object sender, RoutedEventArgs x)
+        {
+            var e = x as Helix.MouseDown3DEventArgs;
+
+            var model = (e.HitTestResult?.ModelHit as Helix.Element3D);
+
+            if (model != null && model.IsDescendentOf(manipulator))
+                return;
+            else model = model?.FindInstanceParent();
+
+            if (model == null)
+            {
+                manipulator.Target = null;
+                manipulator.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            var bounds = model.GetTotalBounds(true);
+            var center = bounds.Center;
+            manipulator.Target = null;
+            manipulator.CenterOffset = center;
+            manipulator.Target = model;
+            manipulator.Visibility = Visibility.Visible;
+        }
+
+        private static Helix.MeshGeometryModel3D box = new Helix.MeshGeometryModel3D { Material = Helix.DiffuseMaterials.Red };
+        public void HighlightBounds(SharpDX.BoundingBox bounds)
+        {
+            var r3d = new Media3D.Rect3D(bounds.Minimum.ToPoint3D(), bounds.Size.ToSize3D());
+            var b = new Helix.MeshBuilder();
+            b.AddBoundingBox(r3d, 0.1);
+            b.AddSphere(bounds.Center, 0.1);
+            var geom = b.ToMeshGeometry3D();
+
+            box.Geometry = geom;
+            if (!Viewport.Items.Contains(box))
+                Viewport.Items.Add(box);
         }
         #endregion
 
@@ -256,7 +351,7 @@ namespace Reclaimer.Controls
             var bounds = Viewport.Items.GetTotalBounds();
 
             Viewport.FixedRotationPoint = bounds.Center.ToPoint3D();
-            (Viewport.Camera as Helix.PerspectiveCamera).FarPlaneDistance = bounds.Size.Length() * 3;
+            (Viewport.Camera as Helix.PerspectiveCamera).FarPlaneDistance = bounds.Size.Length() * 2;
             (Viewport.Camera as Helix.PerspectiveCamera).NearPlaneDistance = 0.01;
 
             ZoomToBounds(bounds);
@@ -404,7 +499,7 @@ namespace Reclaimer.Controls
             var upVector = Numerics.Vector3.Normalize(Viewport.Camera.UpDirection.ToNumericsVector3());
             var forwardVector = Numerics.Vector3.Normalize(Viewport.Camera.LookDirection.ToNumericsVector3());
             var rightVector = Numerics.Vector3.Normalize(Numerics.Vector3.Cross(forwardVector, upVector));
-            
+
 
             var yaw = Numerics.Matrix4x4.CreateFromAxisAngle(upAnchor, -deltaX);
 
