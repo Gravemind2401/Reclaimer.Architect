@@ -47,6 +47,7 @@ namespace Reclaimer.Controls
         private Blam.Halo3.scenario scenario;
 
         private readonly List<ModelManager> bspPalette;
+        private readonly List<CompositeModelManager> skyPalette;
         private readonly List<CompositeModelManager> sceneryPalette;
         private readonly List<CompositeModelManager> bipedPalette;
         private readonly List<CompositeModelManager> vehiclePalette;
@@ -74,6 +75,7 @@ namespace Reclaimer.Controls
             sceneManager = new SceneManager();
 
             bspPalette = new List<ModelManager>();
+            skyPalette = new List<CompositeModelManager>();
             sceneryPalette = new List<CompositeModelManager>();
             bipedPalette = new List<CompositeModelManager>();
             vehiclePalette = new List<CompositeModelManager>();
@@ -142,6 +144,18 @@ namespace Reclaimer.Controls
                 bspPalette[bspPalette.Count - 1]?.PreloadTextures();
             }
 
+            foreach (var sky in scenario.SkyReferences)
+            {
+                SetStatus($"Loading sky palette... ({scenario.SkyReferences.IndexOf(sky) + 1} of {scenario.SkyReferences.Count})");
+
+                CompositeGeometryModel geom;
+                if (CompositeModelFactory.TryGetModel(sky.SkyObjectReference.Tag, out geom))
+                    skyPalette.Add(new CompositeModelManager(sceneManager, geom));
+                else skyPalette.Add(null);
+
+                skyPalette[skyPalette.Count - 1]?.PreloadTextures();
+            }
+
             LoadPalette(scenario.SceneryPalette, sceneryPalette, "scenery");
             LoadPalette(scenario.BipedPalette, bipedPalette, "biped");
             LoadPalette(scenario.VehiclePalette, vehiclePalette, "vehicle");
@@ -176,6 +190,32 @@ namespace Reclaimer.Controls
 
             if (bspNode.HasItems)
                 TreeViewItems.Add(bspNode);
+
+            var skyNode = new TreeItemModel { Header = "sky", IsChecked = true };
+            var skyInstances = new List<CompositeModelInstance>();
+
+            for (int i = 0; i < scenario.SkyReferences.Count; i++)
+            {
+                var sky = scenario.SkyReferences[i];
+                var manager = skyPalette[i];
+
+                if (manager == null)
+                {
+                    skyInstances.Add(null);
+                    continue;
+                }
+
+                var inst = manager.GenerateModel();
+                inst.Element.IsHitTestVisible = false;
+                skyInstances.Add(inst);
+
+                var permNode = new TreeItemModel { Header = sky.SkyObjectReference.Tag.FileName(), IsChecked = true, Tag = inst };
+                skyNode.Items.Add(permNode);
+            }
+
+            objectInstances.Add("sky", skyInstances);
+            if (skyNode.HasItems)
+                TreeViewItems.Add(skyNode);
 
             LoadInstances("scen", scenario.SceneryPlacements, sceneryPalette);
             LoadInstances("bipd", scenario.BipedPlacements, bipedPalette);

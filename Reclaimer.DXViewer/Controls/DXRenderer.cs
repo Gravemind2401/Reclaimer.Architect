@@ -247,8 +247,6 @@ namespace Reclaimer.Controls
             Viewport.OnRendered -= Viewport_OnRendered;
 
             Viewport.Items.Remove(manipulator);
-            Viewport.Items.Remove(highlightedGeometry);
-            Viewport.Items.Remove(selectedGeometry);
             foreach (var c in children)
                 Viewport.Items.Remove(c);
 
@@ -260,8 +258,6 @@ namespace Reclaimer.Controls
             if (Viewport == null) return;
 
             Viewport.Items.Add(manipulator);
-            Viewport.Items.Add(highlightedGeometry);
-            Viewport.Items.Add(selectedGeometry);
             foreach (var c in children)
                 Viewport.Items.Add(c);
 
@@ -323,8 +319,10 @@ namespace Reclaimer.Controls
                 Viewport.Items.Add(box);
         }
 
-        private void EmptyMimicGeometry(Helix.GroupModel3D model)
+        private void EmptyMimicGeometry(Helix.GroupElement3D model)
         {
+            (model.Parent as Helix.GroupElement3D)?.Children.Remove(model);
+
             foreach (var e in model.Children)
                 e.Dispose();
 
@@ -332,25 +330,31 @@ namespace Reclaimer.Controls
             model.Visibility = Visibility.Collapsed;
         }
 
-        private IEnumerable<Helix.MeshGeometryModel3D> MimicGeometry(Helix.GroupElement3D element, Helix.Material material)
+        private void MimicGeometry(Helix.GroupElement3D source, Helix.GroupElement3D target, Helix.Material material)
         {
-            var allMeshes = element.EnumerateDescendents().OfType<Helix.MeshGeometryModel3D>();
+            EmptyMimicGeometry(target);
+
+            var allMeshes = source.EnumerateDescendents().OfType<Helix.MeshGeometryModel3D>();
             foreach (var m in allMeshes)
             {
                 var transform = m.Transform.Value;
                 transform *= m.EnumerateAncestors()
+                    .TakeWhile(e => e != source)
                     .Select(e => e.Transform.Value)
                     .Aggregate((a, b) => a * b);
 
-                yield return new Helix.MeshGeometryModel3D
+                target.Children.Add(new Helix.MeshGeometryModel3D
                 {
                     CullMode = SharpDX.Direct3D11.CullMode.Back,
                     DepthBias = -100,
                     Geometry = m.Geometry,
                     Material = material,
                     Transform = new Media3D.MatrixTransform3D(transform)
-                };
+                });
             }
+
+            source.Children.Add(target);
+            target.Visibility = Visibility.Visible;
         }
 
         private Helix.Element3D highlightedElement;
@@ -372,12 +376,8 @@ namespace Reclaimer.Controls
             else if (targeted == highlightedElement || targeted == selectedElement)
                 return;
 
-            EmptyMimicGeometry(highlightedGeometry);
-            foreach (var m in MimicGeometry(targeted, HighlightMaterial))
-                highlightedGeometry.Children.Add(m);
-
+            MimicGeometry(targeted, highlightedGeometry, HighlightMaterial);
             highlightedElement = targeted;
-            highlightedGeometry.Visibility = Visibility.Visible;
         }
 
         private Helix.Element3D selectedElement;
@@ -405,13 +405,7 @@ namespace Reclaimer.Controls
             manipulator.Target = model;
 
             if (SelectionMaterial != null)
-            {
-                EmptyMimicGeometry(selectedGeometry);
-                foreach (var m in MimicGeometry(model as Helix.GroupElement3D, SelectionMaterial))
-                    selectedGeometry.Children.Add(m);
-
-                selectedGeometry.Visibility = Visibility.Visible;
-            }
+                MimicGeometry(model as Helix.GroupElement3D, selectedGeometry, SelectionMaterial);
 
             selectedElement = model;
             EmptyMimicGeometry(highlightedGeometry);
