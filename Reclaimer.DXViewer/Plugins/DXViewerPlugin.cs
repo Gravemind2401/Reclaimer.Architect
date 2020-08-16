@@ -1,5 +1,6 @@
 ﻿using Adjutant.Blam.Common;
 using Adjutant.Utilities;
+using Reclaimer.Models;
 using Reclaimer.Windows;
 using System;
 using System.Collections.Generic;
@@ -73,6 +74,11 @@ namespace Reclaimer.Plugins
             {
                 if (Controls.DXEditor.CanOpenTag(modelTag))
                 {
+                    var model = new Models.ScenarioModel(modelTag);
+                    var hierarchyView = new Controls.HierarchyView { Scenario = model };
+                    var propertyView = new Controls.PropertyView { Scenario = model };
+
+
                     var viewer = new Controls.DXEditor
                     {
                         LogOutput = LogOutput,
@@ -81,9 +87,37 @@ namespace Reclaimer.Plugins
                         ClearStatus = ClearWorkingStatus
                     };
 
-                    viewer.LoadGeometry(modelTag, $"{fileName}");
+                    var layout = new DockContainerModel();
+                    var docPanel = new DocumentPanelModel();
 
-                    container.AddItem(viewer.TabModel);
+                    var mainSplit = new SplitPanelModel();
+                    mainSplit.Item1 = docPanel;
+
+                    var toolSplit = new SplitPanelModel { Orientation = System.Windows.Controls.Orientation.Vertical };
+                    var tool1 = new ToolWellModel();
+                    tool1.Children.Add(hierarchyView.TabModel);
+                    var tool2 = new ToolWellModel();
+                    tool2.Children.Add(propertyView.TabModel);
+                    toolSplit.Item1 = tool1;
+                    toolSplit.Item2 = tool2;
+
+                    mainSplit.Item2 = toolSplit;
+                    toolSplit.PanelSize = new System.Windows.GridLength(500);
+                    docPanel.AddItem(viewer.TabModel);
+                    layout.Content = mainSplit;
+
+                    var wnd = new RaftedWindow(layout, docPanel)
+                    {
+                        Width = 1600,
+                        Height = 900
+                    };
+
+                    wnd.Show();
+                    wnd.Activate();
+
+                    //viewer.LoadGeometry(modelTag, $"{fileName}");
+
+                    //container.AddItem(viewer.TabModel);
                 }
                 else
                 {

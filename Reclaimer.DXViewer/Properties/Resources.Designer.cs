@@ -59,5 +59,49 @@ namespace Reclaimer.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;scenario&gt;
+        ///  &lt;section name=&quot;mission&quot;&gt;
+        ///    &lt;enum16 name=&quot;Map Type&quot; offset=&quot;0x0&quot; visible=&quot;true&quot;&gt;
+        ///      &lt;option name=&quot;Single Player&quot; value=&quot;0x0&quot; /&gt;
+        ///      &lt;option name=&quot;Multiplayer&quot; value=&quot;0x1&quot; /&gt;
+        ///      &lt;option name=&quot;Main Menu&quot; value=&quot;0x2&quot; /&gt;
+        ///    &lt;/enum16&gt;
+        ///    &lt;flags16 name=&quot;Flags&quot; offset=&quot;0x2&quot; visible=&quot;true&quot;&gt;
+        ///      &lt;bit name=&quot;Bit 0&quot; index=&quot;0&quot; /&gt;
+        ///      &lt;bit name=&quot;Bit 1&quot; index=&quot;1&quot; /&gt;
+        ///      &lt;bit name=&quot;Bit 2&quot; index=&quot;2&quot; /&gt;
+        ///      &lt;bit name=&quot;Bit 3&quot; index=&quot;3&quot; /&gt;
+        ///     [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Halo3Scenario {
+            get {
+                return ResourceManager.GetString("Halo3Scenario", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;
+        ///&lt;node header=&quot;Mission&quot; type=&quot;Mission&quot;&gt;
+        ///  &lt;node header=&quot;Objects&quot;&gt;
+        ///    &lt;node header=&quot;Devices&quot;&gt;
+        ///      &lt;node header=&quot;Machines&quot; type=&quot;Machines&quot; /&gt;
+        ///      &lt;node header=&quot;Controls&quot; type=&quot;Controls&quot; /&gt;
+        ///      &lt;node header=&quot;Light fixtures&quot; type=&quot;LightFixtures&quot; /&gt;
+        ///      &lt;node header=&quot;Device groups&quot; type=&quot;DeviceGroups&quot; /&gt;
+        ///    &lt;/node&gt;
+        ///    &lt;node header=&quot;Items&quot;&gt;
+        ///      &lt;node header=&quot;Equipment&quot; type=&quot;Equipment&quot; /&gt;
+        ///      &lt;node header=&quot;Weapons&quot; type=&quot;Weapons&quot; /&gt;
+        ///    &lt;/node&gt;
+        ///   [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string NodeHierarchy {
+            get {
+                return ResourceManager.GetString("NodeHierarchy", resourceCulture);
+            }
+        }
     }
 }

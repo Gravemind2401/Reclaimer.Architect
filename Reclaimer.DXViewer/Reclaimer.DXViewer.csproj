@@ -36,6 +36,10 @@
       <HintPath>..\packages\CommonServiceLocator.2.0.4\lib\net46\CommonServiceLocator.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="ControlzEx, Version=3.0.2.4, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ControlzEx.3.0.2.4\lib\net462\ControlzEx.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Cyotek.Drawing.BitmapFont, Version=1.0.0.0, Culture=neutral, PublicKeyToken=58daa28b0b2de221, processorArchitecture=MSIL">
       <HintPath>..\packages\Cyotek.Drawing.BitmapFont.1.3.4\lib\net46\Cyotek.Drawing.BitmapFont.dll</HintPath>
       <Private>True</Private>
@@ -46,6 +50,10 @@
     </Reference>
     <Reference Include="HelixToolkit.Wpf.SharpDX, Version=2.12.0.0, Culture=neutral, PublicKeyToken=52aa3500039caf0d, processorArchitecture=MSIL">
       <HintPath>..\packages\HelixToolkit.Wpf.SharpDX.2.12.0\lib\net45\HelixToolkit.Wpf.SharpDX.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MahApps.Metro, Version=1.6.5.1, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.1.6.5\lib\net46\MahApps.Metro.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Prism, Version=7.2.0.1422, Culture=neutral, PublicKeyToken=40ee6c3a2184dc59, processorArchitecture=MSIL">
@@ -95,7 +103,7 @@
     </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Prism.Wpf.7.2.0.1422\lib\net45\System.Windows.Interactivity.dll</HintPath>
+      <HintPath>..\packages\ControlzEx.3.0.2.4\lib\net462\System.Windows.Interactivity.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Xml" />
@@ -122,12 +130,21 @@
       <DependentUpon>DXViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\DXRenderer.cs" />
+    <Compile Include="Controls\HierarchyView.xaml.cs">
+      <DependentUpon>HierarchyView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\PropertyView.xaml.cs">
+      <DependentUpon>PropertyView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Geometry\CompositeGeometryModel.cs" />
     <Compile Include="Geometry\CompositeModelManager.cs" />
     <Compile Include="Geometry\IModelInstance.cs" />
     <Compile Include="Geometry\MeshTemplate.cs" />
     <Compile Include="Geometry\ModelManager.cs" />
     <Compile Include="Geometry\SceneManager.cs" />
+    <Compile Include="Models\NodeType.cs" />
+    <Compile Include="Models\PaletteType.cs" />
+    <Compile Include="Models\ScenarioModel.cs" />
     <Compile Include="Utilities\CompositeModelFactory.cs" />
     <Compile Include="Utilities\Extensions.cs" />
     <Compile Include="Utilities\NativeMethods.cs" />
@@ -178,7 +195,9 @@
       <Name>System.IO.Endian</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Resources\NodeHierarchy.xml" />
+  </ItemGroup>
   <ItemGroup>
     <Page Include="Controls\DXEditor.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -188,10 +207,23 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Controls\HierarchyView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\PropertyView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Themes\Generic.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Halo3Scenario.xml">
+      <SubType>Designer</SubType>
+    </Resource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<node header="Mission" type="Mission">
+  <node header="Objects">
+    <node header="Devices">
+      <node header="Machines" type="Machines" />
+      <node header="Controls" type="Controls" />
+      <node header="Light fixtures" type="LightFixtures" />
+      <node header="Device groups" type="DeviceGroups" />
+    </node>
+    <node header="Items">
+      <node header="Equipment" type="Equipment" />
+      <node header="Weapons" type="Weapons" />
+    </node>
+    <node header="Units">
+      <node header="Bipeds" type="Bipeds" />
+      <node header="Vehicles" type="Vehicles" />
+    </node>
+    <node header="Crates" type="Crates" />
+    <node header="Scenery" type="Scenery" />
+    <node header="Sound scenery" type="SoundScenery" />
+  </node>
+  <node header="Player starting positions" type="PlayerStarts" />
+  <node header="AI">
+    
+  </node>
+  <node header="Comments" type="Comments" />
+  <node header="Sandbox">
+    <node header="Vehicles" type="ForgeVehicles" />
+    <node header="Weapons" type="ForgeWeapons" />
+    <node header="Equipment" type="ForgeEquipment" />
+    <node header="Scenery" type="ForgeScenery" />
+    <node header="Teleporters" type="ForgeTeleporters" />
+    <node header="Goal Objects" type="ForgeGoalObjects" />
+    <node header="Spawning" type="ForgeSpawning" />
+  </node>
+  <node header="Game data">
+    <node header="Trigger volumes" type="TriggerVolumes" />
+    <node header="Recorded animations" />
+    <node header="Flags" />
+    <node header="Camera points" type="CameraPoints" />
+    <node header="Chapter titles" />
+    <node header="Netgame flags" />
+    <node header="Netgame Equipment" />
+    <node header="Starting profiles" type="StartProfiles" />
+    <node header="Detail objects" />
+    <node header="Decals" type="Decals" />
+  </node>
+  <node header="Cluster properties">
+
+  </node>
+</node>
