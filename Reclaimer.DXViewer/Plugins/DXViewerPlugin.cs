@@ -74,18 +74,23 @@ namespace Reclaimer.Plugins
             {
                 if (Controls.DXEditor.CanOpenTag(modelTag))
                 {
-                    var model = new Models.ScenarioModel(modelTag);
-                    var hierarchyView = new Controls.HierarchyView { Scenario = model };
-                    var propertyView = new Controls.PropertyView { Scenario = model };
-
-
-                    var viewer = new Controls.DXEditor
+                    var hierarchyView = new Controls.HierarchyView();
+                    var propertyView = new Controls.PropertyView();
+                    var renderView = new Controls.DXEditor
                     {
                         LogOutput = LogOutput,
                         LogError = LogError,
                         SetStatus = SetWorkingStatus,
                         ClearStatus = ClearWorkingStatus
                     };
+
+                    var model = new Models.ScenarioModel(modelTag)
+                    {
+                        HierarchyView = hierarchyView,
+                        PropertyView = propertyView,
+                        RenderView = renderView
+                    };
+
 
                     var layout = new DockContainerModel();
                     var docPanel = new DocumentPanelModel();
@@ -103,7 +108,7 @@ namespace Reclaimer.Plugins
 
                     mainSplit.Item2 = toolSplit;
                     toolSplit.PanelSize = new System.Windows.GridLength(500);
-                    docPanel.AddItem(viewer.TabModel);
+                    docPanel.AddItem(renderView.TabModel);
                     layout.Content = mainSplit;
 
                     var wnd = new RaftedWindow(layout, docPanel)
@@ -115,6 +120,7 @@ namespace Reclaimer.Plugins
                     wnd.Show();
                     wnd.Activate();
 
+                    renderView.LoadScenario();
                     //viewer.LoadGeometry(modelTag, $"{fileName}");
 
                     //container.AddItem(viewer.TabModel);

@@ -16,7 +16,5 @@
         </ResourceDictionary>
     </UserControl.Resources>
     
-    <Grid>
-        <c:MetaViewer x:Name="metaViewer" />
-    </Grid>
+    <local:MiniMetaViewer x:Name="metaViewer" />
 </UserControl>

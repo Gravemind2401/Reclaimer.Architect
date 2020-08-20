@@ -133,6 +133,9 @@
     <Compile Include="Controls\HierarchyView.xaml.cs">
       <DependentUpon>HierarchyView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\MiniMetaViewer.xaml.cs">
+      <DependentUpon>MiniMetaViewer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\PropertyView.xaml.cs">
       <DependentUpon>PropertyView.xaml</DependentUpon>
     </Compile>
@@ -141,7 +144,9 @@
     <Compile Include="Geometry\IModelInstance.cs" />
     <Compile Include="Geometry\MeshTemplate.cs" />
     <Compile Include="Geometry\ModelManager.cs" />
+    <Compile Include="Geometry\ObjectHolder.cs" />
     <Compile Include="Geometry\SceneManager.cs" />
+    <Compile Include="Models\IScenarioHandler.cs" />
     <Compile Include="Models\NodeType.cs" />
     <Compile Include="Models\PaletteType.cs" />
     <Compile Include="Models\ScenarioModel.cs" />
@@ -196,7 +201,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\NodeHierarchy.xml" />
+    <Resource Include="Resources\NodeHierarchy.xml">
+      <SubType>Designer</SubType>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
     <Page Include="Controls\DXEditor.xaml">
@@ -210,6 +217,10 @@
     <Page Include="Controls\HierarchyView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\MiniMetaViewer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Controls\PropertyView.xaml">
       <SubType>Designer</SubType>

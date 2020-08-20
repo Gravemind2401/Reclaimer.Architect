@@ -1,7 +1,4 @@
 ﻿using Adjutant.Blam.Common;
-using Adjutant.Geometry;
-using Adjutant.Spatial;
-using Adjutant.Utilities;
 using Reclaimer.Geometry;
 using Reclaimer.Models;
 using Reclaimer.Utilities;
@@ -9,7 +6,6 @@ using Studio.Controls;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Drawing.Dds;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,7 +30,7 @@ namespace Reclaimer.Controls
     /// <summary>
     /// Interaction logic for DXViewer.xaml
     /// </summary>
-    public partial class DXEditor : IDisposable
+    public partial class DXEditor : IScenarioRenderView, IDisposable
     {
         //private delegate bool GetDataFolder(out string dataFolder);
         //private delegate bool SaveImage(IBitmap bitmap, string baseDir);
@@ -44,20 +40,7 @@ namespace Reclaimer.Controls
         private readonly SceneManager sceneManager;
         private readonly Helix.GroupModel3D modelGroup = new Helix.GroupModel3D();
 
-        private Blam.Halo3.scenario scenario;
-
-        private readonly List<ModelManager> bspPalette;
-        private readonly List<CompositeModelManager> skyPalette;
-        private readonly List<CompositeModelManager> sceneryPalette;
-        private readonly List<CompositeModelManager> bipedPalette;
-        private readonly List<CompositeModelManager> vehiclePalette;
-        private readonly List<CompositeModelManager> equipmentPalette;
-        private readonly List<CompositeModelManager> weaponPalette;
-        private readonly List<CompositeModelManager> machinePalette;
-        private readonly List<CompositeModelManager> cratePalette;
-
-        private readonly List<ModelInstance> bspInstances;
-        private readonly Dictionary<string, List<CompositeModelInstance>> objectInstances;
+        private ScenarioModel scenario;
 
         public TabModel TabModel { get; }
         public ObservableCollection<TreeItemModel> TreeViewItems { get; }
@@ -74,48 +57,57 @@ namespace Reclaimer.Controls
             TreeViewItems = new ObservableCollection<TreeItemModel>();
             sceneManager = new SceneManager();
 
-            bspPalette = new List<ModelManager>();
-            skyPalette = new List<CompositeModelManager>();
-            sceneryPalette = new List<CompositeModelManager>();
-            bipedPalette = new List<CompositeModelManager>();
-            vehiclePalette = new List<CompositeModelManager>();
-            equipmentPalette = new List<CompositeModelManager>();
-            weaponPalette = new List<CompositeModelManager>();
-            machinePalette = new List<CompositeModelManager>();
-            cratePalette = new List<CompositeModelManager>();
-
-            bspInstances = new List<ModelInstance>();
-            objectInstances = new Dictionary<string, List<CompositeModelInstance>>();
-
             DataContext = this;
 
             modelGroup.Visibility = Visibility.Collapsed;
             renderer.AddChild(modelGroup);
         }
 
-        public void LoadGeometry(IIndexItem scenarioTag, string fileName)
+        public void ClearScenario()
         {
-            if (!CanOpenTag(scenarioTag))
-                throw new NotSupportedException($"{scenarioTag.ClassName} tags are not supported.");
+            scenario = null;
+        }
 
+        public void SetScenario(ScenarioModel scenario)
+        {
+            this.scenario = scenario;
+
+            var fileName = scenario.ScenarioTag.FileName();
             TabModel.ToolTip = fileName;
             TabModel.Header = Utils.GetFileName(fileName);
+        }
 
+        public void NavigateToObject(NodeType nodeType, int index)
+        {
+            var paletteKey = PaletteType.FromNodeType(nodeType);
+            if (paletteKey == null)
+                return;
+
+            var obj = sceneManager.PaletteHolders[paletteKey].Instances[index];
+            if (obj != null)
+                renderer.ZoomToBounds(obj.Element.GetTotalBounds(), 500);
+        }
+
+        public void LoadScenario()
+        {
             Task.Run(() =>
             {
-                scenario = scenarioTag.ReadMetadata<Blam.Halo3.scenario>();
-                ReadGeometry();
-
-                SetStatus("Rendering geometry...");
-                Dispatcher.Invoke(RenderGeometry);
-
-                ClearStatus();
-
+                sceneManager.ReadScenario(scenario);
                 Dispatcher.Invoke(() =>
                 {
-                    renderer.ScaleToContent();
+                    sceneManager.RenderScenario();
 
-                    var elements = bspInstances.Where(i => i != null)
+                    foreach (var instance in sceneManager.BspHolder.Instances)
+                        modelGroup.Children.Add(instance.Element);
+
+                    foreach (var instance in sceneManager.SkyHolder.Instances)
+                        modelGroup.Children.Add(instance.Element);
+
+                    foreach (var holder in sceneManager.PaletteHolders.Values)
+                        modelGroup.Children.Add(holder.GroupElement);
+
+                    renderer.ScaleToContent();
+                    var elements = sceneManager.BspHolder.Instances.Where(i => i != null)
                         .Select(i => i.Element);
 
                     if (elements.Any())
@@ -126,168 +118,58 @@ namespace Reclaimer.Controls
                     }
 
                     modelGroup.Visibility = Visibility.Visible;
+
+                    #region Generate Tree Nodes
+                    var bspNode = new TreeItemModel { Header = "sbsp", IsChecked = true };
+                    for (int i = 0; i < sceneManager.BspHolder.Instances.Count; i++)
+                    {
+                        var bsp = sceneManager.BspHolder.Instances[i];
+                        var tag = scenario.Bsps[i].Tag;
+                        if (bsp == null)
+                            continue;
+
+                        bsp.Element.IsHitTestVisible = false;
+
+                        var permNode = new TreeItemModel { Header = tag.FileName(), IsChecked = true, Tag = bsp };
+                        bspNode.Items.Add(permNode);
+                    }
+
+                    if (bspNode.HasItems)
+                        TreeViewItems.Add(bspNode);
+
+                    var skyNode = new TreeItemModel { Header = "sky", IsChecked = true };
+                    for (int i = 0; i < sceneManager.BspHolder.Instances.Count; i++)
+                    {
+                        var sky = sceneManager.SkyHolder.Instances[i];
+                        var tag = scenario.Skies[i].Tag;
+                        if (sky == null)
+                            continue;
+
+                        sky.Element.IsHitTestVisible = false;
+
+                        var permNode = new TreeItemModel { Header = tag.FileName(), IsChecked = true, Tag = sky };
+                        skyNode.Items.Add(permNode);
+                    }
+
+                    if (skyNode.HasItems)
+                        TreeViewItems.Add(skyNode);
+
+                    foreach (var holder in sceneManager.PaletteHolders.Values)
+                    {
+                        var paletteNode = new TreeItemModel { Header = holder.Name, IsChecked = true };
+
+                        foreach (var inst in holder.Instances.Where(i => i != null))
+                        {
+                            var permNode = new TreeItemModel { Header = inst.Name, IsChecked = true, Tag = inst };
+                            paletteNode.Items.Add(permNode);
+                        }
+
+                        if (paletteNode.HasItems)
+                            TreeViewItems.Add(paletteNode);
+                    } 
+                    #endregion
                 });
             });
-        }
-
-        private void ReadGeometry()
-        {
-            foreach (var bsp in scenario.StructureBsps)
-            {
-                SetStatus($"Loading bsp palette... ({scenario.StructureBsps.IndexOf(bsp) + 1} of {scenario.StructureBsps.Count})");
-
-                IRenderGeometry geom;
-                if (ContentFactory.TryGetGeometryContent(bsp.BspReference.Tag, out geom))
-                    bspPalette.Add(new ModelManager(sceneManager, geom.ReadGeometry(0)));
-                else bspPalette.Add(null);
-
-                bspPalette[bspPalette.Count - 1]?.PreloadTextures();
-            }
-
-            foreach (var sky in scenario.SkyReferences)
-            {
-                SetStatus($"Loading sky palette... ({scenario.SkyReferences.IndexOf(sky) + 1} of {scenario.SkyReferences.Count})");
-
-                CompositeGeometryModel geom;
-                if (CompositeModelFactory.TryGetModel(sky.SkyObjectReference.Tag, out geom))
-                    skyPalette.Add(new CompositeModelManager(sceneManager, geom));
-                else skyPalette.Add(null);
-
-                skyPalette[skyPalette.Count - 1]?.PreloadTextures();
-            }
-
-            LoadPalette(scenario.SceneryPalette, sceneryPalette, "scenery");
-            LoadPalette(scenario.BipedPalette, bipedPalette, "biped");
-            LoadPalette(scenario.VehiclePalette, vehiclePalette, "vehicle");
-            LoadPalette(scenario.EquipmentPalette, equipmentPalette, "equipment");
-            LoadPalette(scenario.WeaponPalette, weaponPalette, "weapon");
-            LoadPalette(scenario.MachinePalette, machinePalette, "machine");
-            LoadPalette(scenario.CratePalette, cratePalette, "crate");
-        }
-
-        private void RenderGeometry()
-        {
-            var bspNode = new TreeItemModel { Header = "sbsp", IsChecked = true };
-
-            for (int i = 0; i < scenario.StructureBsps.Count; i++)
-            {
-                var bsp = scenario.StructureBsps[i];
-                var manager = bspPalette[i];
-
-                if (manager == null)
-                {
-                    bspInstances.Add(null);
-                    continue;
-                }
-
-                var inst = manager.GenerateModel();
-                inst.Element.IsHitTestVisible = false;
-                bspInstances.Add(inst);
-
-                var permNode = new TreeItemModel { Header = bsp.BspReference.Tag.FileName(), IsChecked = true, Tag = inst };
-                bspNode.Items.Add(permNode);
-            }
-
-            if (bspNode.HasItems)
-                TreeViewItems.Add(bspNode);
-
-            var skyNode = new TreeItemModel { Header = "sky", IsChecked = true };
-            var skyInstances = new List<CompositeModelInstance>();
-
-            for (int i = 0; i < scenario.SkyReferences.Count; i++)
-            {
-                var sky = scenario.SkyReferences[i];
-                var manager = skyPalette[i];
-
-                if (manager == null)
-                {
-                    skyInstances.Add(null);
-                    continue;
-                }
-
-                var inst = manager.GenerateModel();
-                inst.Element.IsHitTestVisible = false;
-                skyInstances.Add(inst);
-
-                var permNode = new TreeItemModel { Header = sky.SkyObjectReference.Tag.FileName(), IsChecked = true, Tag = inst };
-                skyNode.Items.Add(permNode);
-            }
-
-            objectInstances.Add("sky", skyInstances);
-            if (skyNode.HasItems)
-                TreeViewItems.Add(skyNode);
-
-            LoadInstances("scen", scenario.SceneryPlacements, sceneryPalette);
-            LoadInstances("bipd", scenario.BipedPlacements, bipedPalette);
-            LoadInstances("vehi", scenario.VehiclePlacements, vehiclePalette);
-            LoadInstances("eqip", scenario.EquipmentPlacements, equipmentPalette);
-            LoadInstances("weap", scenario.WeaponPlacements, weaponPalette);
-            LoadInstances("mach", scenario.MachinePlacements, machinePalette);
-            LoadInstances("bloc", scenario.CratePlacements, cratePalette);
-
-            foreach (var m in bspInstances.Where(i => i != null))
-                modelGroup.Children.Add(m.Element);
-
-            foreach (var m in objectInstances.Values.SelectMany(x => x).Where(i => i != null))
-                modelGroup.Children.Add(m.Element);
-        }
-
-        private void LoadPalette(IList<Blam.Halo3.PaletteItem> items, IList<CompositeModelManager> target, string name)
-        {
-            var index = 1;
-            foreach (var item in items)
-            {
-                SetStatus($"Loading {name} palette... ({index++} of {items.Count})");
-                CompositeGeometryModel geom;
-                if (CompositeModelFactory.TryGetModel(item.ObjectReference.Tag, out geom))
-                    target.Add(new CompositeModelManager(sceneManager, geom));
-                else target.Add(null);
-
-                target[target.Count - 1]?.PreloadTextures();
-            }
-        }
-
-        private void LoadInstances(string name, IEnumerable<Blam.Halo3.ObjectPlacement> items, IList<CompositeModelManager> palette)
-        {
-            var instances = new List<CompositeModelInstance>();
-            objectInstances.Add(name, instances);
-
-            var regNode = new TreeItemModel { Header = name, IsChecked = true };
-
-            foreach (var item in items)
-            {
-                var manager = item.PaletteIndex >= 0 ? palette[item.PaletteIndex] : null;
-                if (manager == null)
-                {
-                    instances.Add(null);
-                    continue;
-                }
-
-                var inst = manager.GenerateModel();
-                instances.Add(inst);
-
-                var mat = SharpDX.Matrix.Scaling(item.Scale == 0 ? 1 : item.Scale)
-                    * SharpDX.Matrix.RotationYawPitchRoll(item.Rotation.Z, item.Rotation.Y, item.Rotation.X)
-                    * SharpDX.Matrix.Translation(((IRealVector3D)item.Position).ToVector3());
-
-                //var mat = SharpDX.Matrix.Scaling(item.Scale)
-                //    * SharpDX.Matrix.RotationX(item.Rotation.X)
-                //    * SharpDX.Matrix.RotationY(item.Rotation.Y)
-                //    * SharpDX.Matrix.RotationZ(item.Rotation.Z)
-                //    * SharpDX.Matrix.Translation(((IRealVector3D)item.Position).ToVector3());
-
-                inst.Element.Transform = new MatrixTransform3D(mat.ToMatrix3D());
-
-                var itemName = manager.Model.Name;
-                if (item.NameIndex >= 0)
-                    itemName += string.Format(" {{{0}}}", scenario.ObjectNames[item.NameIndex].Name);
-
-                var permNode = new TreeItemModel { Header = itemName, IsChecked = true, Tag = inst };
-                regNode.Items.Add(permNode);
-            }
-
-            if (regNode.HasItems)
-                TreeViewItems.Add(regNode);
         }
 
         #region Treeview Events
@@ -418,25 +300,6 @@ namespace Reclaimer.Controls
         {
             TreeViewItems.Clear();
             modelGroup.Children.Clear();
-
-            var compManagers = sceneryPalette
-                .Concat(bipedPalette)
-                .Concat(vehiclePalette)
-                .Concat(equipmentPalette)
-                .Concat(weaponPalette)
-                .Concat(cratePalette);
-
-            foreach (var man in compManagers)
-            {
-                man?.Model.Dispose();
-                man?.Dispose();
-            }
-
-            foreach (var man in bspPalette)
-            {
-                man?.Model.Dispose();
-                man?.Dispose();
-            }
 
             sceneManager?.Dispose();
             renderer.Dispose();

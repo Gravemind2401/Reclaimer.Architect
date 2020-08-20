@@ -19,44 +19,37 @@ namespace Reclaimer.Controls
     /// <summary>
     /// Interaction logic for HierarchyView.xaml
     /// </summary>
-    public partial class HierarchyView : UserControl
+    public partial class HierarchyView : IScenarioHierarchyView
     {
         public TabModel TabModel { get; }
 
         private ScenarioModel scenario;
-        public ScenarioModel Scenario
-        {
-            get { return scenario; }
-            set
-            {
-                if (value != scenario)
-                {
-                    OnScenarioUnset();
-                    scenario = value;
-                    OnScenarioSet();
-                }
-            }
-        }
 
         public HierarchyView()
         {
             InitializeComponent();
-            TabModel = new TabModel(this, Studio.Controls.TabItemType.Tool);
+            TabModel = new TabModel(this, Studio.Controls.TabItemType.Tool) { Header = "Hierarchy" };
         }
 
-        private void OnScenarioUnset()
+        public void ClearScenario()
         {
-            DataContext = null;
+            DataContext = scenario = null;
         }
 
-        private void OnScenarioSet()
+        public void SetScenario(ScenarioModel scenario)
         {
-            DataContext = scenario;
+            DataContext = this.scenario = scenario;
         }
 
         private void tv_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             scenario.SelectedNode = tv.SelectedItem as TreeItemModel;
+        }
+
+        private void ListItemMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            var type = (NodeType)scenario.SelectedNode.Tag;
+            scenario.RenderView?.NavigateToObject(type, scenario.SelectedItemIndex);
         }
     }
 }

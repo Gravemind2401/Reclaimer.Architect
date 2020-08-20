@@ -1,4 +1,8 @@
-﻿using Adjutant.Geometry;
+﻿using Adjutant.Blam.Common;
+using Adjutant.Geometry;
+using Adjutant.Spatial;
+using Adjutant.Utilities;
+using Reclaimer.Models;
 using Reclaimer.Utilities;
 using System;
 using System.Collections.Generic;
@@ -13,7 +17,6 @@ using static HelixToolkit.Wpf.SharpDX.Media3DExtension;
 using Media = System.Windows.Media;
 using Media3D = System.Windows.Media.Media3D;
 using Helix = HelixToolkit.Wpf.SharpDX;
-using System.Windows;
 
 namespace Reclaimer.Geometry
 {
@@ -23,6 +26,94 @@ namespace Reclaimer.Geometry
 
         private readonly Dictionary<int, Helix.TextureModel> sceneTextures = new Dictionary<int, Helix.TextureModel>();
 
+        private ScenarioModel scenario;
+        public ObjectHolder BspHolder { get; private set; }
+        public CompositeObjectHolder SkyHolder { get; private set; }
+        public Dictionary<string, PaletteHolder> PaletteHolders { get; private set; }
+
+        public void ReadScenario(ScenarioModel scenario)
+        {
+            this.scenario = scenario;
+            BspHolder = new ObjectHolder();
+            SkyHolder = new CompositeObjectHolder();
+            PaletteHolders = new Dictionary<string, PaletteHolder>();
+
+            for (int i = 0; i < scenario.Bsps.Count; i++)
+            {
+                IRenderGeometry geom;
+                if (ContentFactory.TryGetGeometryContent(scenario.Bsps[i].Tag, out geom))
+                    BspHolder.Managers.Add(new ModelManager(this, geom.ReadGeometry(0)));
+                else BspHolder.Managers.Add(null);
+
+                BspHolder.Managers[i]?.PreloadTextures();
+            }
+
+            for (int i = 0; i < scenario.Skies.Count; i++)
+            {
+                CompositeGeometryModel geom;
+                if (CompositeModelFactory.TryGetModel(scenario.Skies[i].Tag, out geom))
+                    SkyHolder.Managers.Add(new CompositeModelManager(this, geom));
+                else SkyHolder.Managers.Add(null);
+
+                SkyHolder.Managers[i]?.PreloadTextures();
+            }
+
+            foreach (var definition in scenario.Palettes.Values)
+            {
+                var holder = new PaletteHolder(definition);
+                PaletteHolders.Add(holder.Name, holder);
+
+                for (int i = 0; i < definition.Palette.Count; i++)
+                {
+                    CompositeGeometryModel geom;
+                    if (CompositeModelFactory.TryGetModel(definition.Palette[i].Tag, out geom))
+                        holder.Managers.Add(new CompositeModelManager(this, geom));
+                    else holder.Managers.Add(null);
+
+                    holder.Managers[i]?.PreloadTextures();
+                }
+            }
+        }
+
+        public void RenderScenario()
+        {
+            if (scenario == null)
+                throw new InvalidOperationException();
+
+            foreach (var man in BspHolder.Managers)
+                BspHolder.Instances.Add(man?.GenerateModel());
+
+            foreach (var man in SkyHolder.Managers)
+                SkyHolder.Instances.Add(man?.GenerateModel());
+
+            foreach (var holder in PaletteHolders.Values)
+            {
+                holder.GroupElement = new Helix.GroupModel3D();
+                for (int i = 0; i < holder.Definition.Placements.Count; i++)
+                {
+                    var placement = holder.Definition.Placements[i];
+                    var manager = placement.PaletteIndex >= 0 ? holder.Managers[placement.PaletteIndex] : null;
+                    if (manager == null)
+                    {
+                        holder.Instances.Add(null);
+                        continue;
+                    }
+
+                    var inst = manager.GenerateModel();
+                    inst.Name = placement.GetDisplayName();
+
+                    var matrix = SharpDX.Matrix.Scaling(placement.Scale == 0 ? 1 : placement.Scale)
+                        * SharpDX.Matrix.RotationYawPitchRoll(placement.Rotation.Z, placement.Rotation.Y, placement.Rotation.X)
+                        * SharpDX.Matrix.Translation(((IRealVector3D)placement.Position).ToVector3());
+
+                    inst.Element.Transform = new Media3D.MatrixTransform3D(matrix.ToMatrix3D());
+                    holder.Instances.Add(inst);
+                    holder.GroupElement.Children.Add(inst.Element);
+                }
+            }
+        }
+
+        #region Materials
         public Helix.Material LoadMaterial(IGeometryModel model, int matIndex, out bool isTransparent)
         {
             if (matIndex < 0 || matIndex >= model.Materials.Count)
@@ -79,9 +170,19 @@ namespace Reclaimer.Geometry
 
             return tex;
         }
+        #endregion
 
         public void Dispose()
         {
+            BspHolder?.Dispose();
+            SkyHolder?.Dispose();
+
+            if (PaletteHolders != null)
+            {
+                foreach (var holder in PaletteHolders.Values)
+                    holder.Dispose();
+            }
+
             foreach (var tex in sceneTextures.Values)
                 tex.CompressedStream?.Dispose();
 

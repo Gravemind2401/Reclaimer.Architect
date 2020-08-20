@@ -144,6 +144,7 @@ namespace Reclaimer.Geometry
         private readonly Dictionary<string, List<ModelInstance>> lookup = new Dictionary<string, List<ModelInstance>>();
 
         public Helix.GroupModel3D Element { get; }
+        public string Name { get; set; }
         public string CurrentVariant { get; private set; }
 
         internal CompositeModelInstance(Dictionary<string, List<ModelInstance>> variants)

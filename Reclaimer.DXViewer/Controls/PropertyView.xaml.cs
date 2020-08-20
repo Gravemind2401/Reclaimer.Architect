@@ -19,80 +19,55 @@ namespace Reclaimer.Controls
     /// <summary>
     /// Interaction logic for PropertyView.xaml
     /// </summary>
-    public partial class PropertyView : UserControl
+    public partial class PropertyView : IScenarioPropertyView
     {
         public TabModel TabModel { get; }
 
         private ScenarioModel scenario;
-        public ScenarioModel Scenario
-        {
-            get { return scenario; }
-            set
-            {
-                if (value != scenario)
-                {
-                    OnScenarioUnset();
-                    scenario = value;
-                    OnScenarioSet();
-                }
-            }
-        }
 
         public PropertyView()
         {
             InitializeComponent();
-            TabModel = new TabModel(this, Studio.Controls.TabItemType.Tool);
+            TabModel = new TabModel(this, Studio.Controls.TabItemType.Tool) { Header = "Properties" };
         }
 
-        private void OnScenarioUnset()
+        public void ClearScenario()
+        {
+            ClearProperties();
+            scenario = null;
+        }
+
+        public void SetScenario(ScenarioModel scenario)
+        {
+            this.scenario = scenario;
+        }
+
+        public void ClearProperties()
+        {
+            metaViewer.Metadata.Clear();
+            metaViewer.Visibility = Visibility.Hidden;
+        }
+
+        public void ShowProperties(NodeType nodeType, int itemIndex)
         {
             metaViewer.Metadata.Clear();
             metaViewer.Visibility = Visibility.Hidden;
 
-            if (scenario != null)
-            {
-                scenario.SelectedNodeChanged -= Scenario_SelectionChanged;
-                scenario.SelectedItemChanged -= Scenario_SelectionChanged;
-            }
-        }
-
-        private void OnScenarioSet()
-        {
-            if (scenario != null)
-            {
-                scenario.SelectedNodeChanged += Scenario_SelectionChanged;
-                scenario.SelectedItemChanged += Scenario_SelectionChanged;
-                LoadNodeData();
-            }
-        }
-
-        private void Scenario_SelectionChanged(object sender, EventArgs e)
-        {
-            LoadNodeData();
-        }
-
-        private void LoadNodeData()
-        {
-            metaViewer.Metadata.Clear();
-            metaViewer.Visibility = Visibility.Hidden;
-
-            if (scenario.SelectedNode == null)
-                return;
-
-            var type = (NodeType)scenario.SelectedNode.Tag;
-            var paletteKey = PaletteType.FromNodeType(type);
-            if (paletteKey != null && scenario.SelectedItemIndex >= 0)
+            var paletteKey = PaletteType.FromNodeType(nodeType);
+            if (paletteKey != null && itemIndex >= 0)
             {
                 var palette = scenario.Palettes[paletteKey];
-                var baseAddress =  palette.PlacementBlockRef.TagBlock.Pointer.Address
-                    + scenario.SelectedItemIndex * palette.PlacementBlockRef.BlockSize;
+                var baseAddress = palette.PlacementBlockRef.TagBlock.Pointer.Address
+                    + itemIndex * palette.PlacementBlockRef.BlockSize;
 
+                metaViewer.LoadMetadata(scenario.ScenarioTag, palette.PlacementsNode, baseAddress);
             }
             else
             {
-                switch (type)
+                switch (nodeType)
                 {
                     case NodeType.Mission:
+                        metaViewer.LoadMetadata(scenario.ScenarioTag, scenario.Sections["mission"].Node, scenario.ScenarioTag.MetaPointer.Address);
                         break;
 
                     default:

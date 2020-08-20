@@ -16,9 +16,6 @@ namespace Reclaimer.Models
 {
     public class ScenarioModel : BindableBase
     {
-        public event EventHandler SelectedNodeChanged;
-        public event EventHandler SelectedItemChanged;
-
         private static TreeItemModel XmlToNode(XmlNode xml)
         {
             var header = xml.GetStringAttribute("header");
@@ -39,8 +36,55 @@ namespace Reclaimer.Models
         public ObservableCollection<TreeItemModel> Hierarchy { get; }
         public ObservableCollection<string> Items { get; }
 
+        public ObservableCollection<TagReference> Bsps { get; }
+        public ObservableCollection<TagReference> Skies { get; }
         public List<string> ObjectNames { get; }
         public Dictionary<string, PaletteDefinition> Palettes { get; }
+
+        private IScenarioHierarchyView hierarchyView;
+        public IScenarioHierarchyView HierarchyView
+        {
+            get { return hierarchyView; }
+            set
+            {
+                var prev = hierarchyView;
+                if (SetProperty(ref hierarchyView, value))
+                {
+                    prev?.ClearScenario();
+                    hierarchyView?.SetScenario(this);
+                }
+            }
+        }
+
+        private IScenarioPropertyView propertyView;
+        public IScenarioPropertyView PropertyView
+        {
+            get { return propertyView; }
+            set
+            {
+                var prev = propertyView;
+                if (SetProperty(ref propertyView, value))
+                {
+                    prev?.ClearScenario();
+                    propertyView?.SetScenario(this);
+                }
+            }
+        }
+
+        private IScenarioRenderView renderView;
+        public IScenarioRenderView RenderView
+        {
+            get { return renderView; }
+            set
+            {
+                var prev = renderView;
+                if (SetProperty(ref renderView, value))
+                {
+                    prev?.ClearScenario();
+                    renderView?.SetScenario(this);
+                }
+            }
+        }
 
         private TreeItemModel selectedNode;
         public TreeItemModel SelectedNode
@@ -71,14 +115,18 @@ namespace Reclaimer.Models
             Hierarchy = new ObservableCollection<TreeItemModel>();
             Items = new ObservableCollection<string>();
 
+            Bsps = new ObservableCollection<TagReference>();
+            Skies = new ObservableCollection<TagReference>();
             ObjectNames = new List<string>();
             Palettes = new Dictionary<string, PaletteDefinition>();
 
             LoadSections();
             LoadHierarchy();
-            LoadObjectNames();
-            LoadPalettes();
-            LoadPlacements();
+            ReadBsps();
+            ReadSkies();
+            ReadObjectNames();
+            ReadPalettes();
+            ReadPlacements();
         }
 
         private void LoadSections()
@@ -106,7 +154,39 @@ namespace Reclaimer.Models
             Hierarchy[0].IsExpanded = true;
         }
 
-        private void LoadObjectNames()
+        private void ReadBsps()
+        {
+            var reader = ScenarioTag.CacheFile.CreateReader(ScenarioTag.CacheFile.DefaultAddressTranslator);
+
+            var section = Sections["structurebsps"];
+            var refOffset = section.Node.SelectSingleNode("*[@id='tagreference']").GetIntAttribute("offset") ?? 0;
+
+            reader.Seek(ScenarioTag.MetaPointer.Address + section.Offset, System.IO.SeekOrigin.Begin);
+            var tagBlock = reader.ReadObject<TagBlock>();
+            for (int i = 0; i < tagBlock.Count; i++)
+            {
+                reader.Seek(tagBlock.Pointer.Address + section.BlockSize * i + refOffset, System.IO.SeekOrigin.Begin);
+                Bsps.Add(reader.ReadObject<TagReference>());
+            }
+        }
+
+        private void ReadSkies()
+        {
+            var reader = ScenarioTag.CacheFile.CreateReader(ScenarioTag.CacheFile.DefaultAddressTranslator);
+
+            var section = Sections["skies"];
+            var refOffset = section.Node.SelectSingleNode("*[@id='tagreference']").GetIntAttribute("offset") ?? 0;
+
+            reader.Seek(ScenarioTag.MetaPointer.Address + section.Offset, System.IO.SeekOrigin.Begin);
+            var tagBlock = reader.ReadObject<TagBlock>();
+            for (int i = 0; i < tagBlock.Count; i++)
+            {
+                reader.Seek(tagBlock.Pointer.Address + section.BlockSize * i + refOffset, System.IO.SeekOrigin.Begin);
+                Skies.Add(reader.ReadObject<TagReference>());
+            }
+        }
+
+        private void ReadObjectNames()
         {
             var reader = ScenarioTag.CacheFile.CreateReader(ScenarioTag.CacheFile.DefaultAddressTranslator);
 
@@ -122,7 +202,7 @@ namespace Reclaimer.Models
             }
         }
 
-        private void LoadPalettes()
+        private void ReadPalettes()
         {
             var reader = ScenarioTag.CacheFile.CreateReader(ScenarioTag.CacheFile.DefaultAddressTranslator);
 
@@ -155,7 +235,7 @@ namespace Reclaimer.Models
             }
         }
 
-        private void LoadPlacements()
+        private void ReadPlacements()
         {
             var reader = ScenarioTag.CacheFile.CreateReader(ScenarioTag.CacheFile.DefaultAddressTranslator);
 
@@ -184,7 +264,7 @@ namespace Reclaimer.Models
 
                 for (int i = 0; i < tagBlock.Count; i++)
                 {
-                    var placement = new ObjectPlacement();
+                    var placement = new ObjectPlacement(this, paletteName);
                     var baseAddress = tagBlock.Pointer.Address + blockRef.BlockSize * i;
 
                     reader.Seek(baseAddress + paletteIndex, System.IO.SeekOrigin.Begin);
@@ -252,13 +332,13 @@ namespace Reclaimer.Models
 
         private void OnSelectedNodeChanged()
         {
+            PropertyView?.ShowProperties((NodeType)SelectedNode.Tag, -1);
             LoadItems();
-            SelectedNodeChanged?.Invoke(this, EventArgs.Empty);
         }
 
         private void OnSelectedItemChanged()
         {
-            SelectedItemChanged?.Invoke(this, EventArgs.Empty);
+            PropertyView?.ShowProperties((NodeType)SelectedNode.Tag, SelectedItemIndex);
         }
     }
 
@@ -286,7 +366,7 @@ namespace Reclaimer.Models
         public TagBlock TagBlock { get; set; }
     }
 
-    public struct ScenarioSection
+    public class ScenarioSection
     {
         public XmlNode Node { get; set; }
         public string Name { get; set; }
@@ -294,13 +374,34 @@ namespace Reclaimer.Models
         public int BlockSize { get; set; }
     }
 
-    public struct ObjectPlacement
+    public class ObjectPlacement
     {
+        private readonly ScenarioModel parent;
+        private readonly string paletteKey;
+
+        public ObjectPlacement(ScenarioModel parent, string paletteKey)
+        {
+            this.parent = parent;
+            this.paletteKey = paletteKey;
+        }
+
         public int PaletteIndex { get; set; }
         public int NameIndex { get; set; }
         public RealVector3D Position { get; set; }
         public RealVector3D Rotation { get; set; }
         public float Scale { get; set; }
         public StringId Variant { get; set; }
+
+        public string GetDisplayName()
+        {
+            var palette = parent.Palettes[paletteKey];
+
+            if (PaletteIndex < 0 || PaletteIndex >= palette.Palette.Count)
+                return "<invalid>";
+
+            if (NameIndex >= 0)
+                return parent.ObjectNames[NameIndex];
+            else return palette.Palette[PaletteIndex].Tag.FileName();
+        }
     }
 }

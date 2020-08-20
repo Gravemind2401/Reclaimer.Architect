@@ -80,7 +80,11 @@
             <ListBox s:SplitPanel.DesiredSize="200"
                      ItemsSource="{Binding Items}"
                      SelectedIndex="{Binding SelectedItemIndex, Mode=TwoWay}">
-                
+                <ListBox.Resources>
+                    <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                        <EventSetter Event="MouseDoubleClick" Handler="ListItemMouseDoubleClick" />
+                    </Style>
+                </ListBox.Resources>
             </ListBox>
         </s:SplitPanel>
     </DockPanel>

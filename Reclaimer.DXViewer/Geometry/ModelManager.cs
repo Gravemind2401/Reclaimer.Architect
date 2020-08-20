@@ -173,6 +173,7 @@ namespace Reclaimer.Geometry
         private readonly Dictionary<object, Tuple<Guid, MeshTemplate>> instanceLookup = new Dictionary<object, Tuple<Guid, MeshTemplate>>();
 
         public Helix.GroupModel3D Element { get; }
+        public string Name { get; set; }
 
         internal ModelInstance(Helix.GroupModel3D element)
         {
