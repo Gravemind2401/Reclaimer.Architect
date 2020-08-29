@@ -40,6 +40,7 @@ namespace Reclaimer.Controls
         private readonly SceneManager sceneManager;
         private readonly Helix.GroupModel3D modelGroup = new Helix.GroupModel3D();
 
+        private bool isReady;
         private ScenarioModel scenario;
 
         public TabModel TabModel { get; }
@@ -76,9 +77,25 @@ namespace Reclaimer.Controls
             TabModel.ToolTip = fileName;
             TabModel.Header = Utils.GetFileName(fileName);
         }
+        
+        public void SelectPalette(NodeType nodeType)
+        {
+            if (!isReady) return;
+
+            var paletteKey = PaletteType.FromNodeType(nodeType);
+            foreach (var palette in sceneManager.PaletteHolders.Values)
+                palette.GroupElement.IsHitTestVisible = palette.Name == paletteKey;
+        }
+
+        public void SelectObject(NodeType nodeType, int itemIndex)
+        {
+            if (!isReady) return;
+        }
 
         public void NavigateToObject(NodeType nodeType, int index)
         {
+            if (!isReady) return;
+
             var paletteKey = PaletteType.FromNodeType(nodeType);
             if (paletteKey == null)
                 return;
@@ -98,13 +115,22 @@ namespace Reclaimer.Controls
                     sceneManager.RenderScenario();
 
                     foreach (var instance in sceneManager.BspHolder.Instances)
+                    {
+                        instance.Element.IsHitTestVisible = false;
                         modelGroup.Children.Add(instance.Element);
+                    }
 
                     foreach (var instance in sceneManager.SkyHolder.Instances)
+                    {
+                        instance.Element.IsHitTestVisible = false;
                         modelGroup.Children.Add(instance.Element);
+                    }
 
                     foreach (var holder in sceneManager.PaletteHolders.Values)
+                    {
+                        holder.GroupElement.IsHitTestVisible = false;
                         modelGroup.Children.Add(holder.GroupElement);
+                    }
 
                     renderer.ScaleToContent();
                     var elements = sceneManager.BspHolder.Instances.Where(i => i != null)
@@ -128,8 +154,6 @@ namespace Reclaimer.Controls
                         if (bsp == null)
                             continue;
 
-                        bsp.Element.IsHitTestVisible = false;
-
                         var permNode = new TreeItemModel { Header = tag.FileName(), IsChecked = true, Tag = bsp };
                         bspNode.Items.Add(permNode);
                     }
@@ -144,8 +168,6 @@ namespace Reclaimer.Controls
                         var tag = scenario.Skies[i].Tag;
                         if (sky == null)
                             continue;
-
-                        sky.Element.IsHitTestVisible = false;
 
                         var permNode = new TreeItemModel { Header = tag.FileName(), IsChecked = true, Tag = sky };
                         skyNode.Items.Add(permNode);
@@ -166,8 +188,10 @@ namespace Reclaimer.Controls
 
                         if (paletteNode.HasItems)
                             TreeViewItems.Add(paletteNode);
-                    } 
+                    }
                     #endregion
+
+                    isReady = true;
                 });
             });
         }

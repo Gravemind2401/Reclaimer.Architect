@@ -97,6 +97,8 @@ namespace Reclaimer.Models
             }
         }
 
+        public NodeType SelectedNodeType => SelectedNode?.Tag as NodeType? ?? NodeType.None;
+
         private int selectedItemIndex;
         public int SelectedItemIndex
         {
@@ -129,6 +131,7 @@ namespace Reclaimer.Models
             ReadPlacements();
         }
 
+        #region Initialisation
         private void LoadSections()
         {
             var doc = new XmlDocument();
@@ -291,9 +294,10 @@ namespace Reclaimer.Models
                     paletteDef.Placements.Add(placement);
                 }
             }
-        }
+        } 
+        #endregion
 
-        private void LoadItems()
+        private void DisplayItems()
         {
             SelectedItemIndex = -1;
             Items.Clear();
@@ -301,19 +305,17 @@ namespace Reclaimer.Models
             if (selectedNode == null)
                 return;
 
-            var nodeType = (NodeType)SelectedNode.Tag;
-
-            var paletteKey = PaletteType.FromNodeType(nodeType);
+            var paletteKey = PaletteType.FromNodeType(SelectedNodeType);
             if (paletteKey != null)
             {
-                LoadPaletteItems(Palettes[paletteKey]);
+                DisplayPaletteItems(Palettes[paletteKey]);
                 return;
             }
 
             //load other stuff like sandbox items and trigger volumes
         }
 
-        private void LoadPaletteItems(PaletteDefinition palette)
+        private void DisplayPaletteItems(PaletteDefinition palette)
         {
             for (int i = 0; i < palette.Placements.Count; i++)
             {
@@ -332,13 +334,15 @@ namespace Reclaimer.Models
 
         private void OnSelectedNodeChanged()
         {
-            PropertyView?.ShowProperties((NodeType)SelectedNode.Tag, -1);
-            LoadItems();
+            PropertyView?.ShowProperties(SelectedNodeType, -1);
+            RenderView?.SelectPalette(SelectedNodeType);
+            DisplayItems();
         }
 
         private void OnSelectedItemChanged()
         {
-            PropertyView?.ShowProperties((NodeType)SelectedNode.Tag, SelectedItemIndex);
+            PropertyView?.ShowProperties(SelectedNodeType, SelectedItemIndex);
+            RenderView?.SelectObject(SelectedNodeType, SelectedItemIndex);
         }
     }
 

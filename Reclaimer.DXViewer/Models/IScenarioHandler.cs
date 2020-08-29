@@ -25,6 +25,8 @@ namespace Reclaimer.Models
 
     public interface IScenarioRenderView : IScenarioHandler
     {
+        void SelectPalette(NodeType nodeType);
+        void SelectObject(NodeType nodeType, int itemIndex);
         void NavigateToObject(NodeType nodeType, int itemIndex);
     }
 }
