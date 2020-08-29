@@ -1,4 +1,5 @@
 ﻿using Reclaimer.Models;
+using Reclaimer.Plugins.MetaViewer.Halo3;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +25,7 @@ namespace Reclaimer.Controls
         public TabModel TabModel { get; }
 
         private ScenarioModel scenario;
+        private MetaContext context;
 
         public PropertyView()
         {
@@ -40,6 +42,7 @@ namespace Reclaimer.Controls
         public void SetScenario(ScenarioModel scenario)
         {
             this.scenario = scenario;
+            context = new MetaContext(scenario.ScenarioTag.CacheFile, scenario.ScenarioTag, scenario.Transaction);
         }
 
         public void ClearProperties()
@@ -60,14 +63,14 @@ namespace Reclaimer.Controls
                 var baseAddress = palette.PlacementBlockRef.TagBlock.Pointer.Address
                     + itemIndex * palette.PlacementBlockRef.BlockSize;
 
-                metaViewer.LoadMetadata(scenario.ScenarioTag, palette.PlacementsNode, baseAddress);
+                metaViewer.LoadMetadata(context, palette.PlacementsNode, baseAddress);
             }
             else
             {
                 switch (nodeType)
                 {
                     case NodeType.Mission:
-                        metaViewer.LoadMetadata(scenario.ScenarioTag, scenario.Sections["mission"].Node, scenario.ScenarioTag.MetaPointer.Address);
+                        metaViewer.LoadMetadata(context, scenario.Sections["mission"].Node, scenario.ScenarioTag.MetaPointer.Address);
                         break;
 
                     default:

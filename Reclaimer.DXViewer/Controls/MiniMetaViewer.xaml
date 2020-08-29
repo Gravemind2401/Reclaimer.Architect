@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:Reclaimer.Controls"
              xmlns:mv="clr-namespace:Reclaimer.Plugins.MetaViewer;assembly=Reclaimer"
              xmlns:u="clr-namespace:Studio.Utilities;assembly=Studio"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:studio="clr-namespace:Studio.Controls;assembly=Studio"
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300">
 
@@ -14,12 +15,20 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Reclaimer;component/Resources/Templates.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            
+
             <mv:ShowInvisiblesConverter x:Key="invisConverter" />
             <mv:FieldVisibilityConverter x:Key="fieldVisConverter" />
             <mv:CommentVisibilityConverter x:Key="commentVisConverter" />
             <mv:MetaValueTemplateSelector x:Key="templateSelector" />
             <u:VisibilityConverter x:Key="boolToVisConverter" />
+
+            <Thickness x:Key="containerMargin">1,20,1,1</Thickness>
+            <sys:Double x:Key="pageWidth">450</sys:Double>
+            <sys:Double x:Key="nameColWidthS">130</sys:Double>
+            <sys:Double x:Key="nameColWidth">150</sys:Double>
+            <sys:Double x:Key="valueColWidthS">85</sys:Double>
+            <sys:Double x:Key="valueColWidthM">150</sys:Double>
+            <sys:Double x:Key="valueColWidthL">350</sys:Double>
 
             <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
                 <Setter Property="VerticalAlignment" Value="Top" />
@@ -46,28 +55,35 @@
             </Style>
 
             <DataTemplate x:Key="DefaultContent">
-                <TextBox Width="85" IsReadOnly="True" Text="{Binding Value}" />
+                <TextBox Width="{StaticResource valueColWidthS}">
+                    <TextBox.Text>
+                        <Binding Path="Value" ValidatesOnExceptions="True">
+                            <Binding.ValidationRules>
+                                <mv:MetaValidationRule />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
             </DataTemplate>
 
             <DataTemplate x:Key="StringContent">
-                <TextBox Width="180" MaxLength="{Binding Length}"
-                         IsReadOnly="True" Text="{Binding Value}" />
+                <TextBox Width="{StaticResource valueColWidthM}" MaxLength="{Binding Length}"
+                     IsReadOnly="True" Text="{Binding Value}" />
             </DataTemplate>
 
             <DataTemplate x:Key="EnumContent">
-                <ComboBox Width="180" IsEnabled="True"
-                          ItemsSource="{Binding Options}"
-                          SelectedValuePath="Item1" DisplayMemberPath="Item2"
-                          SelectedValue="{Binding Value}" />
+                <ComboBox Width="{StaticResource valueColWidthM}" ItemsSource="{Binding Options}"
+                      SelectedValuePath="Item1" DisplayMemberPath="Item2"
+                      SelectedValue="{Binding Value}" />
             </DataTemplate>
 
             <DataTemplate x:Key="BitmaskContent">
-                <ListBox Width="150" MaxHeight="260"
-                         ItemsSource="{Binding Options}">
+                <ListBox Width="{StaticResource valueColWidthM}" MaxHeight="260"
+                     ItemsSource="{Binding Options}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <CheckBox IsEnabled="False" IsChecked="{Binding IsChecked}" Content="{Binding Name}" 
-                                      ToolTip="{Binding ToolTip}" ToolTipService.ShowOnDisabled="True" />
+                            <CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Name}" 
+                                  ToolTip="{Binding ToolTip}" ToolTipService.ShowOnDisabled="True" />
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
@@ -75,29 +91,30 @@
 
             <DataTemplate x:Key="TagReferenceContent">
                 <StackPanel Orientation="Horizontal">
-                    <ComboBox Width="150" IsEnabled="False"
-                          ItemContainerStyle="{StaticResource ComboBoxOption}"
-                          DisplayMemberPath="Label"
-                          ItemsSource="{Binding ClassOptions}"
-                          SelectedItem="{Binding SelectedClass}" />
-                    <ComboBox Width="350" Margin="5,0" IsEnabled="False"
-                          ItemContainerStyle="{StaticResource ComboBoxOption}"
-                          DisplayMemberPath="Label"
-                          ToolTip="{Binding SelectedItem.Label}"
-                          ToolTipService.ShowOnDisabled="True"
-                          ItemsSource="{Binding TagOptions}"
-                          SelectedItem="{Binding SelectedItem}" />
+                    <ComboBox Width="{StaticResource valueColWidthM}"
+                      ItemContainerStyle="{StaticResource ComboBoxOption}"
+                      DisplayMemberPath="Label"
+                      ItemsSource="{Binding ClassOptions}"
+                      SelectedItem="{Binding SelectedClass}" />
+                    <ComboBox Width="{StaticResource valueColWidthL}" Margin="5,0"
+                      ItemContainerStyle="{StaticResource ComboBoxOption}"
+                      DisplayMemberPath="Label"
+                      ToolTip="{Binding SelectedItem.Label}"
+                      ToolTipService.ShowOnDisabled="True"
+                      ItemsSource="{Binding TagOptions}"
+                      SelectedItem="{Binding SelectedItem}" />
                 </StackPanel>
             </DataTemplate>
 
             <DataTemplate x:Key="CommentTemplate">
-                <Border Margin="1,20,1,1" Width="450" 
-                        BorderThickness="1" HorizontalAlignment="Left"
-                        BorderBrush="{DynamicResource TextBoxDisabledBorderBrush}"
-                        Background="{DynamicResource TextBoxDisabledBackground}">
+                <Border Margin="{StaticResource containerMargin}"
+                    Width="{StaticResource pageWidth}" 
+                    BorderThickness="1" HorizontalAlignment="Left"
+                    BorderBrush="{DynamicResource TextBoxDisabledBorderBrush}"
+                    Background="{DynamicResource TextBoxDisabledBackground}">
                     <StackPanel>
                         <Label FontSize="13" FontWeight="Bold" Padding="0"
-                               Visibility="{Binding Title, Converter={StaticResource commentVisConverter}}">
+                           Visibility="{Binding Title, Converter={StaticResource commentVisConverter}}">
                             <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" />
                         </Label>
                         <Label Padding="0" Visibility="{Binding Body, Converter={StaticResource commentVisConverter}}">
@@ -116,7 +133,7 @@
                         </MultiBinding>
                     </Grid.Visibility>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="150" />
+                        <ColumnDefinition MinWidth="{StaticResource nameColWidth}" MaxWidth="{StaticResource nameColWidth}" />
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
@@ -124,7 +141,7 @@
                         <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
                     </Label>
                     <ContentPresenter Grid.Column="1" Content="{Binding}" Tag="content"
-                                      ContentTemplateSelector="{StaticResource templateSelector}" />
+                                  ContentTemplateSelector="{StaticResource templateSelector}" />
                     <Label Grid.Column="2">
                         <TextBlock Text="{Binding Description}" TextTrimming="CharacterEllipsis" />
                     </Label>
@@ -137,8 +154,7 @@
                         <Setter Property="MinWidth" Value="20" />
                     </Style>
                     <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
-                        <Setter Property="Width" Value="85" />
-                        <Setter Property="IsReadOnly" Value="True" />
+                        <Setter Property="Width" Value="{StaticResource valueColWidthS}" />
                     </Style>
                 </DataTemplate.Resources>
 
@@ -150,29 +166,61 @@
                         </MultiBinding>
                     </Grid.Visibility>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="130" />
+                        <ColumnDefinition MinWidth="{StaticResource nameColWidthS}" MaxWidth="{StaticResource nameColWidthS}" />
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-                    <Label Grid.Column="0" Width="130">
+                    <Label Grid.Column="0" Width="{StaticResource nameColWidthS}">
                         <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
                     </Label>
                     <StackPanel Grid.Column="1" Orientation="Horizontal">
                         <StackPanel Orientation="Horizontal" Visibility="{Binding Converter={StaticResource fieldVisConverter}, ConverterParameter=0}">
                             <Label Content="{Binding Labels[0]}" />
-                            <TextBox Text="{Binding Value1}" />
+                            <TextBox>
+                                <TextBox.Text>
+                                    <Binding Path="Value1" ValidatesOnExceptions="True">
+                                        <Binding.ValidationRules>
+                                            <mv:MetaValidationRule />
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Visibility="{Binding Converter={StaticResource fieldVisConverter}, ConverterParameter=1}">
                             <Label Content="{Binding Labels[1]}" />
-                            <TextBox Text="{Binding Value2}" />
+                            <TextBox>
+                                <TextBox.Text>
+                                    <Binding Path="Value2" ValidatesOnExceptions="True">
+                                        <Binding.ValidationRules>
+                                            <mv:MetaValidationRule />
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Visibility="{Binding Converter={StaticResource fieldVisConverter}, ConverterParameter=2}">
                             <Label Content="{Binding Labels[2]}" />
-                            <TextBox Text="{Binding Value3}" />
+                            <TextBox>
+                                <TextBox.Text>
+                                    <Binding Path="Value3" ValidatesOnExceptions="True">
+                                        <Binding.ValidationRules>
+                                            <mv:MetaValidationRule />
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Visibility="{Binding Converter={StaticResource fieldVisConverter}, ConverterParameter=3}">
                             <Label Content="{Binding Labels[3]}" />
-                            <TextBox Text="{Binding Value4}" />
+                            <TextBox>
+                                <TextBox.Text>
+                                    <Binding Path="Value4" ValidatesOnExceptions="True">
+                                        <Binding.ValidationRules>
+                                            <mv:MetaValidationRule />
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
                         </StackPanel>
                     </StackPanel>
                     <Label Grid.Column="2">
@@ -182,8 +230,8 @@
             </DataTemplate>
 
             <DataTemplate x:Key="StructureTemplate">
-                <Border Margin="1,20,1,1" BorderThickness="0"
-                        IsEnabled="{Binding IsEnabled}">
+                <Border Margin="{StaticResource containerMargin}" BorderThickness="0"
+                    IsEnabled="{Binding IsEnabled}">
                     <Border.Visibility>
                         <MultiBinding Converter="{StaticResource invisConverter}">
                             <Binding Path="IsVisible" />
@@ -197,30 +245,31 @@
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition MinWidth="10" MaxWidth="10" />
-                            <ColumnDefinition MinWidth="185" MaxWidth="185" />
+                            <ColumnDefinition MinWidth="{StaticResource nameColWidth}" MaxWidth="{StaticResource nameColWidth}" />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
                         <Border Grid.Row="0" Grid.ColumnSpan="3" Background="{DynamicResource Environment.CommandBar.Gradient}" />
                         <Border Grid.Column="0" Grid.Row="1" Background="{DynamicResource Environment.CommandBar.Gradient}" />
                         <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Orientation="Horizontal">
                             <ToggleButton Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}"
-                                          VerticalAlignment="Center" Margin="3"
-                                          IsChecked="{Binding IsExpanded}">
+                                      VerticalAlignment="Center" Margin="3"
+                                      IsChecked="{Binding IsExpanded}">
                                 <ContentControl Template="{StaticResource ic_Expander_16x}" />
                             </ToggleButton>
                             <Label FontSize="13" FontWeight="Bold">
                                 <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
                             </Label>
                         </StackPanel>
-                        <ComboBox Grid.Row="0" Grid.Column="2" Width="130"
-                                  VerticalAlignment="Center" HorizontalAlignment="Left"
-                                  Style="{StaticResource {x:Static ToolBar.ComboBoxStyleKey}}"
-                                  ItemsSource="{Binding BlockLabels}" SelectedIndex="{Binding BlockIndex}" />
+                        <ComboBox Grid.Row="0" Grid.Column="2" Margin="5,0,0,0"
+                              Width="{StaticResource valueColWidthM}"
+                              VerticalAlignment="Center" HorizontalAlignment="Left"
+                              Style="{StaticResource {x:Static ToolBar.ComboBoxStyleKey}}"
+                              ItemsSource="{Binding BlockLabels}" SelectedIndex="{Binding BlockIndex}" />
                         <Grid Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" 
-                              Visibility="{Binding IsExpanded, Converter={StaticResource boolToVisConverter}}">
+                          Visibility="{Binding IsExpanded, Converter={StaticResource boolToVisConverter}}">
                             <ItemsControl Margin="5,5,0,0" ItemsSource="{Binding Children}"
-                                          Visibility="{Binding HasChildren, Converter={StaticResource boolToVisConverter}}"
-                                          ItemTemplateSelector="{StaticResource templateSelector}">
+                                      Visibility="{Binding HasChildren, Converter={StaticResource boolToVisConverter}}"
+                                      ItemTemplateSelector="{StaticResource templateSelector}">
                             </ItemsControl>
                         </Grid>
                     </Grid>
@@ -228,8 +277,8 @@
             </DataTemplate>
 
             <DataTemplate x:Key="ArrayTemplate">
-                <Border Margin="1,20,1,1" BorderThickness="0"
-                        IsEnabled="{Binding IsEnabled}">
+                <Border Margin="{StaticResource containerMargin}" BorderThickness="0"
+                    IsEnabled="{Binding IsEnabled}">
                     <Border.Visibility>
                         <MultiBinding Converter="{StaticResource invisConverter}">
                             <Binding Path="IsVisible" />
@@ -243,15 +292,15 @@
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition MinWidth="10" MaxWidth="10" />
-                            <ColumnDefinition MinWidth="185" MaxWidth="185" />
+                            <ColumnDefinition MinWidth="{StaticResource nameColWidth}" MaxWidth="{StaticResource nameColWidth}" />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
                         <Border Grid.Row="0" Grid.ColumnSpan="3" Background="{DynamicResource Environment.CommandBar.Gradient}" />
                         <Border Grid.Column="0" Grid.Row="1" Background="{DynamicResource Environment.CommandBar.Gradient}" />
                         <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Orientation="Horizontal">
                             <ToggleButton Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}"
-                                          VerticalAlignment="Center" Margin="3"
-                                          IsChecked="{Binding IsExpanded}">
+                                      VerticalAlignment="Center" Margin="3"
+                                      IsChecked="{Binding IsExpanded}">
                                 <ContentControl Template="{StaticResource ic_Expander_16x}" />
                             </ToggleButton>
                             <Label FontSize="14" FontWeight="Bold">
@@ -259,10 +308,10 @@
                             </Label>
                         </StackPanel>
                         <Grid Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" 
-                              Visibility="{Binding IsExpanded, Converter={StaticResource boolToVisConverter}}">
+                          Visibility="{Binding IsExpanded, Converter={StaticResource boolToVisConverter}}">
                             <ItemsControl Margin="5,5,0,0" ItemsSource="{Binding Children}"
-                                          Visibility="{Binding HasChildren, Converter={StaticResource boolToVisConverter}}"
-                                          ItemTemplateSelector="{StaticResource templateSelector}">
+                                      Visibility="{Binding HasChildren, Converter={StaticResource boolToVisConverter}}"
+                                      ItemTemplateSelector="{StaticResource templateSelector}">
                             </ItemsControl>
                         </Grid>
                     </Grid>

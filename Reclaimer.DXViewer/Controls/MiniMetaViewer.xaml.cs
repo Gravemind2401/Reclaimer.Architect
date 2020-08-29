@@ -2,6 +2,7 @@
 using Adjutant.Blam.Halo5;
 using Reclaimer.Models;
 using Reclaimer.Plugins.MetaViewer;
+using Reclaimer.Plugins.MetaViewer.Halo3;
 using Reclaimer.Utilities;
 using Studio.Controls;
 using System;
@@ -44,7 +45,7 @@ namespace Reclaimer.Controls
         }
         #endregion
 
-        private IIndexItem item;
+        private MetaContext context;
         private XmlNode rootNode;
         private long baseAddress;
 
@@ -58,9 +59,9 @@ namespace Reclaimer.Controls
             //ShowInvisibles = MetaViewerPlugin.Settings.ShowInvisibles;
         }
 
-        public void LoadMetadata(IIndexItem tag, XmlNode layout, long baseAddress)
+        public void LoadMetadata(MetaContext context, XmlNode layout, long baseAddress)
         {
-            item = tag;
+            this.context = context;
             rootNode = layout;
             this.baseAddress = baseAddress;
 
@@ -74,7 +75,7 @@ namespace Reclaimer.Controls
             {
                 try
                 {
-                    var meta = MetaValueBase.GetMetaValue(n, item.CacheFile, baseAddress);
+                    var meta = MetaValueBase.GetMetaValue(n, context, baseAddress);
                     Metadata.Add(meta);
                 }
                 catch { }

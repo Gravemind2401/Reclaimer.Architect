@@ -11,6 +11,7 @@ using Adjutant.Blam.Common;
 using Reclaimer.Plugins.MetaViewer;
 using Adjutant.Spatial;
 using System.Windows.Controls;
+using System.IO.Endian;
 
 namespace Reclaimer.Models
 {
@@ -32,6 +33,7 @@ namespace Reclaimer.Models
 
         public IIndexItem ScenarioTag { get; }
 
+        public TransactionStream Transaction { get; }
         public Dictionary<string, ScenarioSection> Sections { get; }
         public ObservableCollection<TreeItemModel> Hierarchy { get; }
         public ObservableCollection<string> Items { get; }
@@ -113,6 +115,7 @@ namespace Reclaimer.Models
         public ScenarioModel(IIndexItem item)
         {
             ScenarioTag = item;
+            Transaction = new TransactionStream(new System.IO.MemoryStream());
             Sections = new Dictionary<string, ScenarioSection>();
             Hierarchy = new ObservableCollection<TreeItemModel>();
             Items = new ObservableCollection<string>();
