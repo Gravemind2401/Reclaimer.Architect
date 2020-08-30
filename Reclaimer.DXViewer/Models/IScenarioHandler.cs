@@ -19,8 +19,10 @@ namespace Reclaimer.Models
 
     public interface IScenarioPropertyView : IScenarioHandler
     {
+        ObjectPlacement CurrentItem { get; }
         void ShowProperties(NodeType nodeType, int itemIndex);
         void ClearProperties();
+        void SetValue(string id, object value);
     }
 
     public interface IScenarioRenderView : IScenarioHandler

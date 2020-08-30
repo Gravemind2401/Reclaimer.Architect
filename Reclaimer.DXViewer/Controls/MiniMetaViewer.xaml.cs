@@ -1,14 +1,9 @@
-﻿using Adjutant.Blam.Common;
-using Adjutant.Blam.Halo5;
-using Reclaimer.Models;
+﻿using Adjutant.Geometry;
 using Reclaimer.Plugins.MetaViewer;
 using Reclaimer.Plugins.MetaViewer.Halo3;
-using Reclaimer.Utilities;
-using Studio.Controls;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -49,11 +44,15 @@ namespace Reclaimer.Controls
         private XmlNode rootNode;
         private long baseAddress;
 
+        private readonly Dictionary<string, MetaValueBase> valuesById;
+
         public ObservableCollection<MetaValueBase> Metadata { get; }
 
         public MiniMetaViewer()
         {
             InitializeComponent();
+            valuesById = new Dictionary<string, MetaValueBase>();
+
             Metadata = new ObservableCollection<MetaValueBase>();
             DataContext = this;
             //ShowInvisibles = MetaViewerPlugin.Settings.ShowInvisibles;
@@ -70,15 +69,46 @@ namespace Reclaimer.Controls
 
         private void LoadData()
         {
+            if (context == null || rootNode == null)
+                return;
+
             Metadata.Clear();
+            valuesById.Clear();
             foreach (XmlNode n in rootNode.ChildNodes)
             {
                 try
                 {
                     var meta = MetaValueBase.GetMetaValue(n, context, baseAddress);
                     Metadata.Add(meta);
+                    if (n.Attributes["id"] != null)
+                        valuesById.Add(n.Attributes["id"].Value, meta);
                 }
                 catch { }
+            }
+        }
+
+        public void SetValue(string id, object value)
+        {
+            if (!valuesById.ContainsKey(id))
+                return;
+
+            var meta = valuesById[id];
+
+            var single = meta as SimpleValue;
+            if (single != null)
+            {
+                single.Value = value;
+                return;
+            }
+
+            var multi = meta as MultiValue;
+            if (multi != null)
+            {
+                var vector = (IXMVector)value;
+                multi.Value1 = vector.X;
+                multi.Value2 = vector.Y;
+                multi.Value3 = vector.Z;
+                multi.Value4 = vector.W;
             }
         }
 

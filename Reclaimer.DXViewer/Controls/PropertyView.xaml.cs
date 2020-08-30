@@ -22,10 +22,11 @@ namespace Reclaimer.Controls
     /// </summary>
     public partial class PropertyView : IScenarioPropertyView
     {
-        public TabModel TabModel { get; }
-
         private ScenarioModel scenario;
         private MetaContext context;
+
+        public TabModel TabModel { get; }
+        public ObjectPlacement CurrentItem { get; private set; }
 
         public PropertyView()
         {
@@ -51,6 +52,8 @@ namespace Reclaimer.Controls
             metaViewer.Visibility = Visibility.Hidden;
         }
 
+        public void SetValue(string id, object value) => metaViewer.SetValue(id, value);
+
         public void ShowProperties(NodeType nodeType, int itemIndex)
         {
             metaViewer.Metadata.Clear();
@@ -64,9 +67,12 @@ namespace Reclaimer.Controls
                     + itemIndex * palette.PlacementBlockRef.BlockSize;
 
                 metaViewer.LoadMetadata(context, palette.PlacementsNode, baseAddress);
+                CurrentItem = palette.Placements[itemIndex];
             }
             else
             {
+                CurrentItem = null;
+
                 switch (nodeType)
                 {
                     case NodeType.Mission:

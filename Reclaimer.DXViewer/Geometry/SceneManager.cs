@@ -17,6 +17,7 @@ using static HelixToolkit.Wpf.SharpDX.Media3DExtension;
 using Media = System.Windows.Media;
 using Media3D = System.Windows.Media.Media3D;
 using Helix = HelixToolkit.Wpf.SharpDX;
+using System.Windows.Data;
 
 namespace Reclaimer.Geometry
 {
@@ -102,11 +103,14 @@ namespace Reclaimer.Geometry
                     var inst = manager.GenerateModel();
                     inst.Name = placement.GetDisplayName();
 
-                    var matrix = SharpDX.Matrix.Scaling(placement.Scale == 0 ? 1 : placement.Scale)
-                        * SharpDX.Matrix.RotationYawPitchRoll(placement.Rotation.Z, placement.Rotation.Y, placement.Rotation.X)
-                        * SharpDX.Matrix.Translation(((IRealVector3D)placement.Position).ToVector3());
+                    var binding = new MultiBinding { Converter = TransformConverter.Instance, Mode = BindingMode.TwoWay };
+                    binding.Bindings.Add(new Binding(nameof(ObjectPlacement.Position)) { Mode = BindingMode.TwoWay });
+                    binding.Bindings.Add(new Binding(nameof(ObjectPlacement.Rotation)) { Mode = BindingMode.TwoWay });
+                    binding.Bindings.Add(new Binding(nameof(ObjectPlacement.Scale)) { Mode = BindingMode.TwoWay });
 
-                    inst.Element.Transform = new Media3D.MatrixTransform3D(matrix.ToMatrix3D());
+                    inst.Element.DataContext = placement;
+                    BindingOperations.SetBinding(inst.Element, Helix.Element3D.TransformProperty, binding);
+
                     holder.Instances.Add(inst);
                     holder.GroupElement.Children.Add(inst.Element);
                 }
