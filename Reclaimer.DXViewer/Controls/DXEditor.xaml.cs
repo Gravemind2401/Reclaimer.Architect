@@ -89,7 +89,11 @@ namespace Reclaimer.Controls
 
         public void SelectObject(NodeType nodeType, int itemIndex)
         {
-            if (!isReady) return;
+            if (!isReady || itemIndex < 0) return;
+
+            SelectPalette(nodeType);
+            var selected = sceneManager.PaletteHolders[PaletteType.FromNodeType(nodeType)];
+            renderer.SetSelectedElement(selected.Instances[itemIndex].Element);
         }
 
         public void NavigateToObject(NodeType nodeType, int index)

@@ -42,10 +42,11 @@ namespace Reclaimer.Utilities
             float scale;
 
             matrix.DecomposeUniformScale(out scale, out rotation, out position);
+            var euler = rotation.ToEulerAngles();
 
             var result = new object[3];
             result[0] = position.ToRealVector3D();
-            result[1] = rotation.ToEulerAngles().ToRealVector3D();
+            result[1] = new RealVector3D(euler.X, euler.Z, euler.Y);
             result[2] = scale;
             return result;
         }

@@ -384,7 +384,11 @@ namespace Reclaimer.Controls
         private void SetSelectedElement(Helix.HitTestResult hit)
         {
             var model = hit?.ModelHit as Helix.Element3D;
+            SetSelectedElement(model);
+        }
 
+        public void SetSelectedElement(Helix.Element3D model)
+        {
             if (model != null && model.IsDescendentOf(manipulator))
                 return;
             else model = model?.FindInstanceParent();

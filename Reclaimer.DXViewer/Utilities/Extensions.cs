@@ -137,6 +137,9 @@ namespace Reclaimer.Utilities
 
         public static Helix.Element3D FindInstanceParent(this Helix.Element3D element)
         {
+            if (element.Tag is IModelInstance)
+                return element;
+
             return element.EnumerateAncestors().Reverse().FirstOrDefault(e => e.Tag is IModelInstance);
         }
 
