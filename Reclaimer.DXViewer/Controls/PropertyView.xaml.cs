@@ -1,4 +1,5 @@
 ﻿using Adjutant.Geometry;
+using Adjutant.Spatial;
 using Reclaimer.Models;
 using Reclaimer.Plugins.MetaViewer;
 using Reclaimer.Plugins.MetaViewer.Halo3;
@@ -142,6 +143,8 @@ namespace Reclaimer.Controls
 
         private void LoadData()
         {
+            foreach (var meta in valuesById.Values)
+                meta.PropertyChanged -= Meta_PropertyChanged;
             Metadata.Clear();
             valuesById.Clear();
             foreach (XmlNode n in rootNode.ChildNodes)
@@ -151,9 +154,35 @@ namespace Reclaimer.Controls
                     var meta = MetaValueBase.GetMetaValue(n, context, baseAddress);
                     Metadata.Add(meta);
                     if (n.Attributes["id"] != null)
+                    {
                         valuesById.Add(n.Attributes["id"].Value, meta);
+                        meta.PropertyChanged += Meta_PropertyChanged;
+                    }
                 }
                 catch { }
+            }
+        }
+
+        private void Meta_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            var id = valuesById.FirstOrDefault(p => p.Value == sender).Key;
+            if (CurrentItem == null || id == null)
+                return;
+
+            switch (id)
+            {
+                case "position":
+                case "rotation":
+                    var multi = sender as MultiValue;
+                    var vector = new RealVector3D(multi.Value1, multi.Value2, multi.Value3);
+                    if (id == "position")
+                        CurrentItem.Position = vector;
+                    else CurrentItem.Rotation = vector;
+                    break;
+                case "scale":
+                    var simple = sender as SimpleValue;
+                    CurrentItem.Scale = float.Parse(simple.Value.ToString());
+                    break;
             }
         }
 
