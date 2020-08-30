@@ -133,9 +133,6 @@
     <Compile Include="Controls\HierarchyView.xaml.cs">
       <DependentUpon>HierarchyView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\MiniMetaViewer.xaml.cs">
-      <DependentUpon>MiniMetaViewer.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Controls\PropertyView.xaml.cs">
       <DependentUpon>PropertyView.xaml</DependentUpon>
     </Compile>
@@ -218,10 +215,6 @@
     <Page Include="Controls\HierarchyView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Controls\MiniMetaViewer.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="Controls\PropertyView.xaml">
       <SubType>Designer</SubType>
