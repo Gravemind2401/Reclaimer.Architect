@@ -130,6 +130,7 @@
       <DependentUpon>DXViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\DXRenderer.cs" />
+    <Compile Include="Controls\ElementHighlighter3D.cs" />
     <Compile Include="Controls\HierarchyView.xaml.cs">
       <DependentUpon>HierarchyView.xaml</DependentUpon>
     </Compile>

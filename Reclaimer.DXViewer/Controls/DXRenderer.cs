@@ -144,16 +144,11 @@ namespace Reclaimer.Controls
         private Helix.Viewport3DX Viewport { get; set; }
         private readonly List<Helix.Element3D> children = new List<Helix.Element3D>();
 
-        private readonly Helix.GroupModel3D highlightedGeometry = new Helix.GroupModel3D
+        private readonly ElementHighlighter3D selector = new ElementHighlighter3D();
+        private readonly ElementHighlighter3D highlighter = new ElementHighlighter3D()
         {
-            IsHitTestVisible = false,
-            Visibility = Visibility.Collapsed
-        };
-
-        private readonly Helix.GroupModel3D selectedGeometry = new Helix.GroupModel3D
-        {
-            IsHitTestVisible = false,
-            Visibility = Visibility.Collapsed
+            HighlightColor = SharpDX.Color.Gold,
+            EnableXRayGrid = false
         };
 
         private readonly Helix.TransformManipulator3D manipulator = new Helix.TransformManipulator3D
@@ -247,6 +242,8 @@ namespace Reclaimer.Controls
             Viewport.OnRendered -= Viewport_OnRendered;
 
             Viewport.Items.Remove(manipulator);
+            Viewport.Items.Remove(highlighter);
+            Viewport.Items.Remove(selector);
             foreach (var c in children)
                 Viewport.Items.Remove(c);
 
@@ -258,6 +255,8 @@ namespace Reclaimer.Controls
             if (Viewport == null) return;
 
             Viewport.Items.Add(manipulator);
+            Viewport.Items.Add(highlighter);
+            Viewport.Items.Add(selector);
             foreach (var c in children)
                 Viewport.Items.Add(c);
 
@@ -319,68 +318,18 @@ namespace Reclaimer.Controls
                 Viewport.Items.Add(box);
         }
 
-        private void EmptyMimicGeometry(Helix.GroupElement3D model)
-        {
-            (model.Parent as Helix.GroupElement3D)?.Children.Remove(model);
-
-            foreach (var e in model.Children)
-                e.Dispose();
-
-            model.Children.Clear();
-            model.Visibility = Visibility.Collapsed;
-        }
-
-        private void MimicGeometry(Helix.GroupElement3D source, Helix.GroupElement3D target, Helix.Material material)
-        {
-            EmptyMimicGeometry(target);
-
-            var allMeshes = source.EnumerateDescendents().OfType<Helix.MeshGeometryModel3D>();
-            foreach (var m in allMeshes)
-            {
-                var transform = m.Transform.Value;
-                transform *= m.EnumerateAncestors()
-                    .TakeWhile(e => e != source)
-                    .Select(e => e.Transform.Value)
-                    .Aggregate((a, b) => a * b);
-
-                target.Children.Add(new Helix.MeshGeometryModel3D
-                {
-                    CullMode = SharpDX.Direct3D11.CullMode.Back,
-                    DepthBias = -100,
-                    Geometry = m.Geometry,
-                    Material = material,
-                    Transform = new Media3D.MatrixTransform3D(transform)
-                });
-            }
-
-            source.Children.Add(target);
-            target.Visibility = Visibility.Visible;
-        }
-
-        private Helix.Element3D highlightedElement;
         private void SetHighlightedElement(IList<Helix.HitTestResult> hits)
         {
-            if (HighlightMaterial == null)
-                return;
-
             var targeted = hits?.Select(h => (h.ModelHit as Helix.Element3D)?.FindInstanceParent())
                 .Where(i => i != null)
                 .FirstOrDefault() as Helix.GroupElement3D;
 
-            if (targeted == null)
-            {
-                highlightedElement = null;
-                EmptyMimicGeometry(highlightedGeometry);
-                return;
-            }
-            else if (targeted == highlightedElement || targeted == selectedElement)
+            if (targeted != null && targeted == selector.Target)
                 return;
 
-            MimicGeometry(targeted, highlightedGeometry, HighlightMaterial);
-            highlightedElement = targeted;
+            highlighter.Target = targeted;
         }
 
-        private Helix.Element3D selectedElement;
         private void SetSelectedElement(Helix.HitTestResult hit)
         {
             var model = hit?.ModelHit as Helix.Element3D;
@@ -393,27 +342,19 @@ namespace Reclaimer.Controls
                 return;
             else model = model?.FindInstanceParent();
 
-            if (model == null)
+            if (model == selector.Target)
+                return;
+
+            if (model != null)
             {
-                selectedElement = null;
-                manipulator.Target = null;
-                manipulator.Visibility = Visibility.Collapsed;
-                EmptyMimicGeometry(selectedGeometry);
-                return;
+                manipulator.SizeScale = Math.Max(0.5, model.GetTotalBounds(true).Size.Length() * 0.35);
+                manipulator.CenterOffset = model.GetTotalBounds(true).Center;
+                manipulator.Visibility = Visibility.Visible;
             }
-            else if (model == selectedElement)
-                return;
+            else
+                manipulator.Visibility = Visibility.Collapsed;
 
-            manipulator.Target = null;
-            manipulator.CenterOffset = model.GetTotalBounds(true).Center;
-            manipulator.Target = model;
-
-            if (SelectionMaterial != null)
-                MimicGeometry(model as Helix.GroupElement3D, selectedGeometry, SelectionMaterial);
-
-            selectedElement = model;
-            EmptyMimicGeometry(highlightedGeometry);
-            manipulator.Visibility = Visibility.Visible;
+            manipulator.Target = selector.Target = model;
         }
 
         #endregion
