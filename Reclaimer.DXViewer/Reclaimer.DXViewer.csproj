@@ -134,6 +134,7 @@
     <Compile Include="Controls\HierarchyView.xaml.cs">
       <DependentUpon>HierarchyView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\TransformManipulatorEx3D.cs" />
     <Compile Include="Controls\PropertyView.xaml.cs">
       <DependentUpon>PropertyView.xaml</DependentUpon>
     </Compile>

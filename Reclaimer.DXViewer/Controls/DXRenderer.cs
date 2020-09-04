@@ -151,9 +151,9 @@ namespace Reclaimer.Controls
             EnableXRayGrid = false
         };
 
-        private readonly Helix.TransformManipulator3D manipulator = new Helix.TransformManipulator3D
+        private readonly TransformManipulatorEx3D manipulator = new TransformManipulatorEx3D
         {
-            EnableScaling = false,
+            UniformScaling = true,
             SizeScale = 1,
             Visibility = Visibility.Collapsed
         };
