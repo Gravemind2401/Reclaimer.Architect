@@ -149,6 +149,11 @@
     <Compile Include="Models\NodeType.cs" />
     <Compile Include="Models\PaletteType.cs" />
     <Compile Include="Models\ScenarioModel.cs" />
+    <Compile Include="Resources\FieldId.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FieldId.resx</DependentUpon>
+    </Compile>
     <Compile Include="Utilities\CompositeModelFactory.cs" />
     <Compile Include="Utilities\Extensions.cs" />
     <Compile Include="Utilities\NativeMethods.cs" />
@@ -170,6 +175,10 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\FieldId.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>FieldId.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

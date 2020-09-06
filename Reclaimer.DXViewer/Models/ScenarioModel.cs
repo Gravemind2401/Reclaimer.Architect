@@ -14,6 +14,7 @@ using System.Windows.Controls;
 using System.IO.Endian;
 using System.Runtime.CompilerServices;
 using System.IO;
+using Reclaimer.Resources;
 
 namespace Reclaimer.Models
 {
@@ -127,17 +128,21 @@ namespace Reclaimer.Models
             ObjectNames = new List<string>();
             Palettes = new Dictionary<string, PaletteDefinition>();
 
-            LoadSections();
-            LoadHierarchy();
-            ReadBsps();
-            ReadSkies();
-            ReadObjectNames();
-            ReadPalettes();
-            ReadPlacements();
+            using (var reader = ScenarioTag.CacheFile.CreateReader(ScenarioTag.CacheFile.DefaultAddressTranslator))
+            {
+                LoadSections(reader);
+                LoadHierarchy();
+                ReadBsps(reader);
+                ReadSkies(reader);
+                ReadObjectNames(reader);
+                ReadPalettes(reader);
+                ReadPlacements(reader);
+                ReadTriggerVolumes(reader);
+            }
         }
 
         #region Initialisation
-        private void LoadSections()
+        private void LoadSections(EndianReader reader)
         {
             var doc = new XmlDocument();
             doc.LoadXml(Properties.Resources.Halo3Scenario);
@@ -151,6 +156,12 @@ namespace Reclaimer.Models
 
                 Sections.Add(section.Name, section);
             }
+
+            foreach (var section in Sections.Values.Where(s => s.BlockSize > 0))
+            {
+                reader.Seek(ScenarioTag.MetaPointer.Address + section.Offset, SeekOrigin.Begin);
+                section.TagBlock = reader.ReadObject<TagBlock>();
+            }
         }
 
         private void LoadHierarchy()
@@ -162,58 +173,44 @@ namespace Reclaimer.Models
             Hierarchy[0].IsExpanded = true;
         }
 
-        private void ReadBsps()
+        private void ReadBsps(EndianReader reader)
         {
-            var reader = ScenarioTag.CacheFile.CreateReader(ScenarioTag.CacheFile.DefaultAddressTranslator);
-
             var section = Sections["structurebsps"];
-            var refOffset = section.Node.SelectSingleNode("*[@id='tagreference']").GetIntAttribute("offset") ?? 0;
+            var refOffset = section.Node.SelectSingleNode($"*[@id='{FieldId.TagReference}']").GetIntAttribute("offset") ?? 0;
 
-            reader.Seek(ScenarioTag.MetaPointer.Address + section.Offset, SeekOrigin.Begin);
-            var tagBlock = reader.ReadObject<TagBlock>();
-            for (int i = 0; i < tagBlock.Count; i++)
+            for (int i = 0; i < section.TagBlock.Count; i++)
             {
-                reader.Seek(tagBlock.Pointer.Address + section.BlockSize * i + refOffset, SeekOrigin.Begin);
+                reader.Seek(section.TagBlock.Pointer.Address + section.BlockSize * i + refOffset, SeekOrigin.Begin);
                 Bsps.Add(reader.ReadObject<TagReference>());
             }
         }
 
-        private void ReadSkies()
+        private void ReadSkies(EndianReader reader)
         {
-            var reader = ScenarioTag.CacheFile.CreateReader(ScenarioTag.CacheFile.DefaultAddressTranslator);
-
             var section = Sections["skies"];
-            var refOffset = section.Node.SelectSingleNode("*[@id='tagreference']").GetIntAttribute("offset") ?? 0;
+            var refOffset = section.Node.SelectSingleNode($"*[@id='{FieldId.TagReference}']").GetIntAttribute("offset") ?? 0;
 
-            reader.Seek(ScenarioTag.MetaPointer.Address + section.Offset, SeekOrigin.Begin);
-            var tagBlock = reader.ReadObject<TagBlock>();
-            for (int i = 0; i < tagBlock.Count; i++)
+            for (int i = 0; i < section.TagBlock.Count; i++)
             {
-                reader.Seek(tagBlock.Pointer.Address + section.BlockSize * i + refOffset, SeekOrigin.Begin);
+                reader.Seek(section.TagBlock.Pointer.Address + section.BlockSize * i + refOffset, SeekOrigin.Begin);
                 Skies.Add(reader.ReadObject<TagReference>());
             }
         }
 
-        private void ReadObjectNames()
+        private void ReadObjectNames(EndianReader reader)
         {
-            var reader = ScenarioTag.CacheFile.CreateReader(ScenarioTag.CacheFile.DefaultAddressTranslator);
-
             var section = Sections["objectnames"];
-            var nameOffset = section.Node.SelectSingleNode("*[@id='name']").GetIntAttribute("offset") ?? 0;
+            var nameOffset = section.Node.SelectSingleNode($"*[@id='{FieldId.Name}']").GetIntAttribute("offset") ?? 0;
 
-            reader.Seek(ScenarioTag.MetaPointer.Address + section.Offset, SeekOrigin.Begin);
-            var tagBlock = reader.ReadObject<TagBlock>();
-            for (int i = 0; i < tagBlock.Count; i++)
+            for (int i = 0; i < section.TagBlock.Count; i++)
             {
-                reader.Seek(tagBlock.Pointer.Address + section.BlockSize * i + nameOffset, SeekOrigin.Begin);
+                reader.Seek(section.TagBlock.Pointer.Address + section.BlockSize * i + nameOffset, SeekOrigin.Begin);
                 ObjectNames.Add(reader.ReadNullTerminatedString(32));
             }
         }
 
-        private void ReadPalettes()
+        private void ReadPalettes(EndianReader reader)
         {
-            var reader = ScenarioTag.CacheFile.CreateReader(ScenarioTag.CacheFile.DefaultAddressTranslator);
-
             var section = Sections["palettes"];
             foreach (XmlNode paletteNode in section.Node.SelectNodes("*[@palette]"))
             {
@@ -232,7 +229,7 @@ namespace Reclaimer.Models
                 reader.Seek(ScenarioTag.MetaPointer.Address + blockRef.Offset, SeekOrigin.Begin);
                 var tagBlock = paletteDef.PaletteBlockRef.TagBlock = reader.ReadObject<TagBlock>();
 
-                var refOffset = paletteNode.SelectSingleNode("*[@id='tagreference']").GetIntAttribute("offset") ?? 0;
+                var refOffset = paletteNode.SelectSingleNode($"*[@id='{FieldId.TagReference}']").GetIntAttribute("offset") ?? 0;
                 for (int i = 0; i < tagBlock.Count; i++)
                 {
                     reader.Seek(tagBlock.Pointer.Address + blockRef.BlockSize * i + refOffset, SeekOrigin.Begin);
@@ -243,10 +240,8 @@ namespace Reclaimer.Models
             }
         }
 
-        private void ReadPlacements()
+        private void ReadPlacements(EndianReader reader)
         {
-            var reader = ScenarioTag.CacheFile.CreateReader(ScenarioTag.CacheFile.DefaultAddressTranslator);
-
             var section = Sections["placements"];
             foreach (XmlNode placementNode in section.Node.SelectNodes("*[@placements]"))
             {
@@ -260,12 +255,12 @@ namespace Reclaimer.Models
                     BlockSize = placementNode.GetIntAttribute("elementSize", "entrySize", "size") ?? 0
                 };
 
-                var paletteIndex = placementNode.SelectSingleNode("*[@id='paletteindex']").GetIntAttribute("offset") ?? 0;
-                var nameIndex = placementNode.SelectSingleNode("*[@id='nameindex']").GetIntAttribute("offset") ?? 0;
-                var position = placementNode.SelectSingleNode("*[@id='position']").GetIntAttribute("offset") ?? 0;
-                var rotation = placementNode.SelectSingleNode("*[@id='rotation']").GetIntAttribute("offset") ?? 0;
-                var scale = placementNode.SelectSingleNode("*[@id='scale']").GetIntAttribute("offset") ?? 0;
-                var variant = placementNode.SelectSingleNode("*[@id='variant']")?.GetIntAttribute("offset");
+                var paletteIndex = placementNode.SelectSingleNode($"*[@id='{FieldId.PaletteIndex}']").GetIntAttribute("offset") ?? 0;
+                var nameIndex = placementNode.SelectSingleNode($"*[@id='{FieldId.NameIndex}']").GetIntAttribute("offset") ?? 0;
+                var position = placementNode.SelectSingleNode($"*[@id='{FieldId.Position}']").GetIntAttribute("offset") ?? 0;
+                var rotation = placementNode.SelectSingleNode($"*[@id='{FieldId.Rotation}']").GetIntAttribute("offset") ?? 0;
+                var scale = placementNode.SelectSingleNode($"*[@id='{FieldId.Scale}']").GetIntAttribute("offset") ?? 0;
+                var variant = placementNode.SelectSingleNode($"*[@id='{FieldId.Variant}']")?.GetIntAttribute("offset");
 
                 reader.Seek(ScenarioTag.MetaPointer.Address + blockRef.Offset, SeekOrigin.Begin);
                 var tagBlock = paletteDef.PlacementBlockRef.TagBlock = reader.ReadObject<TagBlock>();
@@ -307,33 +302,21 @@ namespace Reclaimer.Models
             SelectedItemIndex = -1;
             Items.Clear();
 
-            if (selectedNode == null)
+            if (selectedNode == null || SelectedNodeType == NodeType.None)
                 return;
 
             var paletteKey = PaletteType.FromNodeType(SelectedNodeType);
             if (paletteKey != null)
             {
-                DisplayPaletteItems(Palettes[paletteKey]);
+                foreach (var placement in Palettes[paletteKey].Placements)
+                    Items.Add(placement.GetDisplayName());
+
                 return;
             }
 
             //load other stuff like sandbox items and trigger volumes
-        }
 
-        private void DisplayPaletteItems(PaletteDefinition palette)
-        {
-            for (int i = 0; i < palette.Placements.Count; i++)
             {
-                var placement = palette.Placements[i];
-                if (placement.PaletteIndex < 0 || placement.PaletteIndex >= palette.Palette.Count)
-                {
-                    Items.Add("<invalid>");
-                    continue;
-                }
-
-                if (placement.NameIndex >= 0)
-                    Items.Add(ObjectNames[placement.NameIndex]);
-                else Items.Add(palette.Palette[placement.PaletteIndex].Tag.FileName());
             }
         }
 
@@ -383,6 +366,9 @@ namespace Reclaimer.Models
         public string Name { get; set; }
         public int Offset { get; set; }
         public int BlockSize { get; set; }
+        public TagBlock TagBlock { get; set; }
+
+        public override string ToString() => Name;
     }
 
     public class ObjectPlacement : BindableBase
@@ -394,42 +380,42 @@ namespace Reclaimer.Models
         public int PaletteIndex
         {
             get { return paletteIndex; }
-            set { SetProperty(ref paletteIndex, value, "paletteindex"); }
+            set { SetProperty(ref paletteIndex, value, FieldId.PaletteIndex); }
         }
 
         private int nameIndex;
         public int NameIndex
         {
             get { return nameIndex; }
-            set { SetProperty(ref nameIndex, value, "nameindex"); }
+            set { SetProperty(ref nameIndex, value, FieldId.NameIndex); }
         }
 
         private RealVector3D position;
         public RealVector3D Position
         {
             get { return position; }
-            set { SetProperty(ref position, value, "position"); }
+            set { SetProperty(ref position, value, FieldId.Position); }
         }
 
         private RealVector3D rotation;
         public RealVector3D Rotation
         {
             get { return rotation; }
-            set { SetProperty(ref rotation, value, "rotation"); }
+            set { SetProperty(ref rotation, value, FieldId.Rotation); }
         }
 
         private float scale;
         public float Scale
         {
             get { return scale; }
-            set { SetProperty(ref scale, value, "scale"); }
+            set { SetProperty(ref scale, value, FieldId.Scale); }
         }
 
         private StringId variant;
         public StringId Variant
         {
             get { return variant; }
-            set { SetProperty(ref variant, value, "variant"); }
+            set { SetProperty(ref variant, value, FieldId.Variant); }
         }
 
         public ObjectPlacement(ScenarioModel parent, string paletteKey)
@@ -474,5 +460,7 @@ namespace Reclaimer.Models
                 return parent.ObjectNames[NameIndex];
             else return palette.Palette[PaletteIndex].Tag.FileName();
         }
+
+        public override string ToString() => GetDisplayName();
     }
 }
