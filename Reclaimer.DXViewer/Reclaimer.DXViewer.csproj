@@ -149,6 +149,7 @@
     <Compile Include="Models\NodeType.cs" />
     <Compile Include="Models\PaletteType.cs" />
     <Compile Include="Models\ScenarioModel.cs" />
+    <Compile Include="Models\TriggerVolume.cs" />
     <Compile Include="Resources\FieldId.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

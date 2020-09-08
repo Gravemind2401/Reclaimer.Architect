@@ -45,6 +45,7 @@ namespace Reclaimer.Models
         public ObservableCollection<TagReference> Skies { get; }
         public List<string> ObjectNames { get; }
         public Dictionary<string, PaletteDefinition> Palettes { get; }
+        public ObservableCollection<TriggerVolume> TriggerVolumes { get; }
 
         private IScenarioHierarchyView hierarchyView;
         public IScenarioHierarchyView HierarchyView
@@ -127,6 +128,7 @@ namespace Reclaimer.Models
             Skies = new ObservableCollection<TagReference>();
             ObjectNames = new List<string>();
             Palettes = new Dictionary<string, PaletteDefinition>();
+            TriggerVolumes = new ObservableCollection<TriggerVolume>();
 
             using (var reader = ScenarioTag.CacheFile.CreateReader(ScenarioTag.CacheFile.DefaultAddressTranslator))
             {
@@ -295,6 +297,31 @@ namespace Reclaimer.Models
                 }
             }
         }
+
+        private void ReadTriggerVolumes(EndianReader reader)
+        {
+            var section = Sections["triggervolumes"];
+            var name = section.Node.SelectSingleNode($"*[@id='{FieldId.Name}']").GetIntAttribute("offset") ?? 0;
+            var position = section.Node.SelectSingleNode($"*[@id='{FieldId.Position}']").GetIntAttribute("offset") ?? 0;
+            var size = section.Node.SelectSingleNode($"*[@id='{FieldId.Size}']").GetIntAttribute("offset") ?? 0;
+
+            for (int i = 0; i < section.TagBlock.Count; i++)
+            {
+                var volume = new TriggerVolume(this);
+                var baseAddress = section.TagBlock.Pointer.Address + section.BlockSize * i;
+
+                reader.Seek(baseAddress + name, SeekOrigin.Begin);
+                volume.Name = reader.ReadObject<StringId>();
+
+                reader.Seek(baseAddress + position, SeekOrigin.Begin);
+                volume.Position = reader.ReadObject<RealVector3D>();
+
+                reader.Seek(baseAddress + size, SeekOrigin.Begin);
+                volume.Size = reader.ReadObject<RealVector3D>();
+
+                TriggerVolumes.Add(volume);
+            }
+        }
         #endregion
 
         private void DisplayItems()
@@ -316,7 +343,10 @@ namespace Reclaimer.Models
 
             //load other stuff like sandbox items and trigger volumes
 
+            if (SelectedNodeType == NodeType.TriggerVolumes)
             {
+                foreach (var volume in TriggerVolumes)
+                    Items.Add(volume.Name);
             }
         }
 

@@ -2405,7 +2405,7 @@
     <uint8 name="Starting Firebomb Grenade Count" offset="0x53" visible="true" />
   </section>
   <section name="triggervolumes" offset="0x260" elementSize="0x44">
-    <stringId name="Name" offset="0x0" visible="true" />
+    <stringId name="Name" offset="0x0" visible="true" id="name" />
     <int16 name="Object Name" offset="0x4" visible="true" />
     <int16 name="Unknown" offset="0x6" visible="false" />
     <stringId name="Node Name" offset="0x8" visible="true" />
@@ -2415,12 +2415,8 @@
     <float32 name="Unknown" offset="0x18" visible="false" />
     <float32 name="Unknown" offset="0x1C" visible="false" />
     <float32 name="Unknown" offset="0x20" visible="false" />
-    <float32 name="Position x" offset="0x24" visible="true" />
-    <float32 name="Position y" offset="0x28" visible="true" />
-    <float32 name="Position z" offset="0x2C" visible="true" />
-    <float32 name="Extents x" offset="0x30" visible="true" />
-    <float32 name="Extents y" offset="0x34" visible="true" />
-    <float32 name="Extents z" offset="0x38" visible="true" />
+    <point3 name="Position" offset="0x24" visible="true" id="position" />
+    <vector3 name="Size" offset="0x30" visible="true" id="size" />
     <undefined name="Unknown" offset="0x3C" visible="false" />
     <int16 name="Kill Volume" offset="0x40" visible="true" />
     <int16 name="Editor Folder Index" offset="0x42" visible="true" />
