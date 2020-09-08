@@ -750,6 +750,9 @@ namespace Reclaimer.Controls
                 models.Add(manipulator.translationX);
                 models.Add(manipulator.translationY);
                 models.Add(manipulator.translationZ);
+                models.Add(manipulator.translationXY);
+                models.Add(manipulator.translationYZ);
+                models.Add(manipulator.translationXZ);
                 models.Add(manipulator.rotationX);
                 models.Add(manipulator.rotationY);
                 models.Add(manipulator.rotationZ);
