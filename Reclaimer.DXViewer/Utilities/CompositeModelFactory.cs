@@ -12,7 +12,7 @@ namespace Reclaimer.Utilities
 {
     public static class CompositeModelFactory
     {
-        private static readonly string[] supportedTags = new[] { "hlmt", "weap", "vehi", "bipd", "scen" };
+        private static readonly string[] supportedTags = new[] { "hlmt", "weap", "vehi", "bipd", "scen", "eqip", "bloc" };
 
         public static bool IsTagSupported(IIndexItem tag) => supportedTags.Any(s => tag.ClassCode.ToLower() == s);
 
