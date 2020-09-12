@@ -82,18 +82,28 @@ namespace Reclaimer.Controls
         {
             if (!isReady) return;
 
+            sceneManager.TriggerVolumeGroup.IsRendering = nodeType == NodeType.TriggerVolumes;
+
             var paletteKey = PaletteType.FromNodeType(nodeType);
-            foreach (var palette in sceneManager.PaletteHolders.Values)
-                palette.GroupElement.IsHitTestVisible = palette.Name == paletteKey;
+            if (paletteKey != null)
+            {
+                foreach (var palette in sceneManager.PaletteHolders.Values)
+                    palette.GroupElement.IsHitTestVisible = palette.Name == paletteKey;
+            }
         }
 
         public void SelectObject(NodeType nodeType, int itemIndex)
         {
-            if (!isReady || itemIndex < 0) return;
+            if (!isReady) return;
 
             SelectPalette(nodeType);
-            var selected = sceneManager.PaletteHolders[PaletteType.FromNodeType(nodeType)];
-            renderer.SetSelectedElement(selected.Instances[itemIndex].Element);
+
+            var paletteKey = PaletteType.FromNodeType(nodeType);
+            if (paletteKey != null && itemIndex >= 0)
+            {
+                var selected = sceneManager.PaletteHolders[paletteKey];
+                renderer.SetSelectedElement(selected.Instances[itemIndex].Element);
+            }
         }
 
         public void NavigateToObject(NodeType nodeType, int index)
@@ -146,6 +156,9 @@ namespace Reclaimer.Controls
                         renderer.CameraSpeed = Math.Ceiling(bounds.Size.Length());
                         renderer.ZoomToBounds(bounds);
                     }
+
+                    sceneManager.TriggerVolumeGroup.IsRendering = false;
+                    modelGroup.Children.Add(sceneManager.TriggerVolumeGroup);
 
                     modelGroup.Visibility = Visibility.Visible;
 

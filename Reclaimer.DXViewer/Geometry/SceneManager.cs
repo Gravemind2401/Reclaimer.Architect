@@ -18,6 +18,7 @@ using Media = System.Windows.Media;
 using Media3D = System.Windows.Media.Media3D;
 using Helix = HelixToolkit.Wpf.SharpDX;
 using System.Windows.Data;
+using Reclaimer.Controls;
 
 namespace Reclaimer.Geometry
 {
@@ -32,12 +33,16 @@ namespace Reclaimer.Geometry
         public CompositeObjectHolder SkyHolder { get; private set; }
         public Dictionary<string, PaletteHolder> PaletteHolders { get; private set; }
 
+        public Helix.GroupElement3D TriggerVolumeGroup { get; private set; }
+        public ObservableCollection<BoxManipulator3D> TriggerVolumes { get; private set; }
+
         public void ReadScenario(ScenarioModel scenario)
         {
             this.scenario = scenario;
             BspHolder = new ObjectHolder();
             SkyHolder = new CompositeObjectHolder();
             PaletteHolders = new Dictionary<string, PaletteHolder>();
+            TriggerVolumes = new ObservableCollection<BoxManipulator3D>();
 
             for (int i = 0; i < scenario.Bsps.Count; i++)
             {
@@ -114,6 +119,26 @@ namespace Reclaimer.Geometry
                     holder.Instances.Add(inst);
                     holder.GroupElement.Children.Add(inst.Element);
                 }
+            }
+
+            TriggerVolumeGroup = new Helix.GroupModel3D();
+            foreach (var vol in scenario.TriggerVolumes)
+            {
+                var box = new BoxManipulator3D
+                {
+                    DiffuseColor = new SharpDX.Color(0, 1, 0, 0.5f),
+                    Position = ((IRealVector3D)vol.Position).ToVector3(),
+                    Size = ((IRealVector3D)vol.Size).ToVector3()
+                };
+
+                box.DataContext = vol;
+                BindingOperations.SetBinding(box, BoxManipulator3D.PositionProperty,
+                    new Binding(nameof(TriggerVolume.Position)) { Mode = BindingMode.TwoWay, Converter = SharpDXVectorConverter.Instance });
+                BindingOperations.SetBinding(box, BoxManipulator3D.SizeProperty,
+                    new Binding(nameof(TriggerVolume.Size)) { Mode = BindingMode.TwoWay, Converter = SharpDXVectorConverter.Instance });
+
+                TriggerVolumes.Add(box);
+                TriggerVolumeGroup.Children.Add(box);
             }
         }
 

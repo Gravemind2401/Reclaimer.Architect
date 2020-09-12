@@ -51,7 +51,7 @@ namespace Reclaimer.Controls
         private long baseAddress;
 
         public TabModel TabModel { get; }
-        public ObjectPlacement CurrentItem { get; private set; }
+        public object CurrentItem { get; private set; }
         public ObservableCollection<MetaValueBase> Metadata { get; }
 
         public PropertyView()
@@ -123,18 +123,28 @@ namespace Reclaimer.Controls
             }
             else
             {
-                CurrentItem = null;
-
-                switch (nodeType)
+                if (nodeType == NodeType.Mission)
                 {
-                    case NodeType.Mission:
-                        rootNode = scenario.Sections["mission"].Node;
-                        baseAddress = scenario.ScenarioTag.MetaPointer.Address;
-                        LoadData();
-                        break;
+                    rootNode = scenario.Sections["mission"].Node;
+                    baseAddress = scenario.ScenarioTag.MetaPointer.Address;
+                    CurrentItem = null;
+                    LoadData();
+                }
+                else if (nodeType == NodeType.TriggerVolumes && itemIndex >= 0)
+                {
+                    var section = scenario.Sections["triggervolumes"];
 
-                    default:
-                        return;
+                    rootNode = section.Node;
+                    baseAddress = section.TagBlock.Pointer.Address
+                        + itemIndex * section.BlockSize;
+
+                    CurrentItem = scenario.TriggerVolumes[itemIndex];
+                    LoadData();
+                }
+                else
+                {
+                    CurrentItem = null;
+                    return;
                 }
             }
 
@@ -166,23 +176,47 @@ namespace Reclaimer.Controls
         private void Meta_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             var id = valuesById.FirstOrDefault(p => p.Value == sender).Key;
-            if (CurrentItem == null || id == null)
+            if (id == null)
                 return;
 
-            switch (id)
+            var placement = CurrentItem as ObjectPlacement;
+            if (placement != null)
             {
-                case "position":
-                case "rotation":
-                    var multi = sender as MultiValue;
-                    var vector = new RealVector3D(multi.Value1, multi.Value2, multi.Value3);
-                    if (id == "position")
-                        CurrentItem.Position = vector;
-                    else CurrentItem.Rotation = vector;
-                    break;
-                case "scale":
-                    var simple = sender as SimpleValue;
-                    CurrentItem.Scale = float.Parse(simple.Value.ToString());
-                    break;
+                switch (id)
+                {
+                    case "position":
+                    case "rotation":
+                        var multi = sender as MultiValue;
+                        var vector = new RealVector3D(multi.Value1, multi.Value2, multi.Value3);
+                        if (id == "position")
+                            placement.Position = vector;
+                        else placement.Rotation = vector;
+                        break;
+                    case "scale":
+                        var simple = sender as SimpleValue;
+                        placement.Scale = float.Parse(simple.Value.ToString());
+                        break;
+                }
+
+                return;
+            }
+
+            var volume = CurrentItem as TriggerVolume;
+            if (volume != null)
+            {
+                switch (id)
+                {
+                    case "position":
+                    case "size":
+                        var multi = sender as MultiValue;
+                        var vector = new RealVector3D(multi.Value1, multi.Value2, multi.Value3);
+                        if (id == "position")
+                            volume.Position = vector;
+                        else volume.Size = vector;
+                        break;
+                }
+
+                return;
             }
         }
 
