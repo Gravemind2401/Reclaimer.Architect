@@ -15,6 +15,9 @@ namespace Reclaimer.Models
 {
     public class TriggerVolume : BindableBase
     {
+        public static readonly SharpDX.Color DefaultColour = new SharpDX.Color(0, 1, 0, 0.5f);
+        public static readonly SharpDX.Color SelectedColour = new SharpDX.Color(0, 0.5f, 1, 0.5f);
+
         private readonly ScenarioModel parent;
 
         private StringId name;

@@ -77,7 +77,7 @@ namespace Reclaimer.Controls
             TabModel.ToolTip = fileName;
             TabModel.Header = Utils.GetFileName(fileName);
         }
-        
+
         public void SelectPalette(NodeType nodeType)
         {
             if (!isReady) return;
@@ -104,6 +104,19 @@ namespace Reclaimer.Controls
                 var selected = sceneManager.PaletteHolders[paletteKey];
                 renderer.SetSelectedElement(selected.Instances[itemIndex].Element);
             }
+            else if (nodeType == NodeType.TriggerVolumes && itemIndex >= 0)
+            {
+                var prev = sceneManager.TriggerVolumes.FirstOrDefault(t => t.Tag != null);
+                if (prev != null)
+                {
+                    prev.DiffuseColor = TriggerVolume.DefaultColour;
+                    prev.Tag = null;
+                }
+
+                var selected = sceneManager.TriggerVolumes[itemIndex];
+                selected.DiffuseColor = TriggerVolume.SelectedColour;
+                selected.Tag = true;
+            }
         }
 
         public void NavigateToObject(NodeType nodeType, int index)
@@ -111,19 +124,25 @@ namespace Reclaimer.Controls
             if (!isReady) return;
 
             var paletteKey = PaletteType.FromNodeType(nodeType);
-            if (paletteKey == null)
-                return;
-
-            var obj = sceneManager.PaletteHolders[paletteKey].Instances[index];
-            if (obj != null)
-                renderer.ZoomToBounds(obj.Element.GetTotalBounds(), 500);
+            if (paletteKey != null)
+            {
+                var obj = sceneManager.PaletteHolders[paletteKey].Instances[index];
+                if (obj != null)
+                    renderer.ZoomToBounds(obj.Element.GetTotalBounds(), 500);
+            }
+            else if (nodeType == NodeType.TriggerVolumes)
+            {
+                var obj = sceneManager.TriggerVolumes[index];
+                renderer.ZoomToBounds(new SharpDX.BoundingBox(obj.Position, obj.Position + obj.Size), 500);
+            }
         }
 
         public void LoadScenario()
         {
-            Task.Run(() =>
+            Task.Run(async () =>
             {
-                sceneManager.ReadScenario(scenario);
+                await Task.WhenAll(sceneManager.ReadScenario(scenario));
+
                 Dispatcher.Invoke(() =>
                 {
                     sceneManager.RenderScenario();
@@ -179,7 +198,7 @@ namespace Reclaimer.Controls
                         TreeViewItems.Add(bspNode);
 
                     var skyNode = new TreeItemModel { Header = "sky", IsChecked = true };
-                    for (int i = 0; i < sceneManager.BspHolder.Instances.Count; i++)
+                    for (int i = 0; i < sceneManager.SkyHolder.Instances.Count; i++)
                     {
                         var sky = sceneManager.SkyHolder.Instances[i];
                         var tag = scenario.Skies[i].Tag;

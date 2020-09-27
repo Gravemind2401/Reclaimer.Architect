@@ -19,6 +19,7 @@ using Media3D = System.Windows.Media.Media3D;
 using Helix = HelixToolkit.Wpf.SharpDX;
 using System.Windows.Data;
 using Reclaimer.Controls;
+using System.Collections.Concurrent;
 
 namespace Reclaimer.Geometry
 {
@@ -26,7 +27,7 @@ namespace Reclaimer.Geometry
     {
         private static readonly Helix.Material ErrorMaterial = Helix.DiffuseMaterials.Gold;
 
-        private readonly Dictionary<int, Helix.TextureModel> sceneTextures = new Dictionary<int, Helix.TextureModel>();
+        private readonly ConcurrentDictionary<int, Helix.TextureModel> sceneTextures = new ConcurrentDictionary<int, Helix.TextureModel>();
 
         private ScenarioModel scenario;
         public ObjectHolder BspHolder { get; private set; }
@@ -36,7 +37,7 @@ namespace Reclaimer.Geometry
         public Helix.GroupElement3D TriggerVolumeGroup { get; private set; }
         public ObservableCollection<BoxManipulator3D> TriggerVolumes { get; private set; }
 
-        public void ReadScenario(ScenarioModel scenario)
+        public IEnumerable<Task> ReadScenario(ScenarioModel scenario)
         {
             this.scenario = scenario;
             BspHolder = new ObjectHolder();
@@ -44,40 +45,49 @@ namespace Reclaimer.Geometry
             PaletteHolders = new Dictionary<string, PaletteHolder>();
             TriggerVolumes = new ObservableCollection<BoxManipulator3D>();
 
-            for (int i = 0; i < scenario.Bsps.Count; i++)
+            yield return Task.Run(() =>
             {
-                IRenderGeometry geom;
-                if (ContentFactory.TryGetGeometryContent(scenario.Bsps[i].Tag, out geom))
-                    BspHolder.Managers.Add(new ModelManager(this, geom.ReadGeometry(0)));
-                else BspHolder.Managers.Add(null);
+                for (int i = 0; i < scenario.Bsps.Count; i++)
+                {
+                    IRenderGeometry geom;
+                    if (ContentFactory.TryGetGeometryContent(scenario.Bsps[i].Tag, out geom))
+                        BspHolder.Managers.Add(new ModelManager(this, geom.ReadGeometry(0)));
+                    else BspHolder.Managers.Add(null);
 
-                BspHolder.Managers[i]?.PreloadTextures();
-            }
+                    BspHolder.Managers[i]?.PreloadTextures();
+                }
+            });
 
-            for (int i = 0; i < scenario.Skies.Count; i++)
+            yield return Task.Run(() =>
             {
-                CompositeGeometryModel geom;
-                if (CompositeModelFactory.TryGetModel(scenario.Skies[i].Tag, out geom))
-                    SkyHolder.Managers.Add(new CompositeModelManager(this, geom));
-                else SkyHolder.Managers.Add(null);
+                for (int i = 0; i < scenario.Skies.Count; i++)
+                {
+                    CompositeGeometryModel geom;
+                    if (CompositeModelFactory.TryGetModel(scenario.Skies[i].Tag, out geom))
+                        SkyHolder.Managers.Add(new CompositeModelManager(this, geom));
+                    else SkyHolder.Managers.Add(null);
 
-                SkyHolder.Managers[i]?.PreloadTextures();
-            }
+                    SkyHolder.Managers[i]?.PreloadTextures();
+                }
+            });
 
             foreach (var definition in scenario.Palettes.Values)
             {
                 var holder = new PaletteHolder(definition);
                 PaletteHolders.Add(holder.Name, holder);
 
-                for (int i = 0; i < definition.Palette.Count; i++)
+                yield return Task.Run(() =>
                 {
-                    CompositeGeometryModel geom;
-                    if (CompositeModelFactory.TryGetModel(definition.Palette[i].Tag, out geom))
-                        holder.Managers.Add(new CompositeModelManager(this, geom));
-                    else holder.Managers.Add(null);
+                    for (int i = 0; i < definition.Palette.Count; i++)
+                    {
+                        CompositeGeometryModel geom;
+                        if (CompositeModelFactory.TryGetModel(definition.Palette[i].Tag, out geom))
+                            holder.Managers.Add(new CompositeModelManager(this, geom));
+                        else holder.Managers.Add(null);
 
-                    holder.Managers[i]?.PreloadTextures();
-                }
+                        holder.Managers[i]?.PreloadTextures();
+                    }
+                });
             }
         }
 
@@ -126,7 +136,7 @@ namespace Reclaimer.Geometry
             {
                 var box = new BoxManipulator3D
                 {
-                    DiffuseColor = new SharpDX.Color(0, 1, 0, 0.5f),
+                    DiffuseColor = TriggerVolume.DefaultColour,
                     Position = ((IRealVector3D)vol.Position).ToVector3(),
                     Size = ((IRealVector3D)vol.Size).ToVector3()
                 };
@@ -186,7 +196,9 @@ namespace Reclaimer.Geometry
                 return null;
 
             var key = mat.Flags.HasFlag(MaterialFlags.Transparent) ? -sub.Bitmap.Id : sub.Bitmap.Id;
-            var tex = sceneTextures.ValueOrDefault(key);
+
+            Helix.TextureModel tex;
+            sceneTextures.TryGetValue(key, out tex);
             if (tex == null)
             {
                 var stream = new System.IO.MemoryStream();
@@ -194,7 +206,8 @@ namespace Reclaimer.Geometry
                     sub.Bitmap.ToDds(0).WriteToStream(stream, System.Drawing.Imaging.ImageFormat.Png, DecompressOptions.Default);
                 else sub.Bitmap.ToDds(0).WriteToStream(stream, System.Drawing.Imaging.ImageFormat.Png, DecompressOptions.Bgr24);
                 tex = new Helix.TextureModel(stream);
-                sceneTextures.Add(key, tex);
+                if (!sceneTextures.TryAdd(key, tex))
+                    stream.Dispose(); //another thread beat us to it
             }
 
             return tex;
