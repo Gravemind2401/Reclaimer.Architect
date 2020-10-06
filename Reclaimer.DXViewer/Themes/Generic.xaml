@@ -11,8 +11,6 @@
                 <ControlTemplate TargetType="c:DXRenderer">
                     <Grid>
                         <hx:Viewport3DX x:Name="PART_Viewport"
-                            Camera="{Binding Camera, RelativeSource={RelativeSource TemplatedParent}}"
-                            CameraMode="{Binding CameraMode, RelativeSource={RelativeSource TemplatedParent}}"
                             Background="CornflowerBlue"
                             BackgroundColor="CornflowerBlue"
                             ShowViewCube="False"

@@ -39,11 +39,10 @@ namespace Reclaimer.Controls
         #region Dependency Properties
 
         #region Camera
-        public static readonly DependencyProperty CameraProperty =
-            DependencyProperty.Register(nameof(Camera), typeof(Helix.PerspectiveCamera), typeof(DXRenderer), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+        public static readonly DependencyPropertyKey ViewportPropertyKey =
+            DependencyProperty.RegisterReadOnly(nameof(Viewport), typeof(Helix.Viewport3DX), typeof(DXRenderer), new PropertyMetadata((Helix.Viewport3DX)null));
 
-        public static readonly DependencyProperty CameraModeProperty =
-            DependencyProperty.Register(nameof(CameraMode), typeof(Helix.CameraMode), typeof(DXRenderer), new PropertyMetadata(Helix.CameraMode.WalkAround));
+        public static readonly DependencyProperty ViewportProperty = ViewportPropertyKey.DependencyProperty;
 
         public static readonly DependencyProperty CameraSpeedProperty =
             DependencyProperty.Register(nameof(CameraSpeed), typeof(double), typeof(DXRenderer), new PropertyMetadata(0.015));
@@ -63,16 +62,10 @@ namespace Reclaimer.Controls
 
         public static readonly DependencyProperty PitchProperty = PitchPropertyKey.DependencyProperty;
 
-        public Helix.PerspectiveCamera Camera
+        public Helix.Viewport3DX Viewport
         {
-            get { return (Helix.PerspectiveCamera)GetValue(CameraProperty); }
-            set { SetValue(CameraProperty, value); }
-        }
-
-        public Helix.CameraMode CameraMode
-        {
-            get { return (Helix.CameraMode)GetValue(CameraModeProperty); }
-            set { SetValue(CameraModeProperty, value); }
+            get { return (Helix.Viewport3DX)GetValue(ViewportProperty); }
+            private set { SetValue(ViewportPropertyKey, value); }
         }
 
         public double CameraSpeed
@@ -141,7 +134,6 @@ namespace Reclaimer.Controls
 
         private Point lastPoint;
 
-        private Helix.Viewport3DX Viewport { get; set; }
         private readonly List<Helix.Element3D> children = new List<Helix.Element3D>();
 
         private readonly ElementHighlighter3D selector = new ElementHighlighter3D();
@@ -165,13 +157,6 @@ namespace Reclaimer.Controls
 
             timer = new DispatcherTimer(DispatcherPriority.Send) { Interval = new TimeSpan(0, 0, 0, 0, 10) };
             timer.Tick += Timer_Tick;
-
-            Camera = new Helix.PerspectiveCamera
-            {
-                Position = new Media3D.Point3D(),
-                LookDirection = new Media3D.Vector3D(1, 0, 0),
-                UpDirection = new Media3D.Vector3D(0, 0, 1)
-            };
         }
 
         #region Overrides
@@ -516,7 +501,6 @@ namespace Reclaimer.Controls
             var forwardVector = Numerics.Vector3.Normalize(Viewport.Camera.LookDirection.ToNumericsVector3());
             var rightVector = Numerics.Vector3.Normalize(Numerics.Vector3.Cross(forwardVector, upVector));
 
-
             var yaw = Numerics.Matrix4x4.CreateFromAxisAngle(upAnchor, -deltaX);
 
             forwardVector = Numerics.Vector3.TransformNormal(forwardVector, yaw);
@@ -529,6 +513,9 @@ namespace Reclaimer.Controls
 
             Viewport.Camera.LookDirection = new Media3D.Vector3D(forwardVector.X, forwardVector.Y, forwardVector.Z);
             Viewport.Camera.UpDirection = new Media3D.Vector3D(upVector.X, upVector.Y, upVector.Z);
+
+            Yaw = Math.Atan2(forwardVector.X, forwardVector.Y);
+            Pitch = Math.Asin(-forwardVector.Z);
 
             NativeMethods.SetCursorPos((int)lastPoint.X, (int)lastPoint.Y);
         }
