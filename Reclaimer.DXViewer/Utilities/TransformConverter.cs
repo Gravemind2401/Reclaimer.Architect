@@ -46,7 +46,7 @@ namespace Reclaimer.Utilities
 
             var result = new object[3];
             result[0] = position.ToRealVector3D();
-            result[1] = new RealVector3D(euler.X, euler.Z, euler.Y);
+            result[1] = new RealVector3D(euler.X, euler.Y, euler.Z);
             result[2] = scale;
             return result;
         }

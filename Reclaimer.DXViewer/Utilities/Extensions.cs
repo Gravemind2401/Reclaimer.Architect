@@ -85,45 +85,25 @@ namespace Reclaimer.Utilities
 
         public static SharpDX.Vector3 ToEulerAngles(this SharpDX.Quaternion q)
         {
-            const float PI = (float)Math.PI;
+            var matrix = SharpDX.Matrix.RotationQuaternion(q);
+            var result = new SharpDX.Vector3();
 
-            // Store the Euler angles in radians
-            SharpDX.Vector3 pitchYawRoll = new SharpDX.Vector3();
-
-            double sqw = q.W * q.W;
-            double sqx = q.X * q.X;
-            double sqy = q.Y * q.Y;
-            double sqz = q.Z * q.Z;
-
-            // If quaternion is normalised the unit is one, otherwise it is the correction factor
-            double unit = sqx + sqy + sqz + sqw;
-            double test = q.X * q.Y + q.Z * q.W;
-
-            if (test > 0.4999f * unit)                              // 0.4999f OR 0.5f - EPSILON
+            result.Y = (float)Math.Asin(Clamp(-matrix.M32, -1, 1));
+            if (Math.Abs(matrix.M32) < 0.9999999)
             {
-                // Singularity at north pole
-                pitchYawRoll.Y = 2f * (float)Math.Atan2(q.X, q.W);  // Yaw
-                pitchYawRoll.X = PI * 0.5f;                         // Pitch
-                pitchYawRoll.Z = 0f;                                // Roll
-                return pitchYawRoll;
-            }
-            else if (test < -0.4999f * unit)                        // -0.4999f OR -0.5f + EPSILON
-            {
-                // Singularity at south pole
-                pitchYawRoll.Y = -2f * (float)Math.Atan2(q.X, q.W); // Yaw
-                pitchYawRoll.X = -PI * 0.5f;                        // Pitch
-                pitchYawRoll.Z = 0f;                                // Roll
-                return pitchYawRoll;
+                result.X = (float)Math.Atan2(matrix.M12, matrix.M22);
+                result.Z = (float)Math.Atan2(matrix.M31, matrix.M33);
             }
             else
             {
-                pitchYawRoll.Y = (float)Math.Atan2(2f * q.Y * q.W - 2f * q.X * q.Z, sqx - sqy - sqz + sqw);       // Yaw
-                pitchYawRoll.X = (float)Math.Asin(2f * test / unit);                                              // Pitch
-                pitchYawRoll.Z = (float)Math.Atan2(2f * q.X * q.W - 2f * q.Y * q.Z, -sqx + sqy - sqz + sqw);      // Roll
+                result.X = (float)Math.Atan2(matrix.M21, matrix.M11);
+                result.Z = 0f;
             }
 
-            return pitchYawRoll;
+            return result;
         }
+
+        private static float Clamp(float value, float min, float max) => Math.Min(Math.Max(min, value), max);
 
         public static bool IsDescendentOf(this Helix.Element3D element, Helix.Element3D target)
         {

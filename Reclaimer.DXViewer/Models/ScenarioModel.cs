@@ -403,6 +403,8 @@ namespace Reclaimer.Models
 
     public class ObjectPlacement : BindableBase
     {
+        private volatile bool isBusy;
+
         private readonly ScenarioModel parent;
         private readonly string paletteKey;
 
@@ -456,8 +458,10 @@ namespace Reclaimer.Models
 
         private bool SetProperty<T>(ref T storage, T value, string fieldId, [CallerMemberName] string propertyName = null)
         {
-            if (!base.SetProperty(ref storage, value, propertyName))
+            if (isBusy || !base.SetProperty(ref storage, value, propertyName))
                 return false;
+
+            isBusy = true;
 
             var palette = parent.Palettes[paletteKey];
             var block = palette.PlacementBlockRef;
@@ -475,6 +479,8 @@ namespace Reclaimer.Models
 
             if (parent.PropertyView?.CurrentItem == this)
                 parent.PropertyView.SetValue(fieldId, value);
+
+            isBusy = false;
 
             return true;
         }
