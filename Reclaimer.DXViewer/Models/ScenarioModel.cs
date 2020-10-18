@@ -24,8 +24,10 @@ namespace Reclaimer.Models
         {
             var header = xml.GetStringAttribute("header");
             var type = xml.GetEnumAttribute<NodeType>("type") ?? NodeType.None;
+            var visible = xml.GetBoolAttribute("visible") ?? true;
+            var visibility = visible ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
 
-            var node = new TreeItemModel(header) { Tag = type };
+            var node = new TreeItemModel(header) { Tag = type, Visibility = visibility };
 
             var children = xml.ChildNodes.OfType<XmlNode>().Select(n => XmlToNode(n));
             foreach (var c in children)

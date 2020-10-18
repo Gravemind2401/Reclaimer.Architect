@@ -51,5 +51,43 @@ namespace Reclaimer.Controls
             var type = (NodeType)scenario.SelectedNode.Tag;
             scenario.RenderView?.NavigateToObject(type, scenario.SelectedItemIndex);
         }
+
+        private void RecursiveToggle(IEnumerable<TreeItemModel> collection, bool value)
+        {
+            foreach (var item in collection)
+            {
+                item.IsExpanded = value;
+                RecursiveToggle(item.Items, value);
+            }
+        }
+
+        #region Toolbar Events
+
+        private void btnCollapseAll_Click(object sender, RoutedEventArgs e)
+        {
+            RecursiveToggle(scenario.Hierarchy, false);
+        }
+
+        private void btnExpandAll_Click(object sender, RoutedEventArgs e)
+        {
+            RecursiveToggle(scenario.Hierarchy, true);
+        }
+
+        private void btnAddItem_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void btnDeleteItem_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void btnSave_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        #endregion
     }
 }

@@ -12,6 +12,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Reclaimer;component/Resources/Templates.xaml" />
+                <ResourceDictionary Source="/Reclaimer.DXViewer;component/Resources/Templates.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -19,7 +20,17 @@
     <DockPanel>
         <ToolBarTray DockPanel.Dock="Top" IsLocked="True">
             <ToolBar Margin="3,1">
-                <!--<Button Click="btnCollapseAll_Click"
+                <ToolBar.Resources>
+                    <Style x:Key="{x:Static ToolBar.ButtonStyleKey}" TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                        <Style.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.4" />
+                            </Trigger>
+                        </Style.Triggers>                    
+                    </Style>
+                </ToolBar.Resources>
+                
+                <Button Click="btnCollapseAll_Click"
                         ToolTip="Collapse all">
                     <ContentControl Template="{StaticResource ic_CollapseGroup_16x}" />
                 </Button>
@@ -27,23 +38,20 @@
                         ToolTip="Expand all">
                     <ContentControl Template="{StaticResource ic_ExpandAll_16x}" />
                 </Button>
-                <Button Click="btnSelectAll_Click"
-                        ToolTip="Select all">
-                    <ContentControl Template="{StaticResource ic_Checklist_16x}" />
+                <Separator />
+                <Button Click="btnAddItem_Click" IsEnabled="False"
+                        ToolTip="Save Bitmaps">
+                    <ContentControl Template="{StaticResource ic_Add_16x}" />
                 </Button>
-                <Button Click="btnSelectNone_Click"
-                        ToolTip="Select none">
-                    <ContentControl Template="{StaticResource ic_CheckboxList_16x}" />
+                <Button Click="btnDeleteItem_Click" IsEnabled="False"
+                        ToolTip="Save Model">
+                    <ContentControl Template="{StaticResource ic_Remove_color_16x}" />
                 </Button>
                 <Separator />
-                <Button Click="btnSaveBitmaps_Click"
-                        ToolTip="Save Bitmaps">
-                    <ContentControl Template="{StaticResource ic_ImageStack_16x}" />
-                </Button>
-                <Button Click="btnSave_Click"
+                <Button Click="btnSave_Click" IsEnabled="False"
                         ToolTip="Save Model">
                     <ContentControl Template="{StaticResource ic_Save_16x}" />
-                </Button>-->
+                </Button>
             </ToolBar>
         </ToolBarTray>
         <s:SplitPanel>
@@ -53,6 +61,7 @@
                     <Style TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
                         <!--<Setter Property="ContextMenu" Value="{StaticResource TreeItemContextMenu}" />-->
                         <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                        <Setter Property="Visibility" Value="{Binding Visibility}" />
                         <!--<Setter Property="IsTextSearchEnabled" Value="{Binding IsExpanded}" />-->
                         <!--<Setter Property="TextSearch.TextPath" Value="Header" />-->
                         <!--<EventSetter Event="MouseDoubleClick" Handler="TreeItemMouseDoubleClick" />-->

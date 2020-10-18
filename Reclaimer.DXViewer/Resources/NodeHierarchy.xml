@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <node header="Mission" type="Mission">
   <node header="Objects">
-    <node header="Devices">
+    <node header="Devices" visible="False">
       <node header="Machines" type="Machines" />
       <node header="Controls" type="Controls" />
       <node header="Light fixtures" type="LightFixtures" />
@@ -17,13 +17,13 @@
     </node>
     <node header="Crates" type="Crates" />
     <node header="Scenery" type="Scenery" />
-    <node header="Sound scenery" type="SoundScenery" />
+    <node header="Sound scenery" type="SoundScenery" visible="False" />
   </node>
   <node header="Player starting positions" type="PlayerStarts" />
-  <node header="AI">
+  <node header="AI" visible="False">
     
   </node>
-  <node header="Comments" type="Comments" />
+  <node header="Comments" type="Comments" visible="False" />
   <node header="Sandbox">
     <node header="Vehicles" type="ForgeVehicles" />
     <node header="Weapons" type="ForgeWeapons" />
@@ -35,17 +35,17 @@
   </node>
   <node header="Game data">
     <node header="Trigger volumes" type="TriggerVolumes" />
-    <node header="Recorded animations" />
-    <node header="Flags" />
-    <node header="Camera points" type="CameraPoints" />
-    <node header="Chapter titles" />
-    <node header="Netgame flags" />
-    <node header="Netgame Equipment" />
+    <node header="Recorded animations" visible="False" />
+    <node header="Flags" visible="False" />
+    <node header="Camera points" type="CameraPoints" visible="False" />
+    <node header="Chapter titles" visible="False" />
+    <node header="Netgame flags" visible="False" />
+    <node header="Netgame Equipment" visible="False" />
     <node header="Starting profiles" type="StartProfiles" />
-    <node header="Detail objects" />
-    <node header="Decals" type="Decals" />
+    <node header="Detail objects" visible="False" />
+    <node header="Decals" type="Decals" visible="False" />
   </node>
-  <node header="Cluster properties">
+  <node header="Cluster properties" visible="False">
 
   </node>
 </node>
