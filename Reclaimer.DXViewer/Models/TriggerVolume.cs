@@ -48,6 +48,9 @@ namespace Reclaimer.Models
 
         private bool SetProperty<T>(ref T storage, T value, string fieldId, [CallerMemberName] string propertyName = null)
         {
+            if (parent.IsBusy)
+                return base.SetProperty(ref storage, value, propertyName);
+
             if (!base.SetProperty(ref storage, value, propertyName))
                 return false;
 

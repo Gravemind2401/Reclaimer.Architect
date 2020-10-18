@@ -34,9 +34,12 @@ namespace Reclaimer.Models
             return node;
         }
 
-        public IIndexItem ScenarioTag { get; }
+        internal bool IsBusy { get; private set; }
 
-        public TransactionStream Transaction { get; }
+        public IIndexItem ScenarioTag { get; }
+        public long RootAddress => ScenarioTag.MetaPointer.Address;
+
+        public Stream Transaction { get; }
         public Dictionary<string, ScenarioSection> Sections { get; }
         public ObservableCollection<TreeItemModel> Hierarchy { get; }
         public ObservableCollection<string> Items { get; }
@@ -118,6 +121,8 @@ namespace Reclaimer.Models
 
         public ScenarioModel(IIndexItem item)
         {
+            IsBusy = true;
+
             ScenarioTag = item;
             Transaction = new TransactionStream(new MemoryStream());
             Sections = new Dictionary<string, ScenarioSection>();
@@ -130,7 +135,7 @@ namespace Reclaimer.Models
             Palettes = new Dictionary<string, PaletteDefinition>();
             TriggerVolumes = new ObservableCollection<TriggerVolume>();
 
-            using (var reader = ScenarioTag.CacheFile.CreateReader(ScenarioTag.CacheFile.DefaultAddressTranslator))
+            using (var reader = ScenarioTag.CacheFile.CreateReader(ScenarioTag.CacheFile.DefaultAddressTranslator, Transaction, true))
             {
                 LoadSections(reader);
                 LoadHierarchy();
@@ -141,6 +146,8 @@ namespace Reclaimer.Models
                 ReadPlacements(reader);
                 ReadTriggerVolumes(reader);
             }
+
+            IsBusy = false;
         }
 
         #region Initialisation
@@ -161,7 +168,7 @@ namespace Reclaimer.Models
 
             foreach (var section in Sections.Values.Where(s => s.BlockSize > 0))
             {
-                reader.Seek(ScenarioTag.MetaPointer.Address + section.Offset, SeekOrigin.Begin);
+                reader.Seek(RootAddress + section.Offset, SeekOrigin.Begin);
                 section.TagBlock = reader.ReadObject<TagBlock>();
             }
         }
@@ -228,7 +235,7 @@ namespace Reclaimer.Models
                     BlockSize = paletteNode.GetIntAttribute("elementSize", "entrySize", "size") ?? 0
                 };
 
-                reader.Seek(ScenarioTag.MetaPointer.Address + blockRef.Offset, SeekOrigin.Begin);
+                reader.Seek(RootAddress + blockRef.Offset, SeekOrigin.Begin);
                 var tagBlock = paletteDef.PaletteBlockRef.TagBlock = reader.ReadObject<TagBlock>();
 
                 var refOffset = paletteNode.SelectSingleNode($"*[@id='{FieldId.TagReference}']").GetIntAttribute("offset") ?? 0;
@@ -264,7 +271,7 @@ namespace Reclaimer.Models
                 var scale = placementNode.SelectSingleNode($"*[@id='{FieldId.Scale}']").GetIntAttribute("offset") ?? 0;
                 var variant = placementNode.SelectSingleNode($"*[@id='{FieldId.Variant}']")?.GetIntAttribute("offset");
 
-                reader.Seek(ScenarioTag.MetaPointer.Address + blockRef.Offset, SeekOrigin.Begin);
+                reader.Seek(RootAddress + blockRef.Offset, SeekOrigin.Begin);
                 var tagBlock = paletteDef.PlacementBlockRef.TagBlock = reader.ReadObject<TagBlock>();
 
                 for (int i = 0; i < tagBlock.Count; i++)
@@ -458,6 +465,9 @@ namespace Reclaimer.Models
 
         private bool SetProperty<T>(ref T storage, T value, string fieldId, [CallerMemberName] string propertyName = null)
         {
+            if (parent.IsBusy)
+                return base.SetProperty(ref storage, value, propertyName);
+
             if (isBusy || !base.SetProperty(ref storage, value, propertyName))
                 return false;
 
