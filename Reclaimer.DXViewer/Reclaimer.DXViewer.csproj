@@ -156,6 +156,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>FieldId.resx</DependentUpon>
     </Compile>
+    <Compile Include="Utilities\InMemoryMetadata.cs" />
     <Compile Include="Utilities\SharpDXVectorConverter.cs" />
     <Compile Include="Utilities\CompositeModelFactory.cs" />
     <Compile Include="Utilities\Extensions.cs" />
@@ -243,6 +244,9 @@
     <Resource Include="Resources\Halo3Scenario.xml">
       <SubType>Designer</SubType>
     </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\scnrtest.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
