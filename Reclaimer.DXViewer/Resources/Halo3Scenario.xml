@@ -112,7 +112,7 @@
       <undefined name="Unknown" offset="0x28" visible="false" />
       <undefined name="Unknown" offset="0x2C" visible="false" />
     </tagblock>
-    <tagblock palette="vehicle" offset="0xF8" elementSize="0x30">
+    <tagblock palette="vehicle" srcId="scenario_vehicle_placement" offset="0xF8" elementSize="0x30">
       <tagRef name="Vehicle" offset="0x0" visible="true" id="tagreference" />
       <undefined name="Unknown" offset="0x10" visible="false" />
       <undefined name="Unknown" offset="0x14" visible="false" />
@@ -696,7 +696,7 @@
       </flags32>
     </tagblock>
     <tagblock placements="vehicle" offset="0xEC" elementSize="0xA8">
-      <int16 name="Palette Index" offset="0x0" visible="true" id="paletteindex" />
+      <blockIndex16 name="Palette Index" targetId="scenario_vehicle_placement" offset="0x0" visible="true" id="paletteindex" />
       <int16 name="Name Index" offset="0x2" visible="true" id="nameindex" />
       <flags32 name="Placement Flags" offset="0x4" visible="true">
         <bit name="Not Automatically" index="0" />

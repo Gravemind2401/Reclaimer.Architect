@@ -39,9 +39,11 @@ namespace Reclaimer.Models
         internal bool IsBusy { get; private set; }
 
         public IIndexItem ScenarioTag { get; }
-        public long RootAddress => ScenarioTag.MetaPointer.Address;
+        public long RootAddress => 0; // ScenarioTag.MetaPointer.Address;
 
+        public XmlDocument Xml { get; }
         public Stream Transaction { get; }
+
         public Dictionary<string, ScenarioSection> Sections { get; }
         public ObservableCollection<TreeItemModel> Hierarchy { get; }
         public ObservableCollection<string> Items { get; }
@@ -126,7 +128,9 @@ namespace Reclaimer.Models
             IsBusy = true;
 
             ScenarioTag = item;
-            Transaction = new TransactionStream(new MemoryStream());
+
+            Xml = new XmlDocument();
+            Transaction = new InMemoryMetadataStream(item, Properties.Resources.scnrtest);
             Sections = new Dictionary<string, ScenarioSection>();
             Hierarchy = new ObservableCollection<TreeItemModel>();
             Items = new ObservableCollection<string>();
@@ -155,10 +159,9 @@ namespace Reclaimer.Models
         #region Initialisation
         private void LoadSections(EndianReader reader)
         {
-            var doc = new XmlDocument();
-            doc.LoadXml(Properties.Resources.Halo3Scenario);
+            Xml.LoadXml(Properties.Resources.Halo3Scenario);
 
-            foreach (XmlNode n in doc.SelectNodes("/scenario/section[@name]"))
+            foreach (XmlNode n in Xml.SelectNodes("/scenario/section[@name]"))
             {
                 var section = new ScenarioSection { Node = n };
                 section.Name = n.GetStringAttribute("name");

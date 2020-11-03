@@ -50,6 +50,19 @@ namespace Reclaimer.Utilities
         }
         #endregion
 
+        private static XmlDocument GetDocument(string xml)
+        {
+            var doc = new XmlDocument();
+            doc.LoadXml(xml);
+            return doc;
+        }
+
+        public InMemoryMetadataStream(IIndexItem item, string xml)
+            : this(item, GetDocument(xml))
+        {
+
+        }
+
         public InMemoryMetadataStream(IIndexItem item, XmlDocument doc)
         {
             SourceItem = item;

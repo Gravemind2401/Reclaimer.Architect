@@ -48,6 +48,7 @@ namespace Reclaimer.Controls
         private ScenarioModel scenario;
         private MetaContext context;
         private XmlNode rootNode;
+        private XmlNode altNode;
         private long baseAddress;
 
         public TabModel TabModel { get; }
@@ -72,7 +73,6 @@ namespace Reclaimer.Controls
         public void SetScenario(ScenarioModel scenario)
         {
             this.scenario = scenario;
-            context = new MetaContext(scenario.ScenarioTag.CacheFile, scenario.ScenarioTag, scenario.Transaction);
         }
 
         public void ClearProperties()
@@ -91,30 +91,30 @@ namespace Reclaimer.Controls
             var single = meta as SimpleValue;
             if (single != null)
             {
-                single.Value = value;
+                single.SetValue(value);
                 return;
             }
 
             var multi = meta as MultiValue;
             if (multi != null)
             {
-                var vector = (IXMVector)value;
-                multi.Value1 = vector.X;
-                multi.Value2 = vector.Y;
-                multi.Value3 = vector.Z;
-                multi.Value4 = vector.W;
+                multi.SetValue((IXMVector)value);
+                return;
             }
         }
 
         public void ShowProperties(NodeType nodeType, int itemIndex)
         {
+            context = new MetaContext(scenario.Xml, scenario.ScenarioTag.CacheFile, scenario.ScenarioTag, scenario.Transaction);
             Visibility = Visibility.Hidden;
+            rootNode = altNode = null;
 
             var paletteKey = PaletteType.FromNodeType(nodeType);
             if (paletteKey != null && itemIndex >= 0)
             {
                 var palette = scenario.Palettes[paletteKey];
                 rootNode = palette.PlacementsNode;
+                altNode = palette.PaletteNode;
                 baseAddress = palette.PlacementBlockRef.TagBlock.Pointer.Address
                     + itemIndex * palette.PlacementBlockRef.BlockSize;
 
@@ -126,7 +126,7 @@ namespace Reclaimer.Controls
                 if (nodeType == NodeType.Mission)
                 {
                     rootNode = scenario.Sections["mission"].Node;
-                    baseAddress = scenario.ScenarioTag.MetaPointer.Address;
+                    baseAddress = 0; // scenario.ScenarioTag.MetaPointer.Address;
                     CurrentItem = null;
                     LoadData();
                 }
@@ -171,6 +171,12 @@ namespace Reclaimer.Controls
                 }
                 catch { }
             }
+
+            if (altNode == null)
+                return;
+
+            MetaValueBase.GetMetaValue(altNode, context, 0);
+            context.UpdateBlockIndices();
         }
 
         private void Meta_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
