@@ -410,11 +410,8 @@ namespace Reclaimer.Models
         public override string ToString() => Name;
     }
 
-    public class ObjectPlacement : BindableBase
+    public class ObjectPlacement : ScenarioObject
     {
-        private volatile bool isBusy;
-
-        private readonly ScenarioModel parent;
         private readonly string paletteKey;
 
         private int paletteIndex;
@@ -429,13 +426,6 @@ namespace Reclaimer.Models
         {
             get { return nameIndex; }
             set { SetProperty(ref nameIndex, value, FieldId.NameIndex); }
-        }
-
-        private RealVector3D position;
-        public RealVector3D Position
-        {
-            get { return position; }
-            set { SetProperty(ref position, value, FieldId.Position); }
         }
 
         private RealVector3D rotation;
@@ -460,55 +450,31 @@ namespace Reclaimer.Models
         }
 
         public ObjectPlacement(ScenarioModel parent, string paletteKey)
+            : base(parent)
         {
-            this.parent = parent;
             this.paletteKey = paletteKey;
         }
 
-        private bool SetProperty<T>(ref T storage, T value, string fieldId, [CallerMemberName] string propertyName = null)
+        protected override long GetFieldAddress(string fieldId)
         {
-            if (parent.IsBusy)
-                return base.SetProperty(ref storage, value, propertyName);
-
-            if (isBusy || !base.SetProperty(ref storage, value, propertyName))
-                return false;
-
-            isBusy = true;
-
-            var palette = parent.Palettes[paletteKey];
+            var palette = Parent.Palettes[paletteKey];
             var block = palette.PlacementBlockRef;
             var index = palette.Placements.IndexOf(this);
             var fieldOffset = palette.PlacementsNode.SelectSingleNode($"*[@id='{fieldId}']").GetIntAttribute("offset") ?? 0;
 
-            using (var writer = parent.CreateWriter())
-            {
-                writer.Seek(block.TagBlock.Pointer.Address + block.BlockSize * index + fieldOffset, SeekOrigin.Begin);
-
-                if (typeof(T) == typeof(StringId))
-                    writer.Write(((StringId)(object)value).Id);
-                else writer.WriteObject(value);
-            }
-
-            if (parent.PropertyView?.CurrentItem == this)
-                parent.PropertyView.SetValue(fieldId, value);
-
-            isBusy = false;
-
-            return true;
+            return block.TagBlock.Pointer.Address + block.BlockSize * index + fieldOffset;
         }
 
-        public string GetDisplayName()
+        public override string GetDisplayName()
         {
-            var palette = parent.Palettes[paletteKey];
+            var palette = Parent.Palettes[paletteKey];
 
             if (PaletteIndex < 0 || PaletteIndex >= palette.Palette.Count)
                 return "<invalid>";
 
             if (NameIndex >= 0)
-                return parent.ObjectNames[NameIndex];
+                return Parent.ObjectNames[NameIndex];
             else return palette.Palette[PaletteIndex].Tag.FileName();
         }
-
-        public override string ToString() => GetDisplayName();
     }
 }
