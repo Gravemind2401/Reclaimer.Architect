@@ -135,6 +135,7 @@
     <Compile Include="Controls\HierarchyView.xaml.cs">
       <DependentUpon>HierarchyView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\RenderModel3D.cs" />
     <Compile Include="Controls\TransformManipulatorEx3D.cs" />
     <Compile Include="Controls\PropertyView.xaml.cs">
       <DependentUpon>PropertyView.xaml</DependentUpon>
@@ -143,6 +144,7 @@
     <Compile Include="Geometry\CompositeModelManager.cs" />
     <Compile Include="Geometry\IModelInstance.cs" />
     <Compile Include="Geometry\MeshTemplate.cs" />
+    <Compile Include="Geometry\ModelFactory.cs" />
     <Compile Include="Geometry\ModelManager.cs" />
     <Compile Include="Geometry\ObjectHolder.cs" />
     <Compile Include="Geometry\SceneManager.cs" />
@@ -152,6 +154,7 @@
     <Compile Include="Models\ScenarioModel.cs" />
     <Compile Include="Models\ScenarioObject.cs" />
     <Compile Include="Models\TriggerVolume.cs" />
+    <Compile Include="Models\ModelConfig.cs" />
     <Compile Include="Resources\FieldId.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

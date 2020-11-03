@@ -115,6 +115,25 @@ namespace Reclaimer.Geometry
             return group;
         }
 
+        public virtual Helix.GroupModel3D GenerateModel(Action<Helix.MeshGeometryModel3D, int> applyMaterial)
+        {
+            var group = new Helix.GroupModel3D();
+
+            for (int i = 0; i < submeshCount; i++)
+            {
+                var mesh = new Helix.MeshGeometryModel3D
+                {
+                    Geometry = submeshes[i],
+                };
+
+                applyMaterial(mesh, matIndex[i]);
+                group.Children.Add(mesh);
+            }
+
+            return group;
+        }
+
+
         public virtual MeshTemplate Copy() => new MeshTemplate(this);
 
         public virtual Guid AddInstance(SharpDX.Matrix matrix)
@@ -178,6 +197,27 @@ namespace Reclaimer.Geometry
                     Material = manager.LoadMaterial(model, matIndex[i], out isTransparent),
                     IsTransparent = isTransparent
                 });
+            }
+
+            return group;
+        }
+
+        public override Helix.GroupModel3D GenerateModel(Action<Helix.MeshGeometryModel3D, int> applyMaterial)
+        {
+            if (group != null)
+                return group;
+
+            group = new Helix.GroupModel3D();
+
+            for (int i = 0; i < submeshCount; i++)
+            {
+                var mesh = rootMeshes[i] = new Helix.InstancingMeshGeometryModel3D
+                {
+                    Geometry = submeshes[i],
+                };
+
+                applyMaterial(mesh, matIndex[i]);
+                group.Children.Add(mesh);
             }
 
             return group;
