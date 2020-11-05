@@ -121,6 +121,9 @@ namespace Reclaimer.Geometry
                     ReadTexture(lod.Materials[index]);
             }
 
+            foreach (var lod in lodModels)
+                lod.Dispose();
+
             return true;
         }
 
@@ -174,10 +177,14 @@ namespace Reclaimer.Geometry
             }
         }
 
-        //public Helix.Element3D CreateInstance(IIndexItem tag)
-        //{
+        public ObjectModel3D CreateObjectModel(int id)
+        {
+            if (!modelTypes.ContainsKey(id))
+                return null;
 
-        //}
+            var modelType = modelTypes[id];
+            return new ObjectModel3D(this, modelType.VariantConfig, modelType.ObjectTag.FileName(), modelType.DefaultVariant);
+        }
 
         public RenderModel3D CreateRenderModel(int id) => CreateRenderModel(id, 0);
 
@@ -187,6 +194,16 @@ namespace Reclaimer.Geometry
                 return null;
 
             return geometryCache[id].BuildElement(lod);
+        }
+
+        public ModelProperties GetProperties(int id) => GetProperties(id, 0);
+
+        public ModelProperties GetProperties(int id, int lod)
+        {
+            if (!geometryCache.ContainsKey(id))
+                return null;
+
+            return geometryCache[id].LodProperties[lod];
         }
 
         private class ModelType
@@ -207,13 +224,13 @@ namespace Reclaimer.Geometry
         private class TemplateCollection
         {
             private readonly ModelFactory factory;
-            private readonly IList<IGeometryModel> lods;
             private readonly Dictionary<int, MeshTemplate[]> templates = new Dictionary<int, MeshTemplate[]>();
+            public IReadOnlyList<ModelProperties> LodProperties { get; }
 
             public TemplateCollection(ModelFactory factory, IList<IGeometryModel> lods)
             {
                 this.factory = factory;
-                this.lods = lods;
+                LodProperties = lods.Select(g => new ModelProperties(g)).ToList();
 
                 for (int i = 0; i < lods.Count; i++)
                 {
@@ -234,7 +251,7 @@ namespace Reclaimer.Geometry
 
             public RenderModel3D BuildElement(int lod)
             {
-                var model = lods[lod];
+                var model = LodProperties[lod];
 
                 var regions = new List<RenderModel3D.Region>();
                 var instances = new List<RenderModel3D.InstanceGroup>();
@@ -253,6 +270,10 @@ namespace Reclaimer.Geometry
                         for (int i = permutation.MeshIndex; i < permutation.MeshIndex + permutation.MeshCount; i++)
                         {
                             var template = templates[lod][i];
+
+                            if (template.IsEmpty)
+                                continue;
+
                             if (template.IsInstancing)
                                 template = template.Copy();
 
@@ -300,13 +321,14 @@ namespace Reclaimer.Geometry
                                 permutationRoot.Children.Add(e);
                         }
 
+                        permutationRoot.Transform = GetTransform(permutation);
                         permutations.Add(new RenderModel3D.Permutation(permutationRoot, permutation.Name));
                     }
 
                     regions.Add(new RenderModel3D.Region(region.Name, permutations));
                 }
 
-                return new RenderModel3D(regions, instances);
+                return new RenderModel3D(model.Name, regions, instances);
             }
 
             private Media3D.Transform3D GetTransform(IGeometryPermutation perm)

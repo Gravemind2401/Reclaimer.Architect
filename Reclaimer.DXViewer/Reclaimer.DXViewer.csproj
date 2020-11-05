@@ -135,6 +135,8 @@
     <Compile Include="Controls\HierarchyView.xaml.cs">
       <DependentUpon>HierarchyView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\IMeshNode.cs" />
+    <Compile Include="Controls\ObjectModel3D.cs" />
     <Compile Include="Controls\RenderModel3D.cs" />
     <Compile Include="Controls\TransformManipulatorEx3D.cs" />
     <Compile Include="Controls\PropertyView.xaml.cs">
@@ -146,6 +148,7 @@
     <Compile Include="Geometry\MeshTemplate.cs" />
     <Compile Include="Geometry\ModelFactory.cs" />
     <Compile Include="Geometry\ModelManager.cs" />
+    <Compile Include="Geometry\ModelProperties.cs" />
     <Compile Include="Geometry\ObjectHolder.cs" />
     <Compile Include="Geometry\SceneManager.cs" />
     <Compile Include="Models\IScenarioHandler.cs" />

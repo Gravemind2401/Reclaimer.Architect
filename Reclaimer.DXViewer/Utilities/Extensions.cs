@@ -10,6 +10,7 @@ using Numerics = System.Numerics;
 using Media3D = System.Windows.Media.Media3D;
 using Helix = HelixToolkit.Wpf.SharpDX;
 using Reclaimer.Geometry;
+using Reclaimer.Controls;
 
 namespace Reclaimer.Utilities
 {
@@ -161,6 +162,13 @@ namespace Reclaimer.Utilities
             foreach (var element in elements)
                 CollectChildBounds(element.SceneNode, boundsList, original);
 
+            return boundsList.GetTotalBounds();
+        }
+
+        public static SharpDX.BoundingBox GetTotalBounds(this IEnumerable<SharpDX.BoundingBox> bounds)
+        {
+            var boundsList = bounds as IList<SharpDX.BoundingBox> ?? bounds.ToList();
+
             if (!boundsList.Any())
                 return default(SharpDX.BoundingBox);
 
@@ -199,6 +207,11 @@ namespace Reclaimer.Utilities
                 result[i++] = item;
 
             return result;
+        }
+
+        public static void SetVisibility(this IMeshNode node, bool isVisible)
+        {
+            node.IsVisible = isVisible;
         }
     }
 }

@@ -13,19 +13,22 @@ using Media3D = System.Windows.Media.Media3D;
 using System.Windows.Data;
 using Prism.Mvvm;
 using Reclaimer.Geometry;
+using Reclaimer.Models;
 
 namespace Reclaimer.Controls
 {
-    public class RenderModel3D : GroupElement3D
+    public sealed class RenderModel3D : GroupElement3D, IMeshNode
     {
         private readonly List<GroupElement3D> regionGroups;
         private readonly List<GroupElement3D> instanceGroups;
 
+        public string ModelName { get; }
         public IReadOnlyList<Region> Regions { get; }
         public IReadOnlyList<InstanceGroup> InstanceGroups { get; }
 
-        public RenderModel3D(IEnumerable<Region> regions, IEnumerable<InstanceGroup> instances)
+        public RenderModel3D(string name, IEnumerable<Region> regions, IEnumerable<InstanceGroup> instances)
         {
+            ModelName = name;
             Regions = regions.ToList();
             regionGroups = regions.Select(r => r.Element).ToList();
 
@@ -39,7 +42,74 @@ namespace Reclaimer.Controls
                 Children.Add(group);
         }
 
-        public class Region : BindableBase, IVisibilityToggle
+        public void ShowAll()
+        {
+            foreach (var region in Regions)
+            {
+                foreach (var perm in region.Permutations)
+                    perm.IsVisible = true;
+
+                region.IsVisible = true;
+            }
+
+            foreach (var group in InstanceGroups)
+            {
+                foreach (var inst in group.Instances)
+                    inst.IsVisible = true;
+
+                group.IsVisible = true;
+            }
+        }
+
+        public void ApplyVariant(VariantConfig variant)
+        {
+            for (int i = 0; i < Regions.Count; i++)
+            {
+                var region = Regions[i];
+                var vRegionIndex = variant?.RegionLookup[i] ?? byte.MaxValue;
+
+                for (int j = 0; j < region.Permutations.Count; j++)
+                {
+                    var perm = region.Permutations[j];
+
+                    if (vRegionIndex != byte.MaxValue)
+                    {
+                        var vRegion = variant.Regions[vRegionIndex];
+                        if (vRegion.Permutations.Count > 0 && !vRegion.Permutations.Any(vp => vp.BasePermutationIndex == j))
+                        {
+                            perm.IsVisible = false;
+                            continue;
+                        }
+                    }
+
+                    perm.IsVisible = true;
+                }
+
+                region.IsVisible = region.Permutations.Any(p => p.IsVisible);
+            }
+        }
+
+        #region IMeshNode
+
+        string IMeshNode.Name => ModelName;
+
+        bool IMeshNode.IsVisible
+        {
+            get { return IsRendering; }
+            set { IsRendering = value; }
+        }
+
+        BoundingBox IMeshNode.GetNodeBounds()
+        {
+            return regionGroups.OfType<IMeshNode>()
+                .Union(InstanceGroups.OfType<IMeshNode>())
+                .Select(n => n.GetNodeBounds())
+                .GetTotalBounds();
+        }
+
+        #endregion
+
+        public class Region : BindableBase, IMeshNode
         {
             internal GroupElement3D Element { get; }
 
@@ -66,9 +136,14 @@ namespace Reclaimer.Controls
                 foreach (var perm in permutations)
                     Element.Children.Add(perm.Element);
             }
+
+            public BoundingBox GetNodeBounds()
+            {
+                return Element.GetTotalBounds();
+            }
         }
 
-        public class Permutation : BindableBase, IVisibilityToggle
+        public class Permutation : BindableBase, IMeshNode
         {
             internal Element3D Element;
 
@@ -90,11 +165,16 @@ namespace Reclaimer.Controls
                 Element = element;
                 Name = name;
             }
+
+            public BoundingBox GetNodeBounds()
+            {
+                return Element.GetTotalBounds();
+            }
         }
 
-        public class InstanceGroup : BindableBase, IVisibilityToggle
+        public class InstanceGroup : BindableBase, IMeshNode
         {
-            internal MeshTemplate Template { get; }
+            internal InstancedMeshTemplate Template { get; }
             internal GroupElement3D Element { get; }
 
             public string Name { get; }
@@ -127,9 +207,14 @@ namespace Reclaimer.Controls
                 Instances = temp;
                 Template.UpdateInstances();
             }
+
+            public BoundingBox GetNodeBounds()
+            {
+                return Instances.Select(i => i.GetNodeBounds()).GetTotalBounds();
+            }
         }
 
-        public class Instance : BindableBase, IVisibilityToggle
+        public class Instance : BindableBase, IMeshNode
         {
             internal InstanceGroup Parent { get; }
             internal Guid Id { get; }
@@ -156,11 +241,11 @@ namespace Reclaimer.Controls
                 Id = id;
                 Name = name;
             }
-        }
 
-        public interface IVisibilityToggle
-        {
-            bool IsVisible { get; set; }
+            public BoundingBox GetNodeBounds()
+            {
+                return Parent.Template.GetInstanceBounds(Id);
+            }
         }
     }
 }
