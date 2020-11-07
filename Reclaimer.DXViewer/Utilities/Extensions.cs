@@ -118,10 +118,10 @@ namespace Reclaimer.Utilities
 
         public static Helix.Element3D FindInstanceParent(this Helix.Element3D element)
         {
-            if (element.Tag is IModelInstance)
+            if (element is IMeshNode)
                 return element;
 
-            return element.EnumerateAncestors().Reverse().FirstOrDefault(e => e.Tag is IModelInstance);
+            return element.EnumerateAncestors().Reverse().FirstOrDefault(e => e is IMeshNode);
         }
 
         public static IEnumerable<Helix.Element3D> EnumerateAncestors(this Helix.Element3D element)

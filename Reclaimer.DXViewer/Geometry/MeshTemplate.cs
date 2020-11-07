@@ -97,24 +97,6 @@ namespace Reclaimer.Geometry
             }
         }
 
-        public virtual Helix.GroupModel3D GenerateModel(SceneManager manager, IGeometryModel model)
-        {
-            var group = new Helix.GroupModel3D();
-
-            for (int i = 0; i < submeshCount; i++)
-            {
-                bool isTransparent;
-                group.Children.Add(new Helix.MeshGeometryModel3D
-                {
-                    Geometry = submeshes[i],
-                    Material = manager.LoadMaterial(model, matIndex[i], out isTransparent),
-                    IsTransparent = isTransparent
-                });
-            }
-
-            return group;
-        }
-
         public virtual Helix.GroupModel3D GenerateModel(Action<Helix.MeshGeometryModel3D, int> applyMaterial)
         {
             var group = new Helix.GroupModel3D();
@@ -179,27 +161,6 @@ namespace Reclaimer.Geometry
         {
             instances = new List<InstanceDetails>();
             rootMeshes = new Helix.InstancingMeshGeometryModel3D[submeshCount];
-        }
-
-        public override Helix.GroupModel3D GenerateModel(SceneManager manager, IGeometryModel model)
-        {
-            if (group != null)
-                return group;
-
-            group = new Helix.GroupModel3D();
-
-            for (int i = 0; i < submeshCount; i++)
-            {
-                bool isTransparent;
-                group.Children.Add(rootMeshes[i] = new Helix.InstancingMeshGeometryModel3D
-                {
-                    Geometry = submeshes[i],
-                    Material = manager.LoadMaterial(model, matIndex[i], out isTransparent),
-                    IsTransparent = isTransparent
-                });
-            }
-
-            return group;
         }
 
         public override Helix.GroupModel3D GenerateModel(Action<Helix.MeshGeometryModel3D, int> applyMaterial)

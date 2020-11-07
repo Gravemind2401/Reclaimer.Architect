@@ -102,7 +102,7 @@ namespace Reclaimer.Controls
             if (paletteKey != null && itemIndex >= 0)
             {
                 var selected = sceneManager.PaletteHolders[paletteKey];
-                renderer.SetSelectedElement(selected.Instances[itemIndex].Element);
+                renderer.SetSelectedElement(selected.Elements[itemIndex]);
             }
             else if (nodeType == NodeType.TriggerVolumes && itemIndex >= 0)
             {
@@ -126,9 +126,9 @@ namespace Reclaimer.Controls
             var paletteKey = PaletteType.FromNodeType(nodeType);
             if (paletteKey != null)
             {
-                var obj = sceneManager.PaletteHolders[paletteKey].Instances[index];
+                var obj = sceneManager.PaletteHolders[paletteKey].Elements[index] as IMeshNode;
                 if (obj != null)
-                    renderer.ZoomToBounds(obj.Element.GetTotalBounds(), 500);
+                    renderer.ZoomToBounds(obj.GetNodeBounds(), 500);
             }
             else if (nodeType == NodeType.TriggerVolumes)
             {
@@ -147,16 +147,16 @@ namespace Reclaimer.Controls
                 {
                     sceneManager.RenderScenario();
 
-                    foreach (var instance in sceneManager.BspHolder.Instances)
+                    foreach (var instance in sceneManager.BspHolder.Elements)
                     {
-                        instance.Element.IsHitTestVisible = false;
-                        modelGroup.Children.Add(instance.Element);
+                        instance.IsHitTestVisible = false;
+                        modelGroup.Children.Add(instance);
                     }
 
-                    foreach (var instance in sceneManager.SkyHolder.Instances)
+                    foreach (var instance in sceneManager.SkyHolder.Elements)
                     {
-                        instance.Element.IsHitTestVisible = false;
-                        modelGroup.Children.Add(instance.Element);
+                        instance.IsHitTestVisible = false;
+                        modelGroup.Children.Add(instance);
                     }
 
                     foreach (var holder in sceneManager.PaletteHolders.Values)
@@ -166,8 +166,7 @@ namespace Reclaimer.Controls
                     }
 
                     renderer.ScaleToContent();
-                    var elements = sceneManager.BspHolder.Instances.Where(i => i != null)
-                        .Select(i => i.Element);
+                    var elements = sceneManager.BspHolder.Elements.Where(i => i != null);
 
                     if (elements.Any())
                     {
@@ -182,10 +181,10 @@ namespace Reclaimer.Controls
                     modelGroup.Visibility = Visibility.Visible;
 
                     #region Generate Tree Nodes
-                    var bspNode = new TreeItemModel { Header = "sbsp", IsChecked = true };
-                    for (int i = 0; i < sceneManager.BspHolder.Instances.Count; i++)
+                    var bspNode = new TreeItemModel { Header = sceneManager.BspHolder.Name, IsChecked = true };
+                    for (int i = 0; i < sceneManager.BspHolder.Elements.Count; i++)
                     {
-                        var bsp = sceneManager.BspHolder.Instances[i];
+                        var bsp = sceneManager.BspHolder.Elements[i];
                         var tag = scenario.Bsps[i].Tag;
                         if (bsp == null)
                             continue;
@@ -197,10 +196,10 @@ namespace Reclaimer.Controls
                     if (bspNode.HasItems)
                         TreeViewItems.Add(bspNode);
 
-                    var skyNode = new TreeItemModel { Header = "sky", IsChecked = true };
-                    for (int i = 0; i < sceneManager.SkyHolder.Instances.Count; i++)
+                    var skyNode = new TreeItemModel { Header = sceneManager.SkyHolder.Name, IsChecked = true };
+                    for (int i = 0; i < sceneManager.SkyHolder.Elements.Count; i++)
                     {
-                        var sky = sceneManager.SkyHolder.Instances[i];
+                        var sky = sceneManager.SkyHolder.Elements[i];
                         var tag = scenario.Skies[i].Tag;
                         if (sky == null)
                             continue;
@@ -216,9 +215,12 @@ namespace Reclaimer.Controls
                     {
                         var paletteNode = new TreeItemModel { Header = holder.Name, IsChecked = true };
 
-                        foreach (var inst in holder.Instances.Where(i => i != null))
+                        for(int i = 0; i < holder.Elements.Count; i++)
                         {
-                            var permNode = new TreeItemModel { Header = inst.Name, IsChecked = true, Tag = inst };
+                            var inst = holder.Elements[i];
+                            var item = holder.Definition.Placements[i];
+
+                            var permNode = new TreeItemModel { Header = item.GetDisplayName(), IsChecked = true, Tag = inst };
                             paletteNode.Items.Add(permNode);
                         }
 
@@ -239,9 +241,9 @@ namespace Reclaimer.Controls
             if (item != tv.SelectedItem)
                 return; //because this event bubbles to the parent node
 
-            var inst = item.Tag as IModelInstance;
-            if (inst != null)
-                renderer.ZoomToBounds(inst.Element.GetTotalBounds(), 500);
+            var node = item.Tag as IMeshNode;
+            if (node != null)
+                renderer.ZoomToBounds(node.GetNodeBounds());
         }
 
         private bool isWorking = false;
@@ -268,16 +270,14 @@ namespace Reclaimer.Controls
                     parent.IsChecked = false;
                 else parent.IsChecked = null;
 
-                if (item.Tag is IModelInstance)
-                    (item.Tag as IModelInstance).Element.Visibility = (item.IsChecked ?? false) ? Visibility.Visible : Visibility.Collapsed;
+                (item.Tag as IMeshNode)?.SetVisibility(item.IsChecked ?? false);
             }
             else
             {
                 foreach (TreeItemModel i in item.Items)
                 {
                     i.IsChecked = item.IsChecked;
-                    if (i.Tag is IModelInstance)
-                        (i.Tag as IModelInstance).Element.Visibility = (i.IsChecked ?? false) ? Visibility.Visible : Visibility.Collapsed;
+                    (i.Tag as IMeshNode)?.SetVisibility(item.IsChecked ?? false);
                 }
             }
         }

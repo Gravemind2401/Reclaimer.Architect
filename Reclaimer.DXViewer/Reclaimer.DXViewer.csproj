@@ -142,12 +142,8 @@
     <Compile Include="Controls\PropertyView.xaml.cs">
       <DependentUpon>PropertyView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Geometry\CompositeGeometryModel.cs" />
-    <Compile Include="Geometry\CompositeModelManager.cs" />
-    <Compile Include="Geometry\IModelInstance.cs" />
     <Compile Include="Geometry\MeshTemplate.cs" />
     <Compile Include="Geometry\ModelFactory.cs" />
-    <Compile Include="Geometry\ModelManager.cs" />
     <Compile Include="Geometry\ModelProperties.cs" />
     <Compile Include="Geometry\ObjectHolder.cs" />
     <Compile Include="Geometry\SceneManager.cs" />
@@ -165,7 +161,6 @@
     </Compile>
     <Compile Include="Utilities\InMemoryMetadata.cs" />
     <Compile Include="Utilities\SharpDXVectorConverter.cs" />
-    <Compile Include="Utilities\CompositeModelFactory.cs" />
     <Compile Include="Utilities\Extensions.cs" />
     <Compile Include="Utilities\NativeMethods.cs" />
     <Compile Include="Plugins\DXViewerPlugin.cs" />

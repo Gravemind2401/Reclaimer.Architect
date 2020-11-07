@@ -72,7 +72,7 @@ namespace Reclaimer.Controls
         }
         #endregion
 
-        public static bool CanOpenTag(IIndexItem tag) => DirectContentTags.Any(t => tag.ClassCode.ToLower() == t) || CompositeModelFactory.IsTagSupported(tag);
+        public static bool CanOpenTag(IIndexItem tag) => ModelFactory.IsTagSupported(tag);
 
         private readonly Helix.GroupModel3D modelGroup = new Helix.GroupModel3D();
 
@@ -360,6 +360,7 @@ namespace Reclaimer.Controls
             ClearChildren();
             modelGroup.Dispose();
             renderer.Dispose();
+            modelFactory.Dispose();
             GC.Collect();
         }
         #endregion

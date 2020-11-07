@@ -12,55 +12,33 @@ namespace Reclaimer.Geometry
 {
     public class ObjectHolder
     {
-        public ObservableCollection<ModelManager> Managers { get; }
-        public ObservableCollection<ModelInstance> Instances { get; }
+        public virtual string Name { get; }
+
+        public ObservableCollection<Helix.Element3D> Elements { get; }
+
+        public ObjectHolder(string name)
+            : this()
+        {
+            Name = name;
+        }
 
         public ObjectHolder()
         {
-            Managers = new ObservableCollection<ModelManager>();
-            Instances = new ObservableCollection<ModelInstance>();
+            Elements = new ObservableCollection<Helix.Element3D>();
         }
 
         public virtual void Dispose()
         {
-            foreach (var man in Managers)
-            {
-                man?.Model.Dispose();
-                man?.Dispose();
-            }
+            foreach (var e in Elements)
+                e.Dispose();
 
-            Managers.Clear();
-            Instances.Clear();
+            Elements.Clear();
         }
     }
 
-    public class CompositeObjectHolder
+    public class PaletteHolder : ObjectHolder
     {
-        public ObservableCollection<CompositeModelManager> Managers { get; }
-        public ObservableCollection<CompositeModelInstance> Instances { get; }
-
-        public CompositeObjectHolder()
-        {
-            Managers = new ObservableCollection<CompositeModelManager>();
-            Instances = new ObservableCollection<CompositeModelInstance>();
-        }
-
-        public virtual void Dispose()
-        {
-            foreach (var man in Managers)
-            {
-                man?.Model.Dispose();
-                man?.Dispose();
-            }
-
-            Managers.Clear();
-            Instances.Clear();
-        }
-    }
-
-    public class PaletteHolder : CompositeObjectHolder
-    {
-        public string Name => Definition.Name;
+        public override string Name => Definition.Name;
         public PaletteDefinition Definition { get; }
 
         public Helix.GroupModel3D GroupElement { get; internal set; }

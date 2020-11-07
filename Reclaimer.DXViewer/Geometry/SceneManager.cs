@@ -25,13 +25,11 @@ namespace Reclaimer.Geometry
 {
     public class SceneManager : IDisposable
     {
-        private static readonly Helix.Material ErrorMaterial = Helix.DiffuseMaterials.Gold;
-
-        private readonly ConcurrentDictionary<int, Helix.TextureModel> sceneTextures = new ConcurrentDictionary<int, Helix.TextureModel>();
+        private readonly ModelFactory factory = new ModelFactory();
 
         private ScenarioModel scenario;
         public ObjectHolder BspHolder { get; private set; }
-        public CompositeObjectHolder SkyHolder { get; private set; }
+        public ObjectHolder SkyHolder { get; private set; }
         public Dictionary<string, PaletteHolder> PaletteHolders { get; private set; }
 
         public Helix.GroupElement3D TriggerVolumeGroup { get; private set; }
@@ -40,35 +38,21 @@ namespace Reclaimer.Geometry
         public IEnumerable<Task> ReadScenario(ScenarioModel scenario)
         {
             this.scenario = scenario;
-            BspHolder = new ObjectHolder();
-            SkyHolder = new CompositeObjectHolder();
+            BspHolder = new ObjectHolder("sbsp");
+            SkyHolder = new ObjectHolder("sky");
             PaletteHolders = new Dictionary<string, PaletteHolder>();
             TriggerVolumes = new ObservableCollection<BoxManipulator3D>();
 
             yield return Task.Run(() =>
             {
                 for (int i = 0; i < scenario.Bsps.Count; i++)
-                {
-                    IRenderGeometry geom;
-                    if (ContentFactory.TryGetGeometryContent(scenario.Bsps[i].Tag, out geom))
-                        BspHolder.Managers.Add(new ModelManager(this, geom.ReadGeometry(0)));
-                    else BspHolder.Managers.Add(null);
-
-                    BspHolder.Managers[i]?.PreloadTextures();
-                }
+                    factory.LoadTag(scenario.Bsps[i].Tag, false);
             });
 
             yield return Task.Run(() =>
             {
                 for (int i = 0; i < scenario.Skies.Count; i++)
-                {
-                    CompositeGeometryModel geom;
-                    if (CompositeModelFactory.TryGetModel(scenario.Skies[i].Tag, out geom))
-                        SkyHolder.Managers.Add(new CompositeModelManager(this, geom));
-                    else SkyHolder.Managers.Add(null);
-
-                    SkyHolder.Managers[i]?.PreloadTextures();
-                }
+                    factory.LoadTag(scenario.Skies[i].Tag, false);
             });
 
             foreach (var definition in scenario.Palettes.Values)
@@ -79,14 +63,7 @@ namespace Reclaimer.Geometry
                 yield return Task.Run(() =>
                 {
                     for (int i = 0; i < definition.Palette.Count; i++)
-                    {
-                        CompositeGeometryModel geom;
-                        if (CompositeModelFactory.TryGetModel(definition.Palette[i].Tag, out geom))
-                            holder.Managers.Add(new CompositeModelManager(this, geom));
-                        else holder.Managers.Add(null);
-
-                        holder.Managers[i]?.PreloadTextures();
-                    }
+                        factory.LoadTag(definition.Palette[i].Tag, false);
                 });
             }
         }
@@ -96,11 +73,11 @@ namespace Reclaimer.Geometry
             if (scenario == null)
                 throw new InvalidOperationException();
 
-            foreach (var man in BspHolder.Managers)
-                BspHolder.Instances.Add(man?.GenerateModel());
+            foreach (var bsp in scenario.Bsps)
+                BspHolder.Elements.Add(factory.CreateRenderModel(bsp.Tag.Id));
 
-            foreach (var man in SkyHolder.Managers)
-                SkyHolder.Instances.Add(man?.GenerateModel());
+            foreach (var sky in scenario.Skies)
+                SkyHolder.Elements.Add(factory.CreateObjectModel(sky.Tag.Id));
 
             foreach (var holder in PaletteHolders.Values)
             {
@@ -108,26 +85,31 @@ namespace Reclaimer.Geometry
                 for (int i = 0; i < holder.Definition.Placements.Count; i++)
                 {
                     var placement = holder.Definition.Placements[i];
-                    var manager = placement.PaletteIndex >= 0 ? holder.Managers[placement.PaletteIndex] : null;
-                    if (manager == null)
+                    var tag = placement.PaletteIndex >= 0 ? holder.Definition.Palette[placement.PaletteIndex].Tag : null;
+                    if (tag == null)
                     {
-                        holder.Instances.Add(null);
+                        //need to keep elements at the correct index to match their corresponding block index
+                        holder.Elements.Add(null);
                         continue;
                     }
 
-                    var inst = manager.GenerateModel();
-                    inst.Name = placement.GetDisplayName();
+                    var inst = factory.CreateObjectModel(tag.Id);
+                    if (inst == null)
+                    {
+                        holder.Elements.Add(null);
+                        continue;
+                    }
 
                     var binding = new MultiBinding { Converter = TransformConverter.Instance, Mode = BindingMode.TwoWay };
                     binding.Bindings.Add(new Binding(nameof(ObjectPlacement.Position)) { Mode = BindingMode.TwoWay });
                     binding.Bindings.Add(new Binding(nameof(ObjectPlacement.Rotation)) { Mode = BindingMode.TwoWay });
                     binding.Bindings.Add(new Binding(nameof(ObjectPlacement.Scale)) { Mode = BindingMode.TwoWay });
 
-                    inst.Element.DataContext = placement;
-                    BindingOperations.SetBinding(inst.Element, Helix.Element3D.TransformProperty, binding);
+                    inst.DataContext = placement;
+                    BindingOperations.SetBinding(inst, Helix.Element3D.TransformProperty, binding);
 
-                    holder.Instances.Add(inst);
-                    holder.GroupElement.Children.Add(inst.Element);
+                    holder.Elements.Add(inst);
+                    holder.GroupElement.Children.Add(inst);
                 }
             }
 
@@ -152,68 +134,6 @@ namespace Reclaimer.Geometry
             }
         }
 
-        #region Materials
-        public Helix.Material LoadMaterial(IGeometryModel model, int matIndex, out bool isTransparent)
-        {
-            if (matIndex < 0 || matIndex >= model.Materials.Count)
-            {
-                isTransparent = false;
-                return ErrorMaterial;
-            }
-
-            return LoadMaterial(model.Materials[matIndex], out isTransparent);
-        }
-
-        public Helix.Material LoadMaterial(IGeometryMaterial mat, out bool isTransparent)
-        {
-            var diffuseTexture = GetTexture(mat, MaterialUsage.Diffuse);
-            if (diffuseTexture == null)
-            {
-                isTransparent = false;
-                return ErrorMaterial;
-            }
-
-            var material = new Helix.DiffuseMaterial
-            {
-                DiffuseMap = diffuseTexture
-            };
-
-            material.Freeze();
-            isTransparent = mat.Flags.HasFlag(MaterialFlags.Transparent);
-            return material;
-        }
-
-        public void LoadTexture(IGeometryMaterial mat)
-        {
-            GetTexture(mat, MaterialUsage.Diffuse);
-            //GetTexture(mat, MaterialUsage.Normal);
-        }
-
-        private Helix.TextureModel GetTexture(IGeometryMaterial mat, MaterialUsage usage)
-        {
-            var sub = mat?.Submaterials.FirstOrDefault(s => s.Usage == MaterialUsage.Diffuse);
-            if (string.IsNullOrEmpty(sub?.Bitmap?.Name))
-                return null;
-
-            var key = mat.Flags.HasFlag(MaterialFlags.Transparent) ? -sub.Bitmap.Id : sub.Bitmap.Id;
-
-            Helix.TextureModel tex;
-            sceneTextures.TryGetValue(key, out tex);
-            if (tex == null)
-            {
-                var stream = new System.IO.MemoryStream();
-                if (mat.Flags.HasFlag(MaterialFlags.Transparent))
-                    sub.Bitmap.ToDds(0).WriteToStream(stream, System.Drawing.Imaging.ImageFormat.Png, DecompressOptions.Default);
-                else sub.Bitmap.ToDds(0).WriteToStream(stream, System.Drawing.Imaging.ImageFormat.Png, DecompressOptions.Bgr24);
-                tex = new Helix.TextureModel(stream);
-                if (!sceneTextures.TryAdd(key, tex))
-                    stream.Dispose(); //another thread beat us to it
-            }
-
-            return tex;
-        }
-        #endregion
-
         public void Dispose()
         {
             BspHolder?.Dispose();
@@ -225,10 +145,7 @@ namespace Reclaimer.Geometry
                     holder.Dispose();
             }
 
-            foreach (var tex in sceneTextures.Values)
-                tex.CompressedStream?.Dispose();
-
-            sceneTextures.Clear();
+            factory.Dispose();
         }
     }
 }

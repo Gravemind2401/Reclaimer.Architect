@@ -32,9 +32,13 @@ namespace Reclaimer.Controls
         {
             this.config = config;
             ModelName = name;
-            baseModel = factory.CreateRenderModel(config.RenderModelTag.Id);
             this.defaultVariant = config.Variants.FirstOrDefault(v => v.Name == defaultVariant) ?? config.Variants.FirstOrDefault();
             attachments = new Dictionary<string, List<ObjectModel3D>>();
+
+            if (config.RenderModelTag == null)
+                return;
+
+            baseModel = factory.CreateRenderModel(config.RenderModelTag.Id);
 
             foreach (var variant in config.Variants)
             {

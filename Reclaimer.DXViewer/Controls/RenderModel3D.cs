@@ -101,7 +101,7 @@ namespace Reclaimer.Controls
 
         BoundingBox IMeshNode.GetNodeBounds()
         {
-            return regionGroups.OfType<IMeshNode>()
+            return Regions.OfType<IMeshNode>()
                 .Union(InstanceGroups.OfType<IMeshNode>())
                 .Select(n => n.GetNodeBounds())
                 .GetTotalBounds();

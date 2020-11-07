@@ -21,15 +21,18 @@ using Reclaimer.Utilities;
 
 namespace Reclaimer.Geometry
 {
-    public class ModelFactory
+    public sealed class ModelFactory : IDisposable
     {
+        private static readonly string[] directContentTags = new[] { "mode", "mod2", "sbsp" };
         private static readonly string[] compositeTags = new[] { "hlmt", "weap", "vehi", "bipd", "scen", "eqip", "bloc" };
         private static readonly Helix.Material ErrorMaterial = Helix.DiffuseMaterials.Gold;
 
         private readonly ConcurrentDictionary<int, Helix.TextureModel> textureCache = new ConcurrentDictionary<int, Helix.TextureModel>();
-        private readonly Dictionary<int, TemplateCollection> geometryCache = new Dictionary<int, TemplateCollection>();
-        private readonly Dictionary<int, ModelType> modelTypes = new Dictionary<int, ModelType>();
-        private readonly Dictionary<int, ModelConfig> configCache = new Dictionary<int, ModelConfig>();
+        private readonly ConcurrentDictionary<int, TemplateCollection> geometryCache = new ConcurrentDictionary<int, TemplateCollection>();
+        private readonly ConcurrentDictionary<int, ModelType> modelTypes = new ConcurrentDictionary<int, ModelType>();
+        private readonly ConcurrentDictionary<int, ModelConfig> configCache = new ConcurrentDictionary<int, ModelConfig>();
+
+        public static bool IsTagSupported(IIndexItem tag) => directContentTags.Union(compositeTags).Any(s => tag.ClassCode.ToLower() == s);
 
         public Helix.Material CreateMaterial(IGeometryMaterial mat, out bool isTransparent)
         {
@@ -76,6 +79,12 @@ namespace Reclaimer.Geometry
 
         public void LoadTag(IIndexItem tag, bool lods)
         {
+            if (tag == null)
+                return;
+
+            if (!IsTagSupported(tag))
+                throw new NotSupportedException();
+
             if (compositeTags.Any(s => tag.ClassCode.Equals(s, StringComparison.OrdinalIgnoreCase)))
                 LoadCompositeTag(tag, lods);
             else LoadRenderModelTag(tag, lods);
@@ -103,26 +112,34 @@ namespace Reclaimer.Geometry
             if (geometryCache.ContainsKey(geom.Id))
                 return true;
 
-            var lodCount = lods ? geom.LodCount : 1;
-            var lodModels = Enumerable.Repeat(0, lodCount).Select(i => geom.ReadGeometry(i)).ToList();
-            var col = new TemplateCollection(this, lodModels);
-
-            geometryCache.Add(geom.Id, col);
-
-            foreach (var lod in lodModels)
+            try
             {
-                //cache all referenced textures
-                var matIndexes = lod.Meshes.SelectMany(m => m.Submeshes)
-                    .Select(m => m.MaterialIndex)
-                    .Where(i => i >= 0)
-                    .Distinct();
+                var lodCount = lods ? geom.LodCount : 1;
+                var lodModels = Enumerable.Repeat(0, lodCount).Select(i => geom.ReadGeometry(i)).ToList();
+                var col = new TemplateCollection(this, lodModels);
 
-                foreach (var index in matIndexes)
-                    ReadTexture(lod.Materials[index]);
+                if (!geometryCache.TryAdd(geom.Id, col))
+                    return true; //looks like another thread is already working on this model
+
+                foreach (var lod in lodModels)
+                {
+                    //cache all referenced textures
+                    var matIndexes = lod.Meshes.SelectMany(m => m.Submeshes)
+                        .Select(m => m.MaterialIndex)
+                        .Where(i => i >= 0)
+                        .Distinct();
+
+                    foreach (var index in matIndexes)
+                        ReadTexture(lod.Materials[index]);
+                }
+
+                foreach (var lod in lodModels)
+                    lod.Dispose();
             }
-
-            foreach (var lod in lodModels)
-                lod.Dispose();
+            catch
+            {
+                return false;
+            }
 
             return true;
         }
@@ -140,14 +157,16 @@ namespace Reclaimer.Geometry
                 return false;
 
             var modelType = new ModelType(tag, defaultVariant);
-            modelTypes.Add(tag.Id, modelType);
+            if (!modelTypes.TryAdd(tag.Id, modelType))
+                return true; //looks like another thread is already working on this model
 
             if (configCache.ContainsKey(hlmt.Id))
                 modelType.VariantConfig = configCache[hlmt.Id];
             else
             {
                 var config = modelType.VariantConfig = ModelConfig.FromIndexItem(hlmt);
-                configCache.Add(hlmt.Id, config);
+                if (!configCache.TryAdd(hlmt.Id, config))
+                    return true; //looks like another thread is already working on this model
 
                 LoadTag(config.RenderModelTag, lods);
 
@@ -204,6 +223,14 @@ namespace Reclaimer.Geometry
                 return null;
 
             return geometryCache[id].LodProperties[lod];
+        }
+
+        public void Dispose()
+        {
+            foreach (var tex in textureCache.Values)
+                tex.CompressedStream?.Dispose();
+
+            textureCache.Clear();
         }
 
         private class ModelType
