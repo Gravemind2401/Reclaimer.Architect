@@ -149,6 +149,7 @@
     <Compile Include="Geometry\SceneManager.cs" />
     <Compile Include="Models\IScenarioHandler.cs" />
     <Compile Include="Models\NodeType.cs" />
+    <Compile Include="Models\ObjectPlacement.cs" />
     <Compile Include="Models\PaletteType.cs" />
     <Compile Include="Models\ScenarioModel.cs" />
     <Compile Include="Models\ScenarioObject.cs" />

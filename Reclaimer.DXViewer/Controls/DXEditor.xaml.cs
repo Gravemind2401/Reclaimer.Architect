@@ -137,6 +137,12 @@ namespace Reclaimer.Controls
             }
         }
 
+        public void RefreshObject(string paletteKey, ObjectPlacement placement, string fieldId)
+        {
+            renderer.SetSelectedElement(null);
+            sceneManager.RefreshObject(paletteKey, placement, fieldId);
+        }
+
         public void LoadScenario()
         {
             Task.Run(async () =>
@@ -215,12 +221,11 @@ namespace Reclaimer.Controls
                     {
                         var paletteNode = new TreeItemModel { Header = holder.Name, IsChecked = true };
 
-                        for(int i = 0; i < holder.Elements.Count; i++)
+                        for (int i = 0; i < holder.Elements.Count; i++)
                         {
-                            var inst = holder.Elements[i];
-                            var item = holder.Definition.Placements[i];
+                            var info = holder.GetInfoForIndex(i);
 
-                            var permNode = new TreeItemModel { Header = item.GetDisplayName(), IsChecked = true, Tag = inst };
+                            var permNode = info.TreeItem = new TreeItemModel { Header = info.Placement.GetDisplayName(), IsChecked = true, Tag = info.Element };
                             paletteNode.Items.Add(permNode);
                         }
 

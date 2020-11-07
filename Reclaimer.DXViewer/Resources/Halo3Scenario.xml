@@ -90,7 +90,7 @@
     <int16 name="Placement Index" offset="0x22" visible="true" />
   </section>
   <section name="palettes">
-    <tagblock palette="scenery" offset="0xC8" elementSize="0x30">
+    <tagblock palette="scenery" srcId="scenario_scenery_placement" offset="0xC8" elementSize="0x30">
       <tagRef name="Scenery" offset="0x0" visible="true" id="tagreference" />
       <undefined name="Unknown" offset="0x10" visible="false" />
       <undefined name="Unknown" offset="0x14" visible="false" />
@@ -101,7 +101,7 @@
       <undefined name="Unknown" offset="0x28" visible="false" />
       <undefined name="Unknown" offset="0x2C" visible="false" />
     </tagblock>
-    <tagblock palette="biped" offset="0xE0" elementSize="0x30">
+    <tagblock palette="biped" srcId="scenario_biped_placement" offset="0xE0" elementSize="0x30">
       <tagRef name="Biped" offset="0x0" visible="true" id="tagreference" />
       <undefined name="Unknown" offset="0x10" visible="false" />
       <undefined name="Unknown" offset="0x14" visible="false" />
@@ -123,7 +123,7 @@
       <undefined name="Unknown" offset="0x28" visible="false" />
       <undefined name="Unknown" offset="0x2C" visible="false" />
     </tagblock>
-    <tagblock palette="equipment" offset="0x110" elementSize="0x30">
+    <tagblock palette="equipment" srcId="scenario_equipment_placement" offset="0x110" elementSize="0x30">
       <tagRef name="Equipment" offset="0x0" visible="true" id="tagreference" />
       <undefined name="Unknown" offset="0x10" visible="false" />
       <undefined name="Unknown" offset="0x14" visible="false" />
@@ -134,7 +134,7 @@
       <undefined name="Unknown" offset="0x28" visible="false" />
       <undefined name="Unknown" offset="0x2C" visible="false" />
     </tagblock>
-    <tagblock palette="weapon" offset="0x128" elementSize="0x30">
+    <tagblock palette="weapon" srcId="scenario_weapon_placement" offset="0x128" elementSize="0x30">
       <tagRef name="Weapon" offset="0x0" visible="true" id="tagreference" />
       <undefined name="Unknown" offset="0x10" visible="false" />
       <undefined name="Unknown" offset="0x14" visible="false" />
@@ -145,7 +145,7 @@
       <undefined name="Unknown" offset="0x28" visible="false" />
       <undefined name="Unknown" offset="0x2C" visible="false" />
     </tagblock>
-    <tagblock palette="machine" offset="0x14C" elementSize="0x30">
+    <tagblock palette="machine" srcId="scenario_machine_placement" offset="0x14C" elementSize="0x30">
       <tagRef name="Machine" offset="0x0" visible="true" id="tagreference" />
       <undefined name="Unknown" offset="0x10" visible="false" />
       <undefined name="Unknown" offset="0x14" visible="false" />
@@ -156,7 +156,7 @@
       <undefined name="Unknown" offset="0x28" visible="false" />
       <undefined name="Unknown" offset="0x2C" visible="false" />
     </tagblock>
-    <tagblock palette="control" offset="0x17C" elementSize="0x30">
+    <tagblock palette="control" srcId="scenario_control_placement" offset="0x17C" elementSize="0x30">
       <tagRef name="Control" offset="0x0" visible="true" id="tagreference" />
       <undefined name="Unknown" offset="0x10" visible="false" />
       <undefined name="Unknown" offset="0x14" visible="false" />
@@ -167,7 +167,7 @@
       <undefined name="Unknown" offset="0x28" visible="false" />
       <undefined name="Unknown" offset="0x2C" visible="false" />
     </tagblock>
-    <tagblock palette="crate" offset="0x5F4" elementSize="0x30">
+    <tagblock palette="crate" srcId="scenario_crate_placement" offset="0x5F4" elementSize="0x30">
       <tagRef name="Crate" offset="0x0" visible="true" id="tagreference" />
       <undefined name="Unknown" offset="0x10" visible="false" />
       <undefined name="Unknown" offset="0x14" visible="false" />
@@ -181,7 +181,7 @@
   </section>
   <section name="placements">
     <tagblock placements="scenery" offset="0xBC" elementSize="0xB4">
-      <int16 name="Palette Index" offset="0x0" visible="true" id="paletteindex" />
+      <blockIndex16 name="Palette Index" targetId="scenario_scenery_placement" offset="0x0" visible="true" id="paletteindex" />
       <int16 name="Name Index" offset="0x2" visible="true" id="nameindex" />
       <flags32 name="Placement Flags" offset="0x4" visible="true">
         <bit name="Not Automatically" index="0" />
@@ -461,7 +461,7 @@
       <undefined name="Unknown" offset="0xB0" visible="false" />
     </tagblock>
     <tagblock placements="biped" offset="0xD4" elementSize="0x74">
-      <int16 name="Palette Index" offset="0x0" visible="true" id="paletteindex" />
+      <blockIndex16 name="Palette Index" targetId="scenario_biped_placement" offset="0x0" visible="true" id="paletteindex" />
       <int16 name="Name Index" offset="0x2" visible="true" id="nameindex" />
       <flags32 name="Placement Flags" offset="0x4" visible="true">
         <bit name="Not Automatically" index="0" />
@@ -993,7 +993,7 @@
       <undefined name="Unknown" offset="0xA4" visible="false" />
     </tagblock>
     <tagblock placements="equipment" offset="0x104" elementSize="0x8C">
-      <int16 name="Palette Index" offset="0x0" visible="true" id="paletteindex" />
+      <blockIndex16 name="Palette Index" targetId="scenario_equipment_placement" offset="0x0" visible="true" id="paletteindex" />
       <int16 name="Name Index" offset="0x2" visible="true" id="nameindex" />
       <flags32 name="Placement Flags" offset="0x4" visible="true">
         <bit name="Not Automatically" index="0" />
@@ -1277,7 +1277,7 @@
       <undefined name="Unknown" offset="0x88" visible="false" />
     </tagblock>
     <tagblock placements="weapon" offset="0x11C" elementSize="0xA8">
-      <int16 name="Palette Index" offset="0x0" visible="true" id="paletteindex" />
+      <blockIndex16 name="Palette Index" targetId="scenario_weapon_placement" offset="0x0" visible="true" id="paletteindex" />
       <int16 name="Name Index" offset="0x2" visible="true" id="nameindex" />
       <flags32 name="Placement Flags" offset="0x4" visible="true">
         <bit name="Not Automatically" index="0" />
@@ -1575,7 +1575,7 @@
       <undefined name="Unknown" offset="0xA4" visible="false" />
     </tagblock>
     <tagblock placements="machine" offset="0x140" elementSize="0x70">
-      <int16 name="Palette Index" offset="0x0" visible="true" id="paletteindex" />
+      <blockIndex16 name="Palette Index" targetId="scenario_machine_placement" offset="0x0" visible="true" id="paletteindex" />
       <int16 name="Name Index" offset="0x2" visible="true" id="nameindex" />
       <flags32 name="Placement Flags" offset="0x4" visible="true">
         <bit name="Not Automatically" index="0" />
@@ -1846,7 +1846,7 @@
       <int16 name="Unknown" offset="0x6E" visible="true" />
     </tagblock>
     <tagblock placements="control" offset="0x170" elementSize="0x64">
-      <int16 name="Palette Index" offset="0x0" visible="true" id="paletteindex" />
+      <blockIndex16 name="Palette Index" targetId="scenario_control_placement" offset="0x0" visible="true" id="paletteindex" />
       <int16 name="Name Index" offset="0x2" visible="true" id="nameindex" />
       <flags32 name="Placement Flags" offset="0x4" visible="true">
         <bit name="Not Automatically" index="0" />
@@ -2107,7 +2107,7 @@
       <int16 name="Unknown" offset="0x62" visible="true" />
     </tagblock>
     <tagblock placements="crate" offset="0x5E8" elementSize="0xB0">
-      <int16 name="Palette Index" offset="0x0" visible="true" id="paletteindex" />
+      <blockIndex16 name="Palette Index" targetId="scenario_crate_placement" offset="0x0" visible="true" id="paletteindex" />
       <int16 name="Name Index" offset="0x2" visible="true" id="nameindex" />
       <flags32 name="Placement Flags" offset="0x4" visible="true">
         <bit name="Not Automatically" index="0" />
@@ -2374,9 +2374,7 @@
     </tagblock>
   </section>
   <section name="startpositions" offset="0x254" elementSize="0x18">
-    <float32 name="Position x" offset="0x0" visible="true" />
-    <float32 name="Position y" offset="0x4" visible="true" />
-    <float32 name="Position z" offset="0x8" visible="true" />
+    <point3 name="Position" offset="0x0" visible="true" />
     <degree name="Facing y" offset="0xC" visible="true" />
     <degree name="Facing p" offset="0x10" visible="true" />
     <int16 name="Unknown" offset="0x14" visible="false" />

@@ -30,5 +30,6 @@ namespace Reclaimer.Models
         void SelectPalette(NodeType nodeType);
         void SelectObject(NodeType nodeType, int itemIndex);
         void NavigateToObject(NodeType nodeType, int itemIndex);
+        void RefreshObject(string paletteKey, ObjectPlacement placement, string fieldId);
     }
 }

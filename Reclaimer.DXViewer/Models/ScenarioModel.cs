@@ -46,7 +46,7 @@ namespace Reclaimer.Models
 
         public Dictionary<string, ScenarioSection> Sections { get; }
         public ObservableCollection<TreeItemModel> Hierarchy { get; }
-        public ObservableCollection<string> Items { get; }
+        public ObservableCollection<ListBoxItem> Items { get; }
 
         public ObservableCollection<TagReference> Bsps { get; }
         public ObservableCollection<TagReference> Skies { get; }
@@ -133,7 +133,7 @@ namespace Reclaimer.Models
             Transaction = new InMemoryMetadataStream(item, Properties.Resources.scnrtest);
             Sections = new Dictionary<string, ScenarioSection>();
             Hierarchy = new ObservableCollection<TreeItemModel>();
-            Items = new ObservableCollection<string>();
+            Items = new ObservableCollection<ListBoxItem>();
 
             Bsps = new ObservableCollection<TagReference>();
             Skies = new ObservableCollection<TagReference>();
@@ -348,7 +348,7 @@ namespace Reclaimer.Models
             if (paletteKey != null)
             {
                 foreach (var placement in Palettes[paletteKey].Placements)
-                    Items.Add(placement.GetDisplayName());
+                    Items.Add(new ListBoxItem { Content = placement.GetDisplayName(), Tag = placement });
 
                 return;
             }
@@ -358,7 +358,7 @@ namespace Reclaimer.Models
             if (SelectedNodeType == NodeType.TriggerVolumes)
             {
                 foreach (var volume in TriggerVolumes)
-                    Items.Add(volume.Name);
+                    Items.Add(new ListBoxItem { Content = volume.Name, Tag = volume });
             }
         }
 
@@ -411,73 +411,5 @@ namespace Reclaimer.Models
         public TagBlock TagBlock { get; set; }
 
         public override string ToString() => Name;
-    }
-
-    public class ObjectPlacement : ScenarioObject
-    {
-        private readonly string paletteKey;
-
-        private int paletteIndex;
-        public int PaletteIndex
-        {
-            get { return paletteIndex; }
-            set { SetProperty(ref paletteIndex, value, FieldId.PaletteIndex); }
-        }
-
-        private int nameIndex;
-        public int NameIndex
-        {
-            get { return nameIndex; }
-            set { SetProperty(ref nameIndex, value, FieldId.NameIndex); }
-        }
-
-        private RealVector3D rotation;
-        public RealVector3D Rotation
-        {
-            get { return rotation; }
-            set { SetProperty(ref rotation, value, FieldId.Rotation); }
-        }
-
-        private float scale;
-        public float Scale
-        {
-            get { return scale; }
-            set { SetProperty(ref scale, value, FieldId.Scale); }
-        }
-
-        private StringId variant;
-        public StringId Variant
-        {
-            get { return variant; }
-            set { SetProperty(ref variant, value, FieldId.Variant); }
-        }
-
-        public ObjectPlacement(ScenarioModel parent, string paletteKey)
-            : base(parent)
-        {
-            this.paletteKey = paletteKey;
-        }
-
-        protected override long GetFieldAddress(string fieldId)
-        {
-            var palette = Parent.Palettes[paletteKey];
-            var block = palette.PlacementBlockRef;
-            var index = palette.Placements.IndexOf(this);
-            var fieldOffset = palette.PlacementsNode.SelectSingleNode($"*[@id='{fieldId}']").GetIntAttribute("offset") ?? 0;
-
-            return block.TagBlock.Pointer.Address + block.BlockSize * index + fieldOffset;
-        }
-
-        public override string GetDisplayName()
-        {
-            var palette = Parent.Palettes[paletteKey];
-
-            if (PaletteIndex < 0 || PaletteIndex >= palette.Palette.Count)
-                return "<invalid>";
-
-            if (NameIndex >= 0)
-                return Parent.ObjectNames[NameIndex];
-            else return palette.Palette[PaletteIndex].Tag.FileName();
-        }
     }
 }

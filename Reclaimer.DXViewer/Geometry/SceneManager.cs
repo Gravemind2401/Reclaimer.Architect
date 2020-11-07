@@ -20,6 +20,7 @@ using Helix = HelixToolkit.Wpf.SharpDX;
 using System.Windows.Data;
 using Reclaimer.Controls;
 using System.Collections.Concurrent;
+using Reclaimer.Resources;
 
 namespace Reclaimer.Geometry
 {
@@ -82,35 +83,10 @@ namespace Reclaimer.Geometry
             foreach (var holder in PaletteHolders.Values)
             {
                 holder.GroupElement = new Helix.GroupModel3D();
+                holder.SetCapacity(holder.Definition.Placements.Count);
+
                 for (int i = 0; i < holder.Definition.Placements.Count; i++)
-                {
-                    var placement = holder.Definition.Placements[i];
-                    var tag = placement.PaletteIndex >= 0 ? holder.Definition.Palette[placement.PaletteIndex].Tag : null;
-                    if (tag == null)
-                    {
-                        //need to keep elements at the correct index to match their corresponding block index
-                        holder.Elements.Add(null);
-                        continue;
-                    }
-
-                    var inst = factory.CreateObjectModel(tag.Id);
-                    if (inst == null)
-                    {
-                        holder.Elements.Add(null);
-                        continue;
-                    }
-
-                    var binding = new MultiBinding { Converter = TransformConverter.Instance, Mode = BindingMode.TwoWay };
-                    binding.Bindings.Add(new Binding(nameof(ObjectPlacement.Position)) { Mode = BindingMode.TwoWay });
-                    binding.Bindings.Add(new Binding(nameof(ObjectPlacement.Rotation)) { Mode = BindingMode.TwoWay });
-                    binding.Bindings.Add(new Binding(nameof(ObjectPlacement.Scale)) { Mode = BindingMode.TwoWay });
-
-                    inst.DataContext = placement;
-                    BindingOperations.SetBinding(inst, Helix.Element3D.TransformProperty, binding);
-
-                    holder.Elements.Add(inst);
-                    holder.GroupElement.Children.Add(inst);
-                }
+                    ConfigurePlacement(holder, i);
             }
 
             TriggerVolumeGroup = new Helix.GroupModel3D();
@@ -123,15 +99,88 @@ namespace Reclaimer.Geometry
                     Size = ((IRealVector3D)vol.Size).ToVector3()
                 };
 
-                box.DataContext = vol;
-                BindingOperations.SetBinding(box, BoxManipulator3D.PositionProperty,
-                    new Binding(nameof(TriggerVolume.Position)) { Mode = BindingMode.TwoWay, Converter = SharpDXVectorConverter.Instance });
-                BindingOperations.SetBinding(box, BoxManipulator3D.SizeProperty,
-                    new Binding(nameof(TriggerVolume.Size)) { Mode = BindingMode.TwoWay, Converter = SharpDXVectorConverter.Instance });
+                BindTriggerVolume(vol, box);
 
                 TriggerVolumes.Add(box);
                 TriggerVolumeGroup.Children.Add(box);
             }
+        }
+
+        private void RemovePlacement(PaletteHolder holder, int index)
+        {
+            var element = holder.Elements[index];
+            if (element == null)
+                return;
+
+            holder.GroupElement.Children.Remove(element);
+            element.Dispose();
+            holder.Elements[index] = null;
+        }
+
+        private void ConfigurePlacement(PaletteHolder holder, int index)
+        {
+            RemovePlacement(holder, index);
+
+            var placement = holder.Definition.Placements[index];
+            var tag = placement.PaletteIndex >= 0 ? holder.Definition.Palette[placement.PaletteIndex].Tag : null;
+            if (tag == null)
+            {
+                holder.Elements[index] = null;
+                return;
+            }
+
+            var inst = factory.CreateObjectModel(tag.Id);
+            if (inst == null)
+            {
+                holder.Elements[index] = null;
+                return;
+            }
+
+            BindPlacement(placement, inst);
+
+            holder.Elements[index] = inst;
+            holder.GroupElement.Children.Add(inst);
+        }
+
+        public void RefreshObject(string paletteKey, ObjectPlacement placement, string fieldId)
+        {
+            var holder = PaletteHolders[paletteKey];
+            var index = holder.Definition.Placements.IndexOf(placement);
+
+            if (fieldId == FieldId.Variant)
+                (holder.Elements[index] as ObjectModel3D)?.SetVariant(placement.Variant);
+            else if (fieldId == FieldId.PaletteIndex)
+            {
+                ConfigurePlacement(holder, index);
+
+                var info = holder.GetInfoForIndex(index);
+                info.TreeItem.Header = info.Placement.GetDisplayName();
+                info.TreeItem.Tag = info.Element;
+
+                var listItem = scenario.Items.FirstOrDefault(i => i.Tag == info.Placement);
+                if (listItem != null)
+                    listItem.Content = info.TreeItem.Header;
+            }
+        }
+
+        private void BindPlacement(ObjectPlacement placement, Helix.Element3D model)
+        {
+            var binding = new MultiBinding { Converter = TransformConverter.Instance, Mode = BindingMode.TwoWay };
+            binding.Bindings.Add(new Binding(nameof(ObjectPlacement.Position)) { Mode = BindingMode.TwoWay });
+            binding.Bindings.Add(new Binding(nameof(ObjectPlacement.Rotation)) { Mode = BindingMode.TwoWay });
+            binding.Bindings.Add(new Binding(nameof(ObjectPlacement.Scale)) { Mode = BindingMode.TwoWay });
+
+            model.DataContext = placement;
+            BindingOperations.SetBinding(model, Helix.Element3D.TransformProperty, binding);
+        }
+
+        private void BindTriggerVolume(TriggerVolume vol, BoxManipulator3D box)
+        {
+            box.DataContext = vol;
+            BindingOperations.SetBinding(box, BoxManipulator3D.PositionProperty,
+                new Binding(nameof(TriggerVolume.Position)) { Mode = BindingMode.TwoWay, Converter = SharpDXVectorConverter.Instance });
+            BindingOperations.SetBinding(box, BoxManipulator3D.SizeProperty,
+                new Binding(nameof(TriggerVolume.Size)) { Mode = BindingMode.TwoWay, Converter = SharpDXVectorConverter.Instance });
         }
 
         public void Dispose()

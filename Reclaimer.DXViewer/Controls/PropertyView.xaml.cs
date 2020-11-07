@@ -202,6 +202,10 @@ namespace Reclaimer.Controls
                         var simple = sender as SimpleValue;
                         placement.Scale = float.Parse(simple.Value.ToString());
                         break;
+                    case "paletteindex":
+                        var blockIndex = sender as BlockIndexValue;
+                        placement.PaletteIndex = int.Parse(blockIndex.Value.ToString());
+                        break;
                 }
 
                 return;

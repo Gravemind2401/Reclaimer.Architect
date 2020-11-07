@@ -213,5 +213,18 @@ namespace Reclaimer.Utilities
         {
             node.IsVisible = isVisible;
         }
+
+        public static void Resize<T>(this List<T> list, int newSize)
+        {
+            var prevSize = list.Count;
+            if (newSize < prevSize)
+                list.RemoveRange(newSize, prevSize - newSize);
+            else if (newSize > prevSize)
+            {
+                if (newSize > list.Capacity)
+                    list.Capacity = newSize;
+                list.AddRange(Enumerable.Repeat(default(T), newSize - prevSize));
+            }
+        }
     }
 }
