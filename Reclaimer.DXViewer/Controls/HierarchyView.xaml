@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Reclaimer.Controls"
              xmlns:s="clr-namespace:Studio.Controls;assembly=Studio"
+             xmlns:u="clr-namespace:Reclaimer.Utilities"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
 
@@ -14,6 +15,8 @@
                 <ResourceDictionary Source="/Reclaimer;component/Resources/Templates.xaml" />
                 <ResourceDictionary Source="/Reclaimer.DXViewer;component/Resources/Templates.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <u:IsPaletteNodeConverter x:Key="isPaletteNodeConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -40,12 +43,17 @@
                 </Button>
                 <Separator />
                 <Button Click="btnAddItem_Click" IsEnabled="False"
-                        ToolTip="Save Bitmaps">
+                        ToolTip="Add Object">
                     <ContentControl Template="{StaticResource ic_Add_16x}" />
                 </Button>
                 <Button Click="btnDeleteItem_Click" IsEnabled="False"
-                        ToolTip="Save Model">
+                        ToolTip="Delete Object">
                     <ContentControl Template="{StaticResource ic_Remove_color_16x}" />
+                </Button>
+                <Separator />
+                <Button Click="btnEditPalette_Click" ToolTip="Edit Palette"
+                        IsEnabled="{Binding SelectedNodeType, Converter={StaticResource isPaletteNodeConverter}}">
+                    <ContentControl Template="{StaticResource ic_EditDropDownList_16x}" />
                 </Button>
                 <Separator />
                 <Button Click="btnSave_Click" IsEnabled="False"

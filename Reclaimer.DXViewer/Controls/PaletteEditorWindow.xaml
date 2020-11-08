@@ -1,0 +1,60 @@
+﻿<Window x:Class="Reclaimer.Controls.PaletteEditorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+        xmlns:local="clr-namespace:Reclaimer.Controls"
+        mc:Ignorable="d" ResizeMode="NoResize"
+        WindowStyle="ToolWindow" WindowStartupLocation="CenterOwner"
+        Width="500" Height="500"
+        d:DesignHeight="300" d:DesignWidth="300">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Reclaimer.DXViewer;component/Resources/Templates.xaml" />
+                <ResourceDictionary Source="/Reclaimer.DXViewer;component/Resources/MetaViewerPaletteEditor.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <DockPanel>
+        <ToolBarTray DockPanel.Dock="Top" IsLocked="True">
+            <ToolBar Margin="3,1">
+                <ToolBar.Resources>
+                    <Style x:Key="{x:Static ToolBar.ButtonStyleKey}" TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                        <Style.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.4" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ToolBar.Resources>
+
+                <Button Click="btnReload_Click" ToolTip="Reload data">
+                    <ContentControl Template="{StaticResource ic_Refresh_16x}" />
+                </Button>
+                <Separator />
+                <Button Click="btnAddItem_Click" IsEnabled="False"
+                        ToolTip="Add Item">
+                    <ContentControl Template="{StaticResource ic_Add_16x}" />
+                </Button>
+                <Button Click="btnDeleteItem_Click" IsEnabled="False"
+                        ToolTip="Delete Item">
+                    <ContentControl Template="{StaticResource ic_Remove_color_16x}" />
+                </Button>
+                <Separator />
+                <Button Click="btnSave_Click" IsEnabled="False"
+                        ToolTip="Save Palette">
+                    <ContentControl Template="{StaticResource ic_Save_16x}" />
+                </Button>
+            </ToolBar>
+        </ToolBarTray>
+        <ScrollViewer VerticalScrollBarVisibility="Visible"
+                      HorizontalScrollBarVisibility="Auto">
+            <ItemsControl Padding="5,0" ItemsSource="{Binding Metadata}"
+                          ItemTemplateSelector="{StaticResource templateSelector}">
+            </ItemsControl>
+        </ScrollViewer>
+    </DockPanel>
+</Window>

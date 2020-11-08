@@ -136,7 +136,11 @@
       <DependentUpon>HierarchyView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\IMeshNode.cs" />
+    <Compile Include="Controls\IMetaViewerHost.cs" />
     <Compile Include="Controls\ObjectModel3D.cs" />
+    <Compile Include="Controls\PaletteEditorWindow.xaml.cs">
+      <DependentUpon>PaletteEditorWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\RenderModel3D.cs" />
     <Compile Include="Controls\TransformManipulatorEx3D.cs" />
     <Compile Include="Controls\PropertyView.xaml.cs">
@@ -161,6 +165,7 @@
       <DependentUpon>FieldId.resx</DependentUpon>
     </Compile>
     <Compile Include="Utilities\InMemoryMetadata.cs" />
+    <Compile Include="Utilities\IsPaletteNodeConverter.cs" />
     <Compile Include="Utilities\SharpDXVectorConverter.cs" />
     <Compile Include="Utilities\Extensions.cs" />
     <Compile Include="Utilities\NativeMethods.cs" />
@@ -234,9 +239,21 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Controls\PaletteEditorWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\PropertyView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Resources\MetaViewerSmall.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Resources\MetaViewerPaletteEditor.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Resources\Templates.xaml">
       <SubType>Designer</SubType>

@@ -42,7 +42,7 @@ namespace Reclaimer.Models
         public long RootAddress => 0; // ScenarioTag.MetaPointer.Address;
 
         public XmlDocument Xml { get; }
-        public Stream Transaction { get; }
+        public InMemoryMetadataStream MetadataStream { get; }
 
         public Dictionary<string, ScenarioSection> Sections { get; }
         public ObservableCollection<TreeItemModel> Hierarchy { get; }
@@ -106,7 +106,10 @@ namespace Reclaimer.Models
             set
             {
                 if (SetProperty(ref selectedNode, value))
+                {
+                    RaisePropertyChanged(nameof(SelectedNodeType));
                     OnSelectedNodeChanged();
+                }
             }
         }
 
@@ -130,7 +133,7 @@ namespace Reclaimer.Models
             ScenarioTag = item;
 
             Xml = new XmlDocument();
-            Transaction = new InMemoryMetadataStream(item, Properties.Resources.scnrtest);
+            MetadataStream = new InMemoryMetadataStream(item, Properties.Resources.scnrtest);
             Sections = new Dictionary<string, ScenarioSection>();
             Hierarchy = new ObservableCollection<TreeItemModel>();
             Items = new ObservableCollection<ListBoxItem>();
@@ -141,7 +144,7 @@ namespace Reclaimer.Models
             Palettes = new Dictionary<string, PaletteDefinition>();
             TriggerVolumes = new ObservableCollection<TriggerVolume>();
 
-            using (var reader = ScenarioTag.CacheFile.CreateReader(ScenarioTag.CacheFile.DefaultAddressTranslator, Transaction, true))
+            using (var reader = ScenarioTag.CacheFile.CreateReader(ScenarioTag.CacheFile.DefaultAddressTranslator, MetadataStream, true))
             {
                 LoadSections(reader);
                 LoadHierarchy();
@@ -375,7 +378,7 @@ namespace Reclaimer.Models
             RenderView?.SelectObject(SelectedNodeType, SelectedItemIndex);
         }
 
-        public EndianWriter CreateWriter() => new EndianWriter(Transaction, ScenarioTag.CacheFile.ByteOrder, new UTF8Encoding(), true);
+        public EndianWriter CreateWriter() => new EndianWriter(MetadataStream, ScenarioTag.CacheFile.ByteOrder, new UTF8Encoding(), true);
     }
 
     public class PaletteDefinition

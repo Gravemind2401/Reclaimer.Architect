@@ -61,4 +61,29 @@
         </Viewbox>
     </ControlTemplate>
 
+    <ControlTemplate x:Key="ic_EditDropDownList_16x" TargetType="ContentControl">
+        <Viewbox Width="16" Height="16">
+            <Rectangle Width="16" Height="16">
+                <Rectangle.Fill>
+                    <DrawingBrush>
+                        <DrawingBrush.Drawing>
+                            <DrawingGroup>
+                                <DrawingGroup.Children>
+                                    <GeometryDrawing Brush="#00FFFFFF" Geometry="F1M16,16L0,16 0,0 16,0z" />
+                                    <GeometryDrawing Brush="#FFF6F6F6" Geometry="F1M2.5857,-0.000199999999999534L-0.000299999999999745,2.5858 -0.000299999999999745,3.4138 1.5917,4.9998 -0.000299999999999745,4.9998 -0.000299999999999745,13.0008 16.0007,13.0008 16.0007,4.9998 8.5307,4.9998 3.4227,-0.000199999999999534z" />
+                                    <GeometryDrawing Brush="#FF414141" Geometry="F1M9.5527,6L10.9997,7.417 10.9997,8 13.9997,8 11.9997,10 10.9997,9 10.9997,11 7.6097,11 6.6067,10 2.9997,10 2.9997,8 4.6007,8 2.5947,6 0.999699999999999,6 0.999699999999999,12 14.9997,12 14.9997,6z" />
+                                    <GeometryDrawing Brush="#FF00529C" Geometry="F1M5,3L3,5 7,8.999 9,6.999z" />
+                                    <GeometryDrawing Brush="#FF00529C" Geometry="F1M4,2L2,4 1,3 3,1z" />
+                                    <GeometryDrawing Brush="#FF00529C" Geometry="F1M10,8L10,9.999 8,10" />
+                                    <GeometryDrawing Brush="#FFF0EFF1" Geometry="F1M4.6006,8L2.9996,8 2.9996,10 6.6066,10z" />
+                                    <GeometryDrawing Brush="#FFF0EFF1" Geometry="F1M11,8L11,9 12,10 14,8z" />
+                                </DrawingGroup.Children>
+                            </DrawingGroup>
+                        </DrawingBrush.Drawing>
+                    </DrawingBrush>
+                </Rectangle.Fill>
+            </Rectangle>
+        </Viewbox>
+    </ControlTemplate>
+
 </ResourceDictionary>

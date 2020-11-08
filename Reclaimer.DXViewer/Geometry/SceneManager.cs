@@ -142,6 +142,14 @@ namespace Reclaimer.Geometry
             holder.GroupElement.Children.Add(inst);
         }
 
+        public void RefreshPalette(string paletteKey, int index)
+        {
+            var holder = PaletteHolders[paletteKey];
+            factory.LoadTag(holder.Definition.Palette[index].Tag, false); // in case it is new to the palette
+            foreach (var placement in holder.Definition.Placements.Where(p => p.PaletteIndex == index))
+                RefreshObject(paletteKey, placement, FieldId.PaletteIndex);
+        }
+
         public void RefreshObject(string paletteKey, ObjectPlacement placement, string fieldId)
         {
             var holder = PaletteHolders[paletteKey];

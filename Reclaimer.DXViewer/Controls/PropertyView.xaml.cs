@@ -25,7 +25,7 @@ namespace Reclaimer.Controls
     /// <summary>
     /// Interaction logic for PropertyView.xaml
     /// </summary>
-    public partial class PropertyView : IScenarioPropertyView
+    public partial class PropertyView : IScenarioPropertyView, IMetaViewerHost
     {
         #region Dependency Properties
         public static readonly DependencyProperty ShowInvisiblesProperty =
@@ -105,7 +105,7 @@ namespace Reclaimer.Controls
 
         public void ShowProperties(NodeType nodeType, int itemIndex)
         {
-            context = new MetaContext(scenario.Xml, scenario.ScenarioTag.CacheFile, scenario.ScenarioTag, scenario.Transaction);
+            context = new MetaContext(scenario.Xml, scenario.ScenarioTag.CacheFile, scenario.ScenarioTag, scenario.MetadataStream);
             Visibility = Visibility.Hidden;
             rootNode = altNode = null;
 
@@ -126,7 +126,7 @@ namespace Reclaimer.Controls
                 if (nodeType == NodeType.Mission)
                 {
                     rootNode = scenario.Sections["mission"].Node;
-                    baseAddress = 0; // scenario.ScenarioTag.MetaPointer.Address;
+                    baseAddress = scenario.RootAddress;
                     CurrentItem = null;
                     LoadData();
                 }

@@ -83,6 +83,13 @@ namespace Reclaimer.Controls
 
         }
 
+        private void btnEditPalette_Click(object sender, RoutedEventArgs e)
+        {
+            var paletteKey = PaletteType.FromNodeType(scenario.SelectedNodeType);
+            if (paletteKey != null)
+                new PaletteEditorWindow(scenario, paletteKey) { Owner = Window.GetWindow(this) }.ShowDialog();
+        }
+
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
 

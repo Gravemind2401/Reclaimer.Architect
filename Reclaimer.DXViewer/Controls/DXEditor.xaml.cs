@@ -137,6 +137,12 @@ namespace Reclaimer.Controls
             }
         }
 
+        public void RefreshPalette(string paletteKey, int index)
+        {
+            renderer.SetSelectedElement(null);
+            sceneManager.RefreshPalette(paletteKey, index);
+        }
+
         public void RefreshObject(string paletteKey, ObjectPlacement placement, string fieldId)
         {
             renderer.SetSelectedElement(null);
