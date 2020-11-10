@@ -30,7 +30,7 @@ namespace Reclaimer.Models
         Scenery,
         SoundScenery,
 
-        PlayerStarts,
+        StartPositions,
         Comments,
 
         // Sandbox

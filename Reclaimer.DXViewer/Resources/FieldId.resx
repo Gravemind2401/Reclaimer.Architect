@@ -123,6 +123,9 @@
   <data name="NameIndex" xml:space="preserve">
     <value>nameindex</value>
   </data>
+  <data name="Orientation" xml:space="preserve">
+    <value>orientation</value>
+  </data>
   <data name="PaletteIndex" xml:space="preserve">
     <value>paletteindex</value>
   </data>

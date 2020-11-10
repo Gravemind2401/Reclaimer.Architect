@@ -2374,9 +2374,8 @@
     </tagblock>
   </section>
   <section name="startpositions" offset="0x254" elementSize="0x18">
-    <point3 name="Position" offset="0x0" visible="true" />
-    <degree name="Facing y" offset="0xC" visible="true" />
-    <degree name="Facing p" offset="0x10" visible="true" />
+    <point3 name="Position" offset="0x0" visible="true" id="position" />
+    <vector2 name="Facing" offset="0xC" visible="true" id="orientation" />
     <int16 name="Unknown" offset="0x14" visible="false" />
     <enum16 name="Campaign Player Type" offset="0x16" visible="true">
       <option name="Masterchief" value="0x0" />
@@ -2388,7 +2387,7 @@
     </enum16>
   </section>
   <section name="startprofiles" offset="0x248" elementSize="0x54">
-    <ascii name="Name" offset="0x0" visible="true" length="0x20" />
+    <ascii name="Name" offset="0x0" visible="true" length="0x20" id="name" />
     <float32 name="Starting Health Damage" offset="0x20" visible="true" />
     <float32 name="Starting Shield Damage" offset="0x24" visible="true" />
     <tagRef name="Primary Weapon" offset="0x28" visible="true" />

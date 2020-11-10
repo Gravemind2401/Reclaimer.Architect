@@ -51,7 +51,9 @@ namespace Reclaimer.Models
         public ObservableCollection<TagReference> Bsps { get; }
         public ObservableCollection<TagReference> Skies { get; }
         public List<string> ObjectNames { get; }
+
         public Dictionary<string, PaletteDefinition> Palettes { get; }
+        public ObservableCollection<StartingPosition> StartingPositions { get; }
         public ObservableCollection<TriggerVolume> TriggerVolumes { get; }
 
         private IScenarioHierarchyView hierarchyView;
@@ -142,6 +144,7 @@ namespace Reclaimer.Models
             Skies = new ObservableCollection<TagReference>();
             ObjectNames = new List<string>();
             Palettes = new Dictionary<string, PaletteDefinition>();
+            StartingPositions = new ObservableCollection<StartingPosition>();
             TriggerVolumes = new ObservableCollection<TriggerVolume>();
 
             using (var reader = CreateReader())
@@ -153,6 +156,7 @@ namespace Reclaimer.Models
                 ReadObjectNames(reader);
                 ReadPalettes(reader);
                 ReadPlacements(reader);
+                ReadStartPositions(reader);
                 ReadTriggerVolumes(reader);
             }
 
@@ -210,6 +214,7 @@ namespace Reclaimer.Models
         private void ReadSkies(EndianReader reader)
         {
             var section = Sections["skies"];
+            var refOffset = OffsetById(section.Node, FieldId.TagReference);
 
             for (int i = 0; i < section.TagBlock.Count; i++)
             {
@@ -317,6 +322,27 @@ namespace Reclaimer.Models
             }
         }
 
+        private void ReadStartPositions(EndianReader reader)
+        {
+            var section = Sections["startpositions"];
+            var position = OffsetById(section.Node, FieldId.Position);
+            var orientation = OffsetById(section.Node, FieldId.Orientation);
+
+            for (int i = 0; i < section.TagBlock.Count; i++)
+            {
+                var startPos = new StartingPosition(this);
+                var baseAddress = section.TagBlock.Pointer.Address + section.BlockSize * i;
+
+                reader.Seek(baseAddress + position, SeekOrigin.Begin);
+                startPos.Position = reader.ReadObject<RealVector3D>();
+
+                reader.Seek(baseAddress + orientation, SeekOrigin.Begin);
+                startPos.Orientation = reader.ReadObject<RealVector2D>();
+
+                StartingPositions.Add(startPos);
+            }
+        }
+
         private void ReadTriggerVolumes(EndianReader reader)
         {
             var section = Sections["triggervolumes"];
@@ -360,12 +386,38 @@ namespace Reclaimer.Models
                 return;
             }
 
-            //load other stuff like sandbox items and trigger volumes
+            //load other stuff like sandbox items
 
-            if (SelectedNodeType == NodeType.TriggerVolumes)
+            if (SelectedNodeType == NodeType.StartPositions)
             {
-                foreach (var volume in TriggerVolumes)
-                    Items.Add(new ListBoxItem { Content = volume.Name, Tag = volume });
+                foreach (var pos in StartingPositions)
+                    Items.Add(new ListBoxItem { Content = pos.GetDisplayName(), Tag = pos });
+            }
+            else if (SelectedNodeType == NodeType.StartProfiles)
+                DisplayStartProfiles();
+            else if (SelectedNodeType == NodeType.TriggerVolumes)
+            {
+                foreach (var vol in TriggerVolumes)
+                    Items.Add(new ListBoxItem { Content = vol.GetDisplayName(), Tag = vol });
+            }
+        }
+
+        private void DisplayStartProfiles()
+        {
+            var section = Sections["startprofiles"];
+            var nameOffset = OffsetById(section.Node, FieldId.Name);
+
+            using (var reader = CreateReader())
+            {
+                for (int i = 0; i < section.TagBlock.Count; i++)
+                {
+                    var baseAddress = section.TagBlock.Pointer.Address + section.BlockSize * i;
+                    reader.Seek(baseAddress + nameOffset, SeekOrigin.Begin);
+
+                    var name = reader.ReadNullTerminatedString();
+                    var item = new ScenarioListItem { Name = name };
+                    Items.Add(new ListBoxItem { Content = item.Name, Tag = item });
+                }
             }
         }
 

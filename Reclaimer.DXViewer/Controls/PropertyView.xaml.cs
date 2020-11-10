@@ -130,6 +130,28 @@ namespace Reclaimer.Controls
                     CurrentItem = null;
                     LoadData();
                 }
+                else if (nodeType == NodeType.StartPositions && itemIndex >= 0)
+                {
+                    var section = scenario.Sections["startpositions"];
+
+                    rootNode = section.Node;
+                    baseAddress = section.TagBlock.Pointer.Address
+                        + itemIndex * section.BlockSize;
+
+                    CurrentItem = scenario.StartingPositions[itemIndex];
+                    LoadData();
+                }
+                else if (nodeType == NodeType.StartProfiles && itemIndex >= 0)
+                {
+                    var section = scenario.Sections["startprofiles"];
+
+                    rootNode = section.Node;
+                    baseAddress = section.TagBlock.Pointer.Address
+                        + itemIndex * section.BlockSize;
+
+                    CurrentItem = scenario.Items[itemIndex];
+                    LoadData();
+                }
                 else if (nodeType == NodeType.TriggerVolumes && itemIndex >= 0)
                 {
                     var section = scenario.Sections["triggervolumes"];

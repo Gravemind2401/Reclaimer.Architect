@@ -79,6 +79,15 @@ namespace Reclaimer.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to orientation.
+        /// </summary>
+        internal static string Orientation {
+            get {
+                return ResourceManager.GetString("Orientation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to paletteindex.
         /// </summary>
         internal static string PaletteIndex {

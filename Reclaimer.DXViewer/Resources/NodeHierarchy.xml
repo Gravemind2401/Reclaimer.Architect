@@ -19,7 +19,7 @@
     <node header="Scenery" type="Scenery" />
     <node header="Sound scenery" type="SoundScenery" visible="False" />
   </node>
-  <node header="Player starting positions" type="PlayerStarts" />
+  <node header="Player starting positions" type="StartPositions" />
   <node header="AI" visible="False">
     
   </node>
