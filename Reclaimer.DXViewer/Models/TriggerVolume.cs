@@ -2,6 +2,7 @@
 using Adjutant.Spatial;
 using Prism.Mvvm;
 using Reclaimer.Plugins.MetaViewer;
+using Reclaimer.Plugins.MetaViewer.Halo3;
 using Reclaimer.Resources;
 using System;
 using System.Collections.Generic;
@@ -46,5 +47,20 @@ namespace Reclaimer.Models
         }
 
         public override string GetDisplayName() => Name;
+
+        public override void UpdateFromMetaValue(MetaValueBase meta, string fieldId)
+        {
+            switch (fieldId)
+            {
+                case "position":
+                case "size":
+                    var multi = meta as MultiValue;
+                    var vector = new RealVector3D(multi.Value1, multi.Value2, multi.Value3);
+                    if (fieldId == "position")
+                        Position = vector;
+                    else Size = vector;
+                    break;
+            }
+        }
     }
 }

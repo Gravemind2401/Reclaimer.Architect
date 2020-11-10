@@ -1,6 +1,7 @@
 ﻿using Adjutant.Blam.Common;
 using Adjutant.Spatial;
 using Prism.Mvvm;
+using Reclaimer.Plugins.MetaViewer;
 using Reclaimer.Resources;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Reclaimer.Models
 {
-    public abstract class ScenarioObject : BindableBase
+    public abstract class ScenarioObject : BindableBase, IMetaUpdateReceiver
     {
         private volatile bool isBusy;
 
@@ -61,6 +62,8 @@ namespace Reclaimer.Models
         protected abstract long GetFieldAddress(string fieldId);
 
         public abstract string GetDisplayName();
+
+        public abstract void UpdateFromMetaValue(MetaValueBase meta, string fieldId);
 
         public override string ToString() => GetDisplayName();
     }

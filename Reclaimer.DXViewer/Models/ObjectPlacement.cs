@@ -1,6 +1,7 @@
 ﻿using Adjutant.Blam.Common;
 using Adjutant.Spatial;
 using Reclaimer.Plugins.MetaViewer;
+using Reclaimer.Plugins.MetaViewer.Halo3;
 using Reclaimer.Resources;
 using System;
 using System.Collections.Generic;
@@ -83,6 +84,29 @@ namespace Reclaimer.Models
             if (NameIndex >= 0)
                 return Parent.ObjectNames[NameIndex];
             else return palette.Palette[PaletteIndex].Tag.FileName();
+        }
+
+        public override void UpdateFromMetaValue(MetaValueBase meta, string fieldId)
+        {
+            switch (fieldId)
+            {
+                case "position":
+                case "rotation":
+                    var multi = meta as MultiValue;
+                    var vector = new RealVector3D(multi.Value1, multi.Value2, multi.Value3);
+                    if (fieldId == "position")
+                        Position = vector;
+                    else Rotation = vector;
+                    break;
+                case "scale":
+                    var simple = meta as SimpleValue;
+                    Scale = float.Parse(simple.Value.ToString());
+                    break;
+                case "paletteindex":
+                    var blockIndex = meta as BlockIndexValue;
+                    PaletteIndex = int.Parse(blockIndex.Value.ToString());
+                    break;
+            }
         }
     }
 }

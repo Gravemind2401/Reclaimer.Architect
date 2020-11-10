@@ -185,49 +185,7 @@ namespace Reclaimer.Controls
             if (id == null)
                 return;
 
-            var placement = CurrentItem as ObjectPlacement;
-            if (placement != null)
-            {
-                switch (id)
-                {
-                    case "position":
-                    case "rotation":
-                        var multi = sender as MultiValue;
-                        var vector = new RealVector3D(multi.Value1, multi.Value2, multi.Value3);
-                        if (id == "position")
-                            placement.Position = vector;
-                        else placement.Rotation = vector;
-                        break;
-                    case "scale":
-                        var simple = sender as SimpleValue;
-                        placement.Scale = float.Parse(simple.Value.ToString());
-                        break;
-                    case "paletteindex":
-                        var blockIndex = sender as BlockIndexValue;
-                        placement.PaletteIndex = int.Parse(blockIndex.Value.ToString());
-                        break;
-                }
-
-                return;
-            }
-
-            var volume = CurrentItem as TriggerVolume;
-            if (volume != null)
-            {
-                switch (id)
-                {
-                    case "position":
-                    case "size":
-                        var multi = sender as MultiValue;
-                        var vector = new RealVector3D(multi.Value1, multi.Value2, multi.Value3);
-                        if (id == "position")
-                            volume.Position = vector;
-                        else volume.Size = vector;
-                        break;
-                }
-
-                return;
-            }
+            (CurrentItem as IMetaUpdateReceiver)?.UpdateFromMetaValue(sender as MetaValueBase, id);
         }
 
         private void RecursiveToggle(IEnumerable<MetaValueBase> collection, bool value)

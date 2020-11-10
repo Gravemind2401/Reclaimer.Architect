@@ -151,6 +151,7 @@
     <Compile Include="Geometry\ModelProperties.cs" />
     <Compile Include="Geometry\ObjectHolder.cs" />
     <Compile Include="Geometry\SceneManager.cs" />
+    <Compile Include="Models\IMetaUpdateReceiver.cs" />
     <Compile Include="Models\IScenarioHandler.cs" />
     <Compile Include="Models\NodeType.cs" />
     <Compile Include="Models\ObjectPlacement.cs" />
