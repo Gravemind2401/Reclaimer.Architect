@@ -9,6 +9,8 @@ namespace Reclaimer.Models
 {
     public class ModelConfig
     {
+        public static readonly ModelConfig Empty = new ModelConfig();
+
         public IIndexItem ModelTag { get; set; }
         public IIndexItem RenderModelTag { get; set; }
         public List<VariantConfig> Variants { get; set; } = new List<VariantConfig>();

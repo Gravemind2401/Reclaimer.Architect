@@ -372,7 +372,7 @@ namespace Reclaimer.Controls
             TreeViewItems.Clear();
             modelGroup.Children.Clear();
 
-            sceneManager?.Dispose();
+            sceneManager.Dispose();
             renderer.Dispose();
             GC.Collect();
         }

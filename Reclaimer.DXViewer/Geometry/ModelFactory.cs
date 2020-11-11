@@ -198,21 +198,31 @@ namespace Reclaimer.Geometry
 
         public ObjectModel3D CreateObjectModel(int id)
         {
-            if (!modelTypes.ContainsKey(id))
-                return null;
+            try
+            {
+                if (modelTypes.ContainsKey(id))
+                {
+                    var modelType = modelTypes[id];
+                    return new ObjectModel3D(this, modelType.VariantConfig, modelType.ObjectTag.FileName(), modelType.DefaultVariant);
+                }
+            }
+            catch { }
 
-            var modelType = modelTypes[id];
-            return new ObjectModel3D(this, modelType.VariantConfig, modelType.ObjectTag.FileName(), modelType.DefaultVariant);
+            return new ObjectModel3D(this, ModelConfig.Empty, id.ToString(), string.Empty);
         }
 
         public RenderModel3D CreateRenderModel(int id) => CreateRenderModel(id, 0);
 
         public RenderModel3D CreateRenderModel(int id, int lod)
         {
-            if (!geometryCache.ContainsKey(id))
-                return null;
+            try
+            {
+                if (geometryCache.ContainsKey(id))
+                    return geometryCache[id].BuildElement(lod);
+            }
+            catch { }
 
-            return geometryCache[id].BuildElement(lod);
+            return RenderModel3D.Error(id.ToString());
         }
 
         public ModelProperties GetProperties(int id) => GetProperties(id, 0);

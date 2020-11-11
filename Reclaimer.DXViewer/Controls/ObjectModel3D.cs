@@ -36,9 +36,9 @@ namespace Reclaimer.Controls
             attachments = new Dictionary<string, List<ObjectModel3D>>();
 
             if (config.RenderModelTag == null)
-                return;
-
-            baseModel = factory.CreateRenderModel(config.RenderModelTag.Id);
+                baseModel = RenderModel3D.Error("null");
+            else
+                baseModel = factory.CreateRenderModel(config.RenderModelTag.Id);
 
             foreach (var variant in config.Variants)
             {

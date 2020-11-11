@@ -19,6 +19,32 @@ namespace Reclaimer.Controls
 {
     public sealed class RenderModel3D : GroupElement3D, IMeshNode
     {
+        private static readonly Material errorMaterial;
+        private static readonly Geometry3D errorGeometry;
+
+        static RenderModel3D()
+        {
+            errorMaterial = DiffuseMaterials.Gold;
+
+            var builder = new MeshBuilder();
+            builder.AddOctahedron(Vector3.Zero, Vector3.UnitX, Vector3.UnitZ, 2, 1);
+            errorGeometry = builder.ToMesh();
+        }
+
+        public static RenderModel3D Error(string name)
+        {
+            var element = new MeshGeometryModel3D
+            {
+                Geometry = errorGeometry,
+                Material = errorMaterial
+            };
+
+            var model = new RenderModel3D(name, Enumerable.Empty<Region>(), Enumerable.Empty<InstanceGroup>());
+            model.Children.Add(element);
+
+            return model;
+        }
+
         private readonly List<GroupElement3D> regionGroups;
         private readonly List<GroupElement3D> instanceGroups;
 
