@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <node header="Mission" type="Mission">
   <node header="Objects">
-    <node header="Devices" visible="False">
+    <node header="Devices">
       <node header="Machines" type="Machines" />
       <node header="Controls" type="Controls" />
-      <node header="Light fixtures" type="LightFixtures" />
-      <node header="Device groups" type="DeviceGroups" />
+      <node header="Light fixtures" type="LightFixtures" visible="False" />
+      <node header="Device groups" type="DeviceGroups" visible="False" />
     </node>
     <node header="Items">
       <node header="Equipment" type="Equipment" />

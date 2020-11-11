@@ -24,7 +24,7 @@ namespace Reclaimer.Geometry
     public sealed class ModelFactory : IDisposable
     {
         private static readonly string[] directContentTags = new[] { "mode", "mod2", "sbsp" };
-        private static readonly string[] compositeTags = new[] { "hlmt", "weap", "vehi", "bipd", "scen", "eqip", "bloc" };
+        private static readonly string[] compositeTags = new[] { "hlmt", "weap", "vehi", "bipd", "scen", "eqip", "bloc", "mach", "ctrl" };
         private static readonly Helix.Material ErrorMaterial = Helix.DiffuseMaterials.Gold;
 
         private readonly ConcurrentDictionary<int, Helix.TextureModel> textureCache = new ConcurrentDictionary<int, Helix.TextureModel>();

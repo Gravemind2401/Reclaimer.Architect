@@ -21,7 +21,7 @@
     <sys:Double x:Key="nameColWidth">150</sys:Double>
     <sys:Double x:Key="valueColWidthS">85</sys:Double>
     <sys:Double x:Key="valueColWidthM">150</sys:Double>
-    <sys:Double x:Key="valueColWidthL">350</sys:Double>
+    <sys:Double x:Key="valueColWidthL">300</sys:Double>
 
     <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
         <Setter Property="VerticalAlignment" Value="Top" />
