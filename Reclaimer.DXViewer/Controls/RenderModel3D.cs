@@ -27,7 +27,8 @@ namespace Reclaimer.Controls
             errorMaterial = DiffuseMaterials.Gold;
 
             var builder = new MeshBuilder();
-            builder.AddOctahedron(Vector3.Zero, Vector3.UnitX, Vector3.UnitZ, 2, 1);
+            builder.AddOctahedron(new Vector3(0f, 0f, 0.25f), Vector3.UnitX, Vector3.UnitZ, 0.75f, 0.5f);
+            builder.AddOctahedron(new Vector3(0f, 0f, -0.25f), Vector3.UnitX, -Vector3.UnitZ, 0.75f, 0.5f);
             errorGeometry = builder.ToMesh();
         }
 

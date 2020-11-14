@@ -99,10 +99,16 @@ namespace Reclaimer.Controls
             foreach (var m in allMeshes)
             {
                 var transform = m.Transform.Value;
-                transform *= m.EnumerateAncestors()
+                var ancestors = m.EnumerateAncestors()
                     .TakeWhile(e => e != target)
-                    .Select(e => e.Transform.Value)
-                    .Aggregate((a, b) => a * b);
+                    .ToList();
+
+                if (ancestors.Count > 0)
+                {
+                    transform *= ancestors
+                        .Select(e => e.Transform.Value)
+                        .Aggregate((a, b) => a * b);
+                }
 
                 meshGroup.Children.Add(new MeshGeometryModel3D
                 {
