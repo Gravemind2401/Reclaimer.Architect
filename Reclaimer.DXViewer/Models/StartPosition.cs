@@ -10,16 +10,16 @@ using System.Threading.Tasks;
 
 namespace Reclaimer.Models
 {
-    public class StartingPosition : ScenarioObject
+    public class StartPosition : ScenarioObject
     {
         private RealVector2D orientation;
         public RealVector2D Orientation
         {
             get { return orientation; }
-            set { SetProperty(ref orientation, value, FieldId.Rotation); }
+            set { SetProperty(ref orientation, value, FieldId.Orientation); }
         }
 
-        public StartingPosition(ScenarioModel parent)
+        public StartPosition(ScenarioModel parent)
             : base(parent)
         {
 

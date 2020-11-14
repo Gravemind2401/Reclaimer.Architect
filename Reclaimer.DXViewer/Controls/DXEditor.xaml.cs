@@ -82,6 +82,7 @@ namespace Reclaimer.Controls
         {
             if (!isReady) return;
 
+            sceneManager.StartPositionGroup.IsRendering = nodeType == NodeType.StartPositions;
             sceneManager.TriggerVolumeGroup.IsRendering = nodeType == NodeType.TriggerVolumes;
 
             var paletteKey = PaletteType.FromNodeType(nodeType);
@@ -103,6 +104,10 @@ namespace Reclaimer.Controls
             {
                 var selected = sceneManager.PaletteHolders[paletteKey];
                 renderer.SetSelectedElement(selected.Elements[itemIndex]);
+            }
+            else if (nodeType == NodeType.StartPositions && itemIndex >= 0)
+            {
+                renderer.SetSelectedElement(sceneManager.StartPositions[itemIndex]);
             }
             else if (nodeType == NodeType.TriggerVolumes && itemIndex >= 0)
             {
@@ -129,6 +134,11 @@ namespace Reclaimer.Controls
                 var obj = sceneManager.PaletteHolders[paletteKey].Elements[index] as IMeshNode;
                 if (obj != null)
                     renderer.ZoomToBounds(obj.GetNodeBounds(), 500);
+            }
+            else if (nodeType == NodeType.StartPositions)
+            {
+                var obj = sceneManager.StartPositions[index];
+                renderer.ZoomToBounds(obj.GetTotalBounds(), 500);
             }
             else if (nodeType == NodeType.TriggerVolumes)
             {
@@ -187,7 +197,10 @@ namespace Reclaimer.Controls
                         renderer.ZoomToBounds(bounds);
                     }
 
+                    sceneManager.StartPositionGroup.IsRendering = false;
                     sceneManager.TriggerVolumeGroup.IsRendering = false;
+
+                    modelGroup.Children.Add(sceneManager.StartPositionGroup);
                     modelGroup.Children.Add(sceneManager.TriggerVolumeGroup);
 
                     modelGroup.Visibility = Visibility.Visible;

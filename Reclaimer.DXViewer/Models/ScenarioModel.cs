@@ -53,7 +53,7 @@ namespace Reclaimer.Models
         public List<string> ObjectNames { get; }
 
         public Dictionary<string, PaletteDefinition> Palettes { get; }
-        public ObservableCollection<StartingPosition> StartingPositions { get; }
+        public ObservableCollection<StartPosition> StartingPositions { get; }
         public ObservableCollection<TriggerVolume> TriggerVolumes { get; }
 
         private IScenarioHierarchyView hierarchyView;
@@ -144,7 +144,7 @@ namespace Reclaimer.Models
             Skies = new ObservableCollection<TagReference>();
             ObjectNames = new List<string>();
             Palettes = new Dictionary<string, PaletteDefinition>();
-            StartingPositions = new ObservableCollection<StartingPosition>();
+            StartingPositions = new ObservableCollection<StartPosition>();
             TriggerVolumes = new ObservableCollection<TriggerVolume>();
 
             using (var reader = CreateReader())
@@ -330,7 +330,7 @@ namespace Reclaimer.Models
 
             for (int i = 0; i < section.TagBlock.Count; i++)
             {
-                var startPos = new StartingPosition(this);
+                var startPos = new StartPosition(this);
                 var baseAddress = section.TagBlock.Pointer.Address + section.BlockSize * i;
 
                 reader.Seek(baseAddress + position, SeekOrigin.Begin);

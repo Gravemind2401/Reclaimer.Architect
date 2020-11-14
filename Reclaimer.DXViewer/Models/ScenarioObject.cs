@@ -31,7 +31,7 @@ namespace Reclaimer.Models
             Parent = parent;
         }
 
-        private bool SetProperty<T>(ref T storage, T value, string fieldId, [CallerMemberName] string propertyName = null)
+        protected bool SetProperty<T>(ref T storage, T value, string fieldId, [CallerMemberName] string propertyName = null)
         {
             if (Parent.IsBusy) //if the scenario is still loading just set the value and return
                 return base.SetProperty(ref storage, value, propertyName);

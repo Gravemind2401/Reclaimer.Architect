@@ -33,7 +33,9 @@ namespace Reclaimer.Geometry
         public ObjectHolder SkyHolder { get; private set; }
         public Dictionary<string, PaletteHolder> PaletteHolders { get; private set; }
 
+        public Helix.GroupElement3D StartPositionGroup { get; private set; }
         public Helix.GroupElement3D TriggerVolumeGroup { get; private set; }
+        public ObservableCollection<StartPosition3D> StartPositions { get; private set; }
         public ObservableCollection<BoxManipulator3D> TriggerVolumes { get; private set; }
 
         public IEnumerable<Task> ReadScenario(ScenarioModel scenario)
@@ -42,6 +44,7 @@ namespace Reclaimer.Geometry
             BspHolder = new ObjectHolder("sbsp");
             SkyHolder = new ObjectHolder("sky");
             PaletteHolders = new Dictionary<string, PaletteHolder>();
+            StartPositions = new ObservableCollection<StartPosition3D>();
             TriggerVolumes = new ObservableCollection<BoxManipulator3D>();
 
             yield return Task.Run(() =>
@@ -87,6 +90,15 @@ namespace Reclaimer.Geometry
 
                 for (int i = 0; i < holder.Definition.Placements.Count; i++)
                     ConfigurePlacement(holder, i);
+            }
+
+            StartPositionGroup = new Helix.GroupModel3D();
+            foreach (var pos in scenario.StartingPositions)
+            {
+                var element = new StartPosition3D();
+                BindStartPosition(pos, element);
+                StartPositions.Add(element);
+                StartPositionGroup.Children.Add(element);
             }
 
             TriggerVolumeGroup = new Helix.GroupModel3D();
@@ -179,6 +191,16 @@ namespace Reclaimer.Geometry
             binding.Bindings.Add(new Binding(nameof(ObjectPlacement.Scale)) { Mode = BindingMode.TwoWay });
 
             model.DataContext = placement;
+            BindingOperations.SetBinding(model, Helix.Element3D.TransformProperty, binding);
+        }
+
+        private void BindStartPosition(StartPosition pos, Helix.Element3D model)
+        {
+            var binding = new MultiBinding { Converter = TransformConverter.Instance, Mode = BindingMode.TwoWay };
+            binding.Bindings.Add(new Binding(nameof(StartPosition.Position)) { Mode = BindingMode.TwoWay });
+            binding.Bindings.Add(new Binding(nameof(StartPosition.Orientation)) { Mode = BindingMode.TwoWay });
+
+            model.DataContext = pos;
             BindingOperations.SetBinding(model, Helix.Element3D.TransformProperty, binding);
         }
 

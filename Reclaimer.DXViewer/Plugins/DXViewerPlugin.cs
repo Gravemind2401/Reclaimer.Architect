@@ -16,7 +16,7 @@ namespace Reclaimer.Plugins
 
         public override bool CanOpenFile(OpenFileArgs args)
         {
-            return args.File.Any(i => i is IRenderGeometry) 
+            return args.File.Any(i => i is IRenderGeometry)
                 || args.File.OfType<IIndexItem>().Any(i => Controls.DXViewer.CanOpenTag(i))
                 || args.File.OfType<IIndexItem>().Any(i => Controls.DXEditor.CanOpenTag(i));
         }
@@ -91,7 +91,6 @@ namespace Reclaimer.Plugins
                         RenderView = renderView
                     };
 
-
                     var layout = new DockContainerModel();
                     var docPanel = new DocumentPanelModel();
 
@@ -114,7 +113,9 @@ namespace Reclaimer.Plugins
                     var wnd = new RaftedWindow(layout, docPanel)
                     {
                         Width = 1600,
-                        Height = 900
+                        Height = 900,
+                        WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner,
+                        Owner = System.Windows.Application.Current.MainWindow
                     };
 
                     wnd.Show();

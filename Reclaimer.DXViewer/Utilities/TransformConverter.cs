@@ -11,6 +11,7 @@ using static HelixToolkit.Wpf.SharpDX.Media3DExtension;
 
 using Media3D = System.Windows.Media.Media3D;
 using Helix = HelixToolkit.Wpf.SharpDX;
+using Adjutant.Geometry;
 
 namespace Reclaimer.Utilities
 {
@@ -22,12 +23,12 @@ namespace Reclaimer.Utilities
 
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            var position = (IRealVector3D)values[0];
-            var rotation = (IRealVector3D)values[1];
-            var scale = (float)values[2];
+            var position = (IXMVector)values[0];
+            var rotation = (IXMVector)values[1];
+            var scale = values.Length > 2 ? (float)values[2] : 1f;
 
             var matrix = SharpDX.Matrix.Scaling(scale == 0 ? 1 : scale)
-                * SharpDX.Matrix.RotationYawPitchRoll(rotation.Z, rotation.Y, rotation.X)
+                * SharpDX.Matrix.RotationYawPitchRoll(float.IsNaN(rotation.Z) ? 0f : rotation.Z, rotation.Y, rotation.X)
                 * SharpDX.Matrix.Translation(position.ToVector3());
 
             return new Media3D.MatrixTransform3D(matrix.ToMatrix3D());
@@ -46,7 +47,9 @@ namespace Reclaimer.Utilities
 
             var result = new object[3];
             result[0] = position.ToRealVector3D();
-            result[1] = new RealVector3D(euler.X, euler.Y, euler.Z);
+            result[1] = targetTypes[1] == typeof(RealVector2D) 
+                ? (object)new RealVector2D(euler.X, euler.Y)
+                : (object)new RealVector3D(euler.X, euler.Y, euler.Z);
             result[2] = scale;
             return result;
         }
