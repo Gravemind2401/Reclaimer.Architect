@@ -169,12 +169,9 @@ namespace Reclaimer.Controls
             OnViewportSet();
         }
 
-        protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
+        protected override void OnPreviewMouseRightButtonDown(MouseButtonEventArgs e)
         {
-            base.OnPreviewMouseLeftButtonDown(e);
-
-            if (CheckKeyState(Keys.ControlKey))
-                return;
+            base.OnPreviewMouseRightButtonDown(e);
 
             Focus();
             CaptureMouse();
@@ -185,12 +182,9 @@ namespace Reclaimer.Controls
             e.Handled = true;
         }
 
-        protected override void OnPreviewMouseLeftButtonUp(MouseButtonEventArgs e)
+        protected override void OnPreviewMouseRightButtonUp(MouseButtonEventArgs e)
         {
-            base.OnPreviewMouseLeftButtonUp(e);
-
-            if (CheckKeyState(Keys.ControlKey))
-                return;
+            base.OnPreviewMouseRightButtonUp(e);
 
             ReleaseMouseCapture();
             Cursor = Cursors.Cross;
@@ -212,11 +206,10 @@ namespace Reclaimer.Controls
         {
             base.OnPreviewMouseWheel(e);
 
-            //if (!CheckKeyState(Keys.Control))
-            //    return;
-
             if (e.Delta > 0) CameraSpeed = ClipValue(Math.Ceiling(CameraSpeed * 1050) / 1000, 0.001, MaxCameraSpeed);
             else CameraSpeed = ClipValue(Math.Floor(CameraSpeed * 0950) / 1000, 0.001, MaxCameraSpeed);
+
+            e.Handled = true;
         }
 
         private void OnViewportUnset()
@@ -417,8 +410,6 @@ namespace Reclaimer.Controls
 
         public void Dispose()
         {
-            //timer.Stop();
-
             if (Viewport != null)
             {
                 Viewport.Dispose();

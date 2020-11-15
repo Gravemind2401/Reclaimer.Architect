@@ -32,33 +32,6 @@
                             <hx:DirectionalLight3D Color="White" Direction="{Binding Camera.LookDirection, ElementName=PART_Viewport}" />
                             <hx:AmbientLight3D Color="DarkGray" />
                         </hx:Viewport3DX>
-                        <StatusBar Grid.Row="2" VerticalAlignment="Bottom">
-                            <StatusBar.Background>
-                                <SolidColorBrush Opacity="0.5" Color="WhiteSmoke" />
-                            </StatusBar.Background>
-                            <StatusBarItem>
-                                <TextBlock
-                                    HorizontalAlignment="Left"
-                                    VerticalAlignment="Top"
-                                    Text="{Binding FrameRate, ElementName=PART_Viewport, StringFormat=D3D11 - \{0:0.00\} FPS}" />
-                            </StatusBarItem>
-                            <Separator />
-                            <StatusBarItem>
-                                <TextBlock Text="{Binding Camera.Position, ElementName=PART_Viewport, StringFormat=Position: \{0:0.0\}}" />
-                            </StatusBarItem>
-                            <Separator />
-                            <StatusBarItem>
-                                <TextBlock Text="{Binding Camera.LookDirection, ElementName=PART_Viewport, StringFormat=LookDirection: \{0:0.0\}}" />
-                            </StatusBarItem>
-                            <Separator />
-                            <StatusBarItem>
-                                <TextBlock Text="{Binding Camera.UpDirection, ElementName=PART_Viewport, StringFormat=UpDirection: \{0:0.0\}}" />
-                            </StatusBarItem>
-                            <Separator />
-                            <StatusBarItem>
-                                <TextBlock Text="{Binding Items.Count, ElementName=PART_Viewport, StringFormat=Children: \{0\}}" />
-                            </StatusBarItem>
-                        </StatusBar>
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
