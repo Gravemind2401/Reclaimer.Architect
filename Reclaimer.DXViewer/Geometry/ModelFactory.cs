@@ -188,6 +188,7 @@ namespace Reclaimer.Geometry
             switch (source.CacheFile.CacheType)
             {
                 case CacheType.Halo3Retail:
+                case CacheType.MccHalo3:
                     var meta = source.ReadMetadata<Blam.Halo3.@object>();
                     defaultVariant = meta.DefaultVariant;
                     return meta.Model.Tag;

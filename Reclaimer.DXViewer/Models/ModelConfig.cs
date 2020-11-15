@@ -22,6 +22,7 @@ namespace Reclaimer.Models
             switch (item.CacheFile.CacheType)
             {
                 case CacheType.Halo3Retail:
+                case CacheType.MccHalo3:
                     var meta = item.ReadMetadata<Blam.Halo3.model>();
                     return FromMetadata(item, meta);
 

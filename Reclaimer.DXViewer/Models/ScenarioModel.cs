@@ -15,6 +15,7 @@ using System.IO.Endian;
 using System.Runtime.CompilerServices;
 using System.IO;
 using Reclaimer.Resources;
+using Adjutant.Blam.Common.Gen3;
 
 namespace Reclaimer.Models
 {
@@ -136,7 +137,7 @@ namespace Reclaimer.Models
             ScenarioTag = item;
 
             Xml = new XmlDocument();
-            MetadataStream = new InMemoryMetadataStream(item, Properties.Resources.scnrtest);
+            MetadataStream = new InMemoryMetadataStream(item, GetXmlData(ScenarioTag.CacheFile, "Metadata"));
             Sections = new Dictionary<string, ScenarioSection>();
             Hierarchy = new ObservableCollection<TreeItemModel>();
             Items = new ObservableCollection<ListBoxItem>();
@@ -164,6 +165,24 @@ namespace Reclaimer.Models
             IsBusy = false;
         }
 
+        private string GetXmlData(ICacheFile cache, string suffix)
+        {
+            string prefix;
+            switch(cache.CacheType)
+            {
+                case CacheType.Halo3Retail:
+                case CacheType.MccHalo3:
+                    prefix = "Halo3";
+                    break;
+                default: throw new NotSupportedException();
+            }
+
+            return (string)typeof(Properties.Resources)
+                .GetProperties(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)
+                .First(p => p.Name == $"{prefix}{suffix}")
+                .GetValue(null);
+        }
+
         #region Initialisation
         private int OffsetById(XmlNode node, string fieldId)
         {
@@ -172,7 +191,7 @@ namespace Reclaimer.Models
 
         private void LoadSections(EndianReader reader)
         {
-            Xml.LoadXml(Properties.Resources.Halo3Scenario);
+            Xml.LoadXml(GetXmlData(ScenarioTag.CacheFile, "Scenario"));
 
             foreach (XmlNode n in Xml.SelectNodes("/scenario/section[@name]"))
             {
@@ -435,7 +454,15 @@ namespace Reclaimer.Models
             RenderView?.SelectObject(SelectedNodeType, SelectedItemIndex);
         }
 
-        public EndianReader CreateReader() => ScenarioTag.CacheFile.CreateReader(ScenarioTag.CacheFile.DefaultAddressTranslator, MetadataStream, true);
+        public EndianReader CreateReader()
+        {
+            var reader = ScenarioTag.CacheFile.CreateReader(ScenarioTag.CacheFile.DefaultAddressTranslator, MetadataStream, true);
+            var expander = (ScenarioTag.CacheFile as IMccCacheFile)?.PointerExpander;
+            if (expander != null)
+                reader.RegisterInstance(expander);
+
+            return reader;
+        }
 
         public EndianWriter CreateWriter() => new EndianWriter(MetadataStream, ScenarioTag.CacheFile.ByteOrder, new UTF8Encoding(), true);
     }

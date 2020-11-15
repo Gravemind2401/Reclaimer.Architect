@@ -62,6 +62,23 @@ namespace Reclaimer.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;plugin game=&quot;Halo3&quot; baseSize=&quot;0x7B8&quot;&gt;
+        ///  &lt;!-- Automatically generated plugin --&gt;
+        ///  &lt;revisions&gt;
+        ///    &lt;revision author=&quot;Assembly&quot; version=&quot;1&quot;&gt;Generated plugin from scratch.&lt;/revision&gt;
+        ///    &lt;revision author=&quot;-DeToX-&quot; version=&quot;2&quot;&gt;Named most tagblocks, some values...&lt;/revision&gt;
+        ///    &lt;revision author=&quot;-DeToX-&quot; version=&quot;3&quot;&gt;Named alot of things..&lt;/revision&gt;
+        ///    &lt;revision author=&quot;DeadCanadian&quot; version=&quot;4&quot;&gt;added plugins, named some structs, and stuff&lt;/revision&gt;
+        ///    &lt;revisio [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Halo3Metadata {
+            get {
+                return ResourceManager.GetString("Halo3Metadata", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
         ///&lt;scenario&gt;
         ///  &lt;section name=&quot;mission&quot;&gt;
         ///    &lt;enum16 name=&quot;Map Type&quot; offset=&quot;0x0&quot; visible=&quot;true&quot;&gt;
@@ -89,35 +106,16 @@ namespace Reclaimer.Properties {
         ///    &lt;node header=&quot;Devices&quot;&gt;
         ///      &lt;node header=&quot;Machines&quot; type=&quot;Machines&quot; /&gt;
         ///      &lt;node header=&quot;Controls&quot; type=&quot;Controls&quot; /&gt;
-        ///      &lt;node header=&quot;Light fixtures&quot; type=&quot;LightFixtures&quot; /&gt;
-        ///      &lt;node header=&quot;Device groups&quot; type=&quot;DeviceGroups&quot; /&gt;
+        ///      &lt;node header=&quot;Light fixtures&quot; type=&quot;LightFixtures&quot; visible=&quot;False&quot; /&gt;
+        ///      &lt;node header=&quot;Device groups&quot; type=&quot;DeviceGroups&quot; visible=&quot;False&quot; /&gt;
         ///    &lt;/node&gt;
         ///    &lt;node header=&quot;Items&quot;&gt;
         ///      &lt;node header=&quot;Equipment&quot; type=&quot;Equipment&quot; /&gt;
-        ///      &lt;node header=&quot;Weapons&quot; type=&quot;Weapons&quot; /&gt;
-        ///    &lt;/node&gt;
-        ///   [rest of string was truncated]&quot;;.
+        ///      &lt;node header=&quot;Weapons&quot; ty [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string NodeHierarchy {
             get {
                 return ResourceManager.GetString("NodeHierarchy", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
-        ///&lt;plugin game=&quot;Halo3&quot; baseSize=&quot;0x7B8&quot;&gt;
-        ///  &lt;!-- Automatically generated plugin --&gt;
-        ///  &lt;revisions&gt;
-        ///    &lt;revision author=&quot;Assembly&quot; version=&quot;1&quot;&gt;Generated plugin from scratch.&lt;/revision&gt;
-        ///    &lt;revision author=&quot;-DeToX-&quot; version=&quot;2&quot;&gt;Named most tagblocks, some values...&lt;/revision&gt;
-        ///    &lt;revision author=&quot;-DeToX-&quot; version=&quot;3&quot;&gt;Named alot of things..&lt;/revision&gt;
-        ///    &lt;revision author=&quot;DeadCanadian&quot; version=&quot;4&quot;&gt;added plugins, named some structs, and stuff&lt;/revision&gt;
-        ///    &lt;revisio [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string scnrtest {
-            get {
-                return ResourceManager.GetString("scnrtest", resourceCulture);
             }
         }
     }

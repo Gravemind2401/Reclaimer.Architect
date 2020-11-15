@@ -1,4 +1,5 @@
 ﻿using Adjutant.Blam.Common;
+using Adjutant.Blam.Common.Gen3;
 using Adjutant.Utilities;
 using Reclaimer.Plugins.MetaViewer;
 using System;
@@ -70,6 +71,10 @@ namespace Reclaimer.Utilities
 
             using (var reader = item.CacheFile.CreateReader(item.CacheFile.DefaultAddressTranslator))
             {
+                var expander = (item.CacheFile as IMccCacheFile)?.PointerExpander;
+                if (expander != null)
+                    reader.RegisterInstance(expander);
+
                 reader.Seek(item.MetaPointer.Address, SeekOrigin.Begin);
                 RootBlock = ReadBlocks(reader, doc.DocumentElement, null);
                 //var largest = AllBlocks.OrderByDescending(b => b.TotalSize).ToList();
@@ -88,7 +93,7 @@ namespace Reclaimer.Utilities
             while (nextSize < result.TotalSize)
                 nextSize += 1 << 16;
 
-            result.Allocate(nextAddress, nextSize, SourceItem.CacheFile.ByteOrder, SourceItem.CacheFile.DefaultAddressTranslator);
+            result.Allocate(nextAddress, nextSize, SourceItem.CacheFile.ByteOrder, SourceItem.CacheFile.DefaultAddressTranslator, (SourceItem.CacheFile as IMccCacheFile)?.PointerExpander);
             AllBlocks.Add(result);
 
             var blockAddress = parent == null
@@ -210,6 +215,7 @@ namespace Reclaimer.Utilities
             XmlNode = node;
             ParentBlock = parent;
             ChildBlocks = new List<InMemoryBlockCollection>();
+            ParentBlock?.ChildBlocks.Add(this);
 
             if (parent == null) //tag root
             {
@@ -227,13 +233,17 @@ namespace Reclaimer.Utilities
                 BlockRef = reader.ReadObject<TagBlock>();
                 Count = BlockRef.Count;
                 BlockSize = node.GetIntAttribute("elementSize", "entrySize", "size") ?? 0;
-                reader.Seek(BlockRef.Pointer.Address, SeekOrigin.Begin);
-                data = reader.ReadBytes(TotalSize);
-                ParentBlock.ChildBlocks.Add(this);
+
+                if (Count > 0)
+                {
+                    reader.Seek(BlockRef.Pointer.Address, SeekOrigin.Begin);
+                    data = reader.ReadBytes(TotalSize);
+                }
+                else data = Array.Empty<byte>();
             }
         }
 
-        public void Allocate(int address, int size, ByteOrder byteOrder, IAddressTranslator translator)
+        public void Allocate(int address, int size, ByteOrder byteOrder, IAddressTranslator translator, IPointerExpander expander)
         {
             if (size < TotalSize)
                 throw new ArgumentOutOfRangeException(nameof(size), size, "Insufficent memory allocation");
@@ -245,6 +255,9 @@ namespace Reclaimer.Utilities
                 return;
 
             var newPointer = translator.GetPointer(VirtualAddress);
+            if (expander != null)
+                newPointer = expander.Contract(newPointer);
+
             var bits = BitConverter.GetBytes((int)newPointer);
 
             if (byteOrder == ByteOrder.BigEndian)
@@ -314,6 +327,9 @@ namespace Reclaimer.Utilities
 
         public void Commit(EndianWriter writer)
         {
+            if (Count == 0)
+                return;
+
             var rootAddress = BlockRef?.Pointer.Address ?? OffsetInParent;
 
             writer.Seek(rootAddress, SeekOrigin.Begin);
