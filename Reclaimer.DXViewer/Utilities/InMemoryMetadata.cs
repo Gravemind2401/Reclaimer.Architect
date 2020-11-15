@@ -72,7 +72,7 @@ namespace Reclaimer.Utilities
             {
                 reader.Seek(item.MetaPointer.Address, SeekOrigin.Begin);
                 RootBlock = ReadBlocks(reader, doc.DocumentElement, null);
-                var largest = AllBlocks.OrderByDescending(b => b.TotalSize).ToList();
+                //var largest = AllBlocks.OrderByDescending(b => b.TotalSize).ToList();
             }
 
             currentBlock = AllBlocks.FirstOrDefault(b => b.ContainsAddress(position));
@@ -80,7 +80,7 @@ namespace Reclaimer.Utilities
 
         private InMemoryBlockCollection ReadBlocks(EndianReader reader, XmlNode node, InMemoryBlockCollection parent)
         {
-            var result = new InMemoryBlockCollection(reader, node, parent);
+            var result = new InMemoryBlockCollection(SourceItem, reader, node, parent);
 
             var lastBlock = AllBlocks.LastOrDefault();
             var nextAddress = (lastBlock?.VirtualAddress + lastBlock?.AllocatedSize) ?? 0;
@@ -105,6 +105,16 @@ namespace Reclaimer.Utilities
             }
 
             return result;
+        }
+
+        public void Commit()
+        {
+            using (var fs = new FileStream(SourceItem.CacheFile.FileName, FileMode.Open, FileAccess.Write))
+            using (var writer = new EndianWriter(fs, SourceItem.CacheFile.ByteOrder))
+            {
+                foreach (var block in AllBlocks)
+                    block.Commit(writer);
+            }
         }
 
         #region Stream Implementation
@@ -183,6 +193,7 @@ namespace Reclaimer.Utilities
 
         public XmlNode XmlNode { get; }
         public InMemoryBlockCollection ParentBlock { get; }
+        public List<InMemoryBlockCollection> ChildBlocks { get; }
         public int OffsetInParent { get; }
         public string Name { get; }
         public TagBlock BlockRef { get; }
@@ -194,15 +205,16 @@ namespace Reclaimer.Utilities
 
         public int TotalSize => BlockSize * Count;
 
-        public InMemoryBlockCollection(EndianReader reader, XmlNode node, InMemoryBlockCollection parent)
+        public InMemoryBlockCollection(IIndexItem sourceItem, EndianReader reader, XmlNode node, InMemoryBlockCollection parent)
         {
             XmlNode = node;
             ParentBlock = parent;
-            OffsetInParent = node.GetIntAttribute("offset") ?? 0;
-            Name = node.GetStringAttribute("name");
+            ChildBlocks = new List<InMemoryBlockCollection>();
 
-            if (parent == null)
+            if (parent == null) //tag root
             {
+                OffsetInParent = (int)sourceItem.MetaPointer.Address;
+                Name = sourceItem.FileName();
                 BlockRef = null;
                 Count = 1;
                 BlockSize = node.GetIntAttribute("baseSize") ?? 0;
@@ -210,11 +222,14 @@ namespace Reclaimer.Utilities
             }
             else
             {
+                OffsetInParent = node.GetIntAttribute("offset") ?? 0;
+                Name = node.GetStringAttribute("name");
                 BlockRef = reader.ReadObject<TagBlock>();
                 Count = BlockRef.Count;
                 BlockSize = node.GetIntAttribute("elementSize", "entrySize", "size") ?? 0;
                 reader.Seek(BlockRef.Pointer.Address, SeekOrigin.Begin);
                 data = reader.ReadBytes(TotalSize);
+                ParentBlock.ChildBlocks.Add(this);
             }
         }
 
@@ -229,8 +244,7 @@ namespace Reclaimer.Utilities
             if (ParentBlock == null)
                 return;
 
-            var newPointer = VirtualAddress + (BlockRef.Pointer.Value - BlockRef.Pointer.Address);
-            var aaa = ((Adjutant.Blam.Halo3.TagAddressTranslator)translator).GetPointer(VirtualAddress);
+            var newPointer = translator.GetPointer(VirtualAddress);
             var bits = BitConverter.GetBytes((int)newPointer);
 
             if (byteOrder == ByteOrder.BigEndian)
@@ -296,6 +310,21 @@ namespace Reclaimer.Utilities
                 Array.Clear(data, TotalSize, newSize - currentSize);
 
             Count = newCount;
+        }
+
+        public void Commit(EndianWriter writer)
+        {
+            var rootAddress = BlockRef?.Pointer.Address ?? OffsetInParent;
+
+            writer.Seek(rootAddress, SeekOrigin.Begin);
+            writer.Write(data);
+
+            //restore original pointers
+            foreach (var child in ChildBlocks)
+            {
+                writer.Seek(rootAddress + child.OffsetInParent + 4, SeekOrigin.Begin);
+                writer.Write(child.BlockRef.Pointer.Value);
+            }
         }
 
         public override string ToString() => Name;

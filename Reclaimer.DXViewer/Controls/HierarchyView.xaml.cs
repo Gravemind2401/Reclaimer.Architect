@@ -1,4 +1,6 @@
-﻿using Reclaimer.Models;
+﻿using Adjutant.Blam.Common;
+using Reclaimer.Models;
+using Reclaimer.Plugins;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -92,7 +94,15 @@ namespace Reclaimer.Controls
 
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
-
+            try
+            {
+                scenario.MetadataStream.Commit();
+            }
+            catch (Exception ex)
+            {
+                scenario.LogError($"Unable to save changes to {scenario.ScenarioTag.FileName()}", ex);
+                Substrate.ShowErrorMessage(ex.Message);
+            }
         }
 
         #endregion

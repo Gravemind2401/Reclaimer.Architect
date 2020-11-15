@@ -46,7 +46,7 @@ namespace Reclaimer.Controls
         private readonly Dictionary<string, MetaValueBase> valuesById;
 
         private ScenarioModel scenario;
-        private MetaContext context;
+        private MetaContext context; //dont dispose this because it will dispose our MetadataStream
         private XmlNode rootNode;
         private XmlNode altNode;
         private long baseAddress;

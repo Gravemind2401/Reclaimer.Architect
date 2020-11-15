@@ -37,6 +37,7 @@ namespace Reclaimer.Models
         }
 
         internal bool IsBusy { get; private set; }
+        internal Action<string, Exception> LogError { get; set; }
 
         public IIndexItem ScenarioTag { get; }
         public long RootAddress => 0; // ScenarioTag.MetaPointer.Address;

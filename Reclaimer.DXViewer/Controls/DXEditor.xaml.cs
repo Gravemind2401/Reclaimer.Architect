@@ -85,12 +85,10 @@ namespace Reclaimer.Controls
             sceneManager.StartPositionGroup.IsRendering = nodeType == NodeType.StartPositions;
             sceneManager.TriggerVolumeGroup.IsRendering = nodeType == NodeType.TriggerVolumes;
 
+            //if not a palette this will disable hit testing on all palettes
             var paletteKey = PaletteType.FromNodeType(nodeType);
-            if (paletteKey != null)
-            {
-                foreach (var palette in sceneManager.PaletteHolders.Values)
-                    palette.GroupElement.IsHitTestVisible = palette.Name == paletteKey;
-            }
+            foreach (var palette in sceneManager.PaletteHolders.Values)
+                palette.GroupElement.IsHitTestVisible = palette.Name == paletteKey;
         }
 
         public void SelectObject(NodeType nodeType, int itemIndex)

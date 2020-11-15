@@ -88,7 +88,8 @@ namespace Reclaimer.Plugins
                     {
                         HierarchyView = hierarchyView,
                         PropertyView = propertyView,
-                        RenderView = renderView
+                        RenderView = renderView,
+                        LogError = LogError
                     };
 
                     var layout = new DockContainerModel();
@@ -121,10 +122,9 @@ namespace Reclaimer.Plugins
                     wnd.Show();
                     wnd.Activate();
 
-                    renderView.LoadScenario();
-                    //viewer.LoadGeometry(modelTag, $"{fileName}");
+                    wnd.Owner = null;
 
-                    //container.AddItem(viewer.TabModel);
+                    renderView.LoadScenario();
                 }
                 else
                 {
