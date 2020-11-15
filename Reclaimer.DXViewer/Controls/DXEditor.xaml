@@ -14,6 +14,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Reclaimer;component/Resources/Templates.xaml" />
+                <ResourceDictionary Source="/Reclaimer.DXViewer;component/Resources/Templates.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <u:ToStringConverter x:Key="stringConverter" />
@@ -68,10 +69,27 @@
                         ToolTip="Select none">
                     <ContentControl Template="{StaticResource ic_CheckboxList_16x}" />
                 </Button>
-                <Separator />
+                <!--<Separator />
                 <Button Click="btnSave_Click"
                         ToolTip="Save Model">
                     <ContentControl Template="{StaticResource ic_Save_16x}" />
+                </Button>-->
+                <Separator />
+                <ToggleButton DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}"
+                              IsChecked="{Binding CanTranslate}"
+                              ToolTip="Enable Translation">
+                    <ContentControl Template="{StaticResource ic_MoveGlyph_16x}" />
+                </ToggleButton>
+                <ToggleButton DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}"
+                              IsChecked="{Binding CanRotate}"
+                              ToolTip="Enable Rotation">
+                    <ContentControl Template="{StaticResource ic_Rotate_16x}" />
+                </ToggleButton>
+                <ToggleButton DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}"
+                              IsChecked="{Binding CanScale}"
+                              ToolTip="Enable Scaling">
+                    <ContentControl Template="{StaticResource ic_Scale_16x}" />
+                </ToggleButton>
                 </Button>
             </ToolBar>
         </ToolBarTray>

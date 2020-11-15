@@ -137,6 +137,7 @@
     </Compile>
     <Compile Include="Controls\IMeshNode.cs" />
     <Compile Include="Controls\IMetaViewerHost.cs" />
+    <Compile Include="Controls\ManipulationFlags.cs" />
     <Compile Include="Controls\ObjectModel3D.cs" />
     <Compile Include="Controls\PaletteEditorWindow.xaml.cs">
       <DependentUpon>PaletteEditorWindow.xaml</DependentUpon>

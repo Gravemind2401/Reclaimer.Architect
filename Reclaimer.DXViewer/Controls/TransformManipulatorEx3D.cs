@@ -169,6 +169,18 @@ namespace Reclaimer.Controls
                 (d as TransformManipulatorEx3D).sizeScale = (double)e.NewValue;
             }));
 
+        public ManipulationFlags ManipulationFlags
+        {
+            get { return (ManipulationFlags)GetValue(ManipulationFlagsProperty); }
+            set { SetValue(ManipulationFlagsProperty, value); }
+        }
+
+        public static readonly DependencyProperty ManipulationFlagsProperty =
+            DependencyProperty.Register(nameof(ManipulationFlags), typeof(ManipulationFlags), typeof(TransformManipulatorEx3D), new PropertyMetadata(ManipulationFlags.ManipulateAll, (d, e) =>
+            {
+                (d as TransformManipulatorEx3D).UpdateVisibleGeometry();
+            }));
+
         #endregion
 
         #region Variables
@@ -342,12 +354,25 @@ namespace Reclaimer.Controls
             scaleX.IsRendering = scaleY.IsRendering = scaleZ.IsRendering = false;
         }
 
-        private void RevealAllGeometry()
+        private void UpdateVisibleGeometry()
         {
-            translationX.IsRendering = translationY.IsRendering = translationZ.IsRendering = true;
-            translationXY.IsRendering = translationYZ.IsRendering = translationXZ.IsRendering = true;
-            rotationX.IsRendering = rotationY.IsRendering = rotationZ.IsRendering = true;
-            scaleX.IsRendering = scaleY.IsRendering = scaleZ.IsRendering = true;
+            var flags = ManipulationFlags;
+
+            translationX.IsRendering = flags.HasFlag(ManipulationFlags.TranslateX);
+            translationY.IsRendering = flags.HasFlag(ManipulationFlags.TranslateY);
+            translationZ.IsRendering = flags.HasFlag(ManipulationFlags.TranslateZ);
+
+            translationXY.IsRendering = flags.HasFlag(ManipulationFlags.TranslateXY);
+            translationYZ.IsRendering = flags.HasFlag(ManipulationFlags.TranslateYZ);
+            translationXZ.IsRendering = flags.HasFlag(ManipulationFlags.TranslateXZ);
+
+            rotationX.IsRendering = flags.HasFlag(ManipulationFlags.RotateX);
+            rotationY.IsRendering = flags.HasFlag(ManipulationFlags.RotateY);
+            rotationZ.IsRendering = flags.HasFlag(ManipulationFlags.RotateZ);
+
+            scaleX.IsRendering = flags.HasFlag(ManipulationFlags.ScaleX);
+            scaleY.IsRendering = flags.HasFlag(ManipulationFlags.ScaleY);
+            scaleZ.IsRendering = flags.HasFlag(ManipulationFlags.ScaleZ);
         }
 
         private void SceneNode_OnDetached(object sender, EventArgs e)
@@ -661,7 +686,7 @@ namespace Reclaimer.Controls
             {
                 var material = ((e.HitTestResult.ModelHit as MeshGeometryModel3D).Material as DiffuseMaterial);
                 material.DiffuseColor = currentColor;
-                RevealAllGeometry();
+                UpdateVisibleGeometry();
             }
             manipulationType = ManipulationType.None;
             isCaptured = false;
@@ -692,6 +717,8 @@ namespace Reclaimer.Controls
                 //target.SceneNode.OnTransformChanged += SceneNode_OnTransformChanged;
                 SceneNode_OnTransformChanged(target.SceneNode, new TransformArgs(target.SceneNode.ModelMatrix));
             }
+
+            UpdateVisibleGeometry();
         }
 
         private void SceneNode_OnTransformChanged(object sender, TransformArgs e)

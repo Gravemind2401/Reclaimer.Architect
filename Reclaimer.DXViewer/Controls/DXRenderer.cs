@@ -97,6 +97,9 @@ namespace Reclaimer.Controls
         public static readonly DependencyProperty ManipulationEnabledProperty =
             DependencyProperty.Register(nameof(ManipulationEnabled), typeof(bool), typeof(DXRenderer), new PropertyMetadata(false));
 
+        public static readonly DependencyProperty ManipulationFlagsProperty =
+            DependencyProperty.Register(nameof(ManipulationFlags), typeof(ManipulationFlags), typeof(DXRenderer), new PropertyMetadata(ManipulationFlags.ManipulateAll));
+
         public static readonly DependencyProperty HighlightMaterialProperty =
             DependencyProperty.Register(nameof(HighlightMaterial), typeof(Helix.Material), typeof(DXRenderer), new PropertyMetadata(Helix.DiffuseMaterials.Yellow));
 
@@ -107,6 +110,12 @@ namespace Reclaimer.Controls
         {
             get { return (bool)GetValue(ManipulationEnabledProperty); }
             set { SetValue(ManipulationEnabledProperty, value); }
+        }
+
+        public ManipulationFlags ManipulationFlags
+        {
+            get { return (ManipulationFlags)GetValue(ManipulationFlagsProperty); }
+            set { SetValue(ManipulationFlagsProperty, value); }
         }
 
         public Helix.Material HighlightMaterial
@@ -157,6 +166,9 @@ namespace Reclaimer.Controls
 
             timer = new DispatcherTimer(DispatcherPriority.Send) { Interval = new TimeSpan(0, 0, 0, 0, 10) };
             timer.Tick += Timer_Tick;
+
+            var binding = new Binding(nameof(ManipulationFlags)) { Source = this };
+            BindingOperations.SetBinding(manipulator, TransformManipulatorEx3D.ManipulationFlagsProperty, binding);
         }
 
         #region Overrides

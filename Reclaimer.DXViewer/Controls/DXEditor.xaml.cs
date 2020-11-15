@@ -37,6 +37,47 @@ namespace Reclaimer.Controls
 
         public static bool CanOpenTag(IIndexItem tag) => tag.ClassCode.ToLower() == "scnr";
 
+        #region Dependency Properties
+        public static readonly DependencyProperty CanTranslateProperty =
+            DependencyProperty.Register(nameof(CanTranslate), typeof(bool), typeof(DXEditor), new PropertyMetadata(true, ManipulationToggleChanged));
+
+        public static readonly DependencyProperty CanRotateProperty =
+            DependencyProperty.Register(nameof(CanRotate), typeof(bool), typeof(DXEditor), new PropertyMetadata(true, ManipulationToggleChanged));
+
+        public static readonly DependencyProperty CanScaleProperty =
+            DependencyProperty.Register(nameof(CanScale), typeof(bool), typeof(DXEditor), new PropertyMetadata(true, ManipulationToggleChanged));
+
+        public bool CanTranslate
+        {
+            get { return (bool)GetValue(CanTranslateProperty); }
+            set { SetValue(CanTranslateProperty, value); }
+        }
+
+        public bool CanRotate
+        {
+            get { return (bool)GetValue(CanRotateProperty); }
+            set { SetValue(CanRotateProperty, value); }
+        }
+
+        public bool CanScale
+        {
+            get { return (bool)GetValue(CanScaleProperty); }
+            set { SetValue(CanScaleProperty, value); }
+        }
+
+        private static void ManipulationToggleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var editor = d as DXEditor;
+            var flags = ManipulationFlags.None;
+
+            if (editor.CanTranslate) flags |= ManipulationFlags.Translate;
+            if (editor.CanRotate) flags |= ManipulationFlags.Rotate;
+            if (editor.CanScale) flags |= ManipulationFlags.Scale;
+
+            editor.renderer.ManipulationFlags = flags;
+        }
+        #endregion
+
         private readonly SceneManager sceneManager;
         private readonly Helix.GroupModel3D modelGroup = new Helix.GroupModel3D();
 
