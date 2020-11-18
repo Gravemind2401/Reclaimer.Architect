@@ -22,6 +22,8 @@ namespace Reclaimer.Utilities
 
         public static SharpDX.Vector3 ToVector3(this IRealVector3D v) => new SharpDX.Vector3(v.X, v.Y, v.Z);
 
+        public static RealVector3D ToRealVector3D(this Media3D.Point3D p) => new RealVector3D((float)p.X, (float)p.Y, (float)p.Z);
+
         public static RealVector3D ToRealVector3D(this SharpDX.Vector3 v) => new RealVector3D(v.X, v.Y, v.Z);
 
         public static SharpDX.Quaternion ToQuaternion(this IRealVector4D v) => new SharpDX.Quaternion(v.X, v.Y, v.Z, v.W);

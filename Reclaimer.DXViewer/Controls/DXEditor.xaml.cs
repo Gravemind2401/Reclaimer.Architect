@@ -400,6 +400,16 @@ namespace Reclaimer.Controls
             //ModelViewerPlugin.WriteModelFile(model, sfd.FileName, option.FormatId);
             //ModelViewerPlugin.Settings.DefaultSaveFormat = option.FormatId;
         }
+
+        private void btnBringToCamera_Click(object sender, RoutedEventArgs e)
+        {
+            var selection = renderer.GetSelectedElement();
+            var obj = selection?.DataContext as ScenarioObject;
+            if (obj == null)
+                return;
+
+            obj.Position = renderer.Viewport.Camera.Position.ToRealVector3D();
+        }
         #endregion
 
         private void btnToggleDetails_Click(object sender, RoutedEventArgs e)

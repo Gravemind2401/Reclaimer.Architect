@@ -90,6 +90,10 @@
                               ToolTip="Enable Scaling">
                     <ContentControl Template="{StaticResource ic_Scale_16x}" />
                 </ToggleButton>
+                <Separator />
+                <Button Click="btnBringToCamera_Click"
+                        ToolTip="Bring to camera">
+                    <ContentControl Template="{StaticResource ic_BringtoFront_16x}" />
                 </Button>
             </ToolBar>
         </ToolBarTray>

@@ -326,6 +326,11 @@ namespace Reclaimer.Controls
             SetSelectedElement(model);
         }
 
+        public Helix.Element3D GetSelectedElement()
+        {
+            return selector.Target;
+        }
+
         public void SetSelectedElement(Helix.Element3D model)
         {
             if (model != null && model.IsDescendentOf(manipulator))
