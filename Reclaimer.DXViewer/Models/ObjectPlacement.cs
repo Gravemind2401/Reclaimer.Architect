@@ -83,7 +83,7 @@ namespace Reclaimer.Models
 
             if (NameIndex >= 0)
                 return Parent.ObjectNames[NameIndex];
-            else return palette.Palette[PaletteIndex].Tag.FileName();
+            else return palette.Palette[PaletteIndex].Tag?.FileName() ?? "<null>";
         }
 
         public override void UpdateFromMetaValue(MetaValueBase meta, string fieldId)
