@@ -4,7 +4,9 @@ using Reclaimer.Models;
 using Reclaimer.Windows;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -19,6 +21,12 @@ namespace Reclaimer.Plugins
             return args.File.Any(i => i is IRenderGeometry)
                 || args.File.OfType<IIndexItem>().Any(i => Controls.DXViewer.CanOpenTag(i))
                 || args.File.OfType<IIndexItem>().Any(i => Controls.DXEditor.CanOpenTag(i));
+        }
+
+        public override void Initialise()
+        {
+            foreach(var f in Directory.GetFiles($"{Substrate.PluginsDirectory}\\DXViewer", "*.dll"))
+                Assembly.LoadFile(f);
         }
 
         public override void OpenFile(OpenFileArgs args)

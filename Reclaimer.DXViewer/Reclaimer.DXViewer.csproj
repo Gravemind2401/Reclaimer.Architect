@@ -24,7 +24,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
@@ -281,7 +281,11 @@
   <PropertyGroup>
     <PostBuildEvent>echo F | xcopy ".\$(TargetFileName)" "Plugins\DXViewer\DXViewer.dll" /Y
 echo D | xcopy ".\SharpDX*" "Plugins\DXViewer" /Y
-echo D | xcopy ".\HelixToolkit*" "Plugins\DXViewer" /Y</PostBuildEvent>
+echo D | xcopy ".\HelixToolkit*" "Plugins\DXViewer" /Y
+echo D | xcopy ".\Cyotek*" "Plugins\DXViewer" /Y
+del ".\SharpDX*"
+del ".\HelixToolkit*"
+del ".\Cyotek*"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
