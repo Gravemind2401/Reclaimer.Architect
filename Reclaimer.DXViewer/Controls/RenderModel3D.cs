@@ -228,7 +228,7 @@ namespace Reclaimer.Controls
                 foreach (var inst in instances)
                 {
                     var id = Template.AddInstance(inst.Value);
-                    temp.Add(new Instance(this, id, name));
+                    temp.Add(new Instance(this, id, inst.Key));
                 }
 
                 Instances = temp;
