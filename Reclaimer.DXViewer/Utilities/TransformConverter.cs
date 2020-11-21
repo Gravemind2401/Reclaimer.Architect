@@ -27,8 +27,10 @@ namespace Reclaimer.Utilities
             var rotation = (IXMVector)values[1];
             var scale = values.Length > 2 ? (float)values[2] : 1f;
 
+            var euler = new SharpDX.Vector3(rotation.X, rotation.Y, float.IsNaN(rotation.Z) ? 0f : rotation.Z);
+
             var matrix = SharpDX.Matrix.Scaling(scale == 0 ? 1 : scale)
-                * SharpDX.Matrix.RotationYawPitchRoll(float.IsNaN(rotation.Z) ? 0f : rotation.Z, rotation.Y, rotation.X)
+                * SharpDX.Matrix.RotationQuaternion(euler.EulerToQuaternion())
                 * SharpDX.Matrix.Translation(position.ToVector3());
 
             return new Media3D.MatrixTransform3D(matrix.ToMatrix3D());

@@ -86,20 +86,34 @@ namespace Reclaimer.Utilities
             return new Numerics.Vector3((float)vector.X, (float)vector.Y, (float)vector.Z);
         }
 
+        public static SharpDX.Quaternion EulerToQuaternion(this SharpDX.Vector3 v)
+        {
+            //Halo seems to apply in order of roll, pitch, yaw.
+            //Not sure why Y is negated; there may be difference
+            //in coordinate systems between Halo and SharpDX?
+
+            return SharpDX.Quaternion.RotationAxis(SharpDX.Vector3.UnitX, v.Z)
+                * SharpDX.Quaternion.RotationAxis(SharpDX.Vector3.UnitY, -v.Y)
+                * SharpDX.Quaternion.RotationAxis(SharpDX.Vector3.UnitZ, v.X);
+        }
+
         public static SharpDX.Vector3 ToEulerAngles(this SharpDX.Quaternion q)
         {
+            //https://github.com/mrdoob/three.js/blob/dev/src/math/Euler.js
+            //Due to the issue mentioned in EulerToQuaternion, X and Z are negated to compensate.
+
             var matrix = SharpDX.Matrix.RotationQuaternion(q);
             var result = new SharpDX.Vector3();
 
-            result.Y = (float)Math.Asin(Clamp(-matrix.M32, -1, 1));
-            if (Math.Abs(matrix.M32) < 0.9999999)
+            result.Y = (float)Math.Asin(-Clamp(matrix.M31, -1, 1));
+            if (Math.Abs(matrix.M31) < 0.9999999)
             {
-                result.X = (float)Math.Atan2(matrix.M12, matrix.M22);
-                result.Z = (float)Math.Atan2(matrix.M31, matrix.M33);
+                result.X = -(float)Math.Atan2(matrix.M21, matrix.M11);
+                result.Z = -(float)Math.Atan2(matrix.M32, matrix.M33);
             }
             else
             {
-                result.X = (float)Math.Atan2(matrix.M21, matrix.M11);
+                result.X = -(float)Math.Atan2(-matrix.M12, matrix.M22);
                 result.Z = 0f;
             }
 
