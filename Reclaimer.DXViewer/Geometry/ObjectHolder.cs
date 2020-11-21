@@ -31,7 +31,7 @@ namespace Reclaimer.Geometry
         public virtual void Dispose()
         {
             foreach (var e in Elements)
-                e.Dispose();
+                e?.Dispose();
 
             Elements.Clear();
         }
