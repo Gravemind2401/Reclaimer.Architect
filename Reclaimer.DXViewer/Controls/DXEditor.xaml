@@ -126,11 +126,11 @@
                         <ColumnDefinition MinWidth="65" />
                     </Grid.ColumnDefinitions>
                     <Label Content="Position:" />
-                    <Label Grid.Column="1" HorizontalAlignment="Right" 
+                    <Label Grid.Column="1" HorizontalAlignment="Right" MouseDoubleClick="PosLabel_MouseDoubleClick"
                            Content="{Binding Viewport.Camera.Position.X, ElementName=renderer, Converter={StaticResource stringConverter}, ConverterParameter='F2'}" />
-                    <Label Grid.Column="2" HorizontalAlignment="Right" 
+                    <Label Grid.Column="2" HorizontalAlignment="Right" MouseDoubleClick="PosLabel_MouseDoubleClick"
                            Content="{Binding Viewport.Camera.Position.Y, ElementName=renderer, Converter={StaticResource stringConverter}, ConverterParameter='F2'}" />
-                    <Label Grid.Column="3" HorizontalAlignment="Right" 
+                    <Label Grid.Column="3" HorizontalAlignment="Right" MouseDoubleClick="PosLabel_MouseDoubleClick"
                            Content="{Binding Viewport.Camera.Position.Z, ElementName=renderer, Converter={StaticResource stringConverter}, ConverterParameter='F2'}" />
                 </Grid>
                 <Separator />
@@ -141,9 +141,9 @@
                         <ColumnDefinition MinWidth="50" />
                     </Grid.ColumnDefinitions>
                     <Label Content="Angle:" />
-                    <Label Grid.Column="1" HorizontalAlignment="Right" 
+                    <Label Grid.Column="1" HorizontalAlignment="Right" MouseDoubleClick="PosLabel_MouseDoubleClick"
                            Content="{Binding Yaw, ElementName=renderer, Converter={StaticResource radToDegConverter}, ConverterParameter='F2'}" />
-                    <Label Grid.Column="2" HorizontalAlignment="Right" 
+                    <Label Grid.Column="2" HorizontalAlignment="Right" MouseDoubleClick="PosLabel_MouseDoubleClick"
                            Content="{Binding Pitch, ElementName=renderer, Converter={StaticResource radToDegConverter}, ConverterParameter='F2'}" />
                 </Grid>
                 <Separator />
@@ -185,29 +185,35 @@
                     <Setter Property="Background" Value="LightGray" />
                 </Style>
             </s:SplitPanel.Resources>
-            <TreeView x:Name="tv" s:SplitPanel.DesiredSize="250"
-                    ItemsSource="{Binding TreeViewItems}"
-                    VerticalContentAlignment="Center">
-                <TreeView.ItemContainerStyle>
-                    <Style TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
-                        <Setter Property="IsExpanded" Value="{Binding IsExpanded}" />
-                        <Setter Property="ItemsSource" Value="{Binding Items}" />
-                        <EventSetter Event="MouseDoubleClick" Handler="TreeViewItem_MouseDoubleClick" />
-                    </Style>
-                </TreeView.ItemContainerStyle>
-                <TreeView.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal">
-                            <CheckBox IsChecked="{Binding IsChecked}"
-                                      VerticalAlignment="Center"
-                                      Checked="TreeViewItem_Checked"
-                                      Unchecked="TreeViewItem_Checked" />
-                            <TextBlock Text="{Binding Header}" Margin="5,0,0,0"
-                                       VerticalAlignment="Center" />
-                        </StackPanel>
-                    </DataTemplate>
-                </TreeView.ItemTemplate>
-            </TreeView>
+            <DockPanel s:SplitPanel.DesiredSize="250">
+                <s:SearchControl x:Name="txtSearch" x:FieldModifier="private" DockPanel.Dock="Top"
+                        WatermarkText="Search" LiveSearchEnabled="True" LiveSearchDelay="500"
+                        SearchAccepted="txtSearch_SearchChanged" SearchCanceled="txtSearch_SearchChanged" />
+                <TreeView x:Name="tv" s:SplitPanel.DesiredSize="250"
+                        ItemsSource="{Binding TreeViewItems}"
+                        VerticalContentAlignment="Center">
+                    <TreeView.ItemContainerStyle>
+                        <Style TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+                            <Setter Property="Visibility" Value="{Binding Visibility}" />
+                            <Setter Property="IsExpanded" Value="{Binding IsExpanded}" />
+                            <Setter Property="ItemsSource" Value="{Binding Items}" />
+                            <EventSetter Event="MouseDoubleClick" Handler="TreeViewItem_MouseDoubleClick" />
+                        </Style>
+                    </TreeView.ItemContainerStyle>
+                    <TreeView.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox IsChecked="{Binding IsChecked}"
+                                          VerticalAlignment="Center"
+                                          Checked="TreeViewItem_Checked"
+                                          Unchecked="TreeViewItem_Checked" />
+                                <TextBlock Text="{Binding Header}" Margin="5,0,0,0"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </TreeView.ItemTemplate>
+                </TreeView>
+            </DockPanel>
             <Grid>
                 <local:DXRenderer x:Name="renderer"
                             x:FieldModifier="private" 

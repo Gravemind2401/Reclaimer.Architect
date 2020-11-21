@@ -16,6 +16,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
@@ -316,16 +317,16 @@ namespace Reclaimer.Controls
             if (isWorking) return;
 
             isWorking = true;
-            SetState((e.OriginalSource as FrameworkElement).DataContext as TreeItemModel);
+            SetState((e.OriginalSource as FrameworkElement).DataContext as TreeItemModel, true);
             isWorking = false;
         }
 
-        private void SetState(TreeItemModel item)
+        private void SetState(TreeItemModel item, bool updateRender)
         {
             if (item.HasItems == false)
             {
                 var parent = item.Parent as TreeItemModel;
-                var children = parent.Items.Cast<TreeItemModel>();
+                var children = parent.Items.Where(i => i.IsVisible);
 
                 if (children.All(i => i.IsChecked == true))
                     parent.IsChecked = true;
@@ -333,14 +334,17 @@ namespace Reclaimer.Controls
                     parent.IsChecked = false;
                 else parent.IsChecked = null;
 
-                (item.Tag as IMeshNode)?.SetVisibility(item.IsChecked ?? false);
+                if (updateRender)
+                    (item.Tag as IMeshNode)?.SetVisibility(item.IsChecked ?? false);
             }
             else
             {
-                foreach (TreeItemModel i in item.Items)
+                foreach (var i in item.Items.Where(i => i.IsVisible))
                 {
                     i.IsChecked = item.IsChecked;
-                    (i.Tag as IMeshNode)?.SetVisibility(item.IsChecked ?? false);
+
+                    if (updateRender)
+                        (i.Tag as IMeshNode)?.SetVisibility(item.IsChecked ?? false);
                 }
             }
         }
@@ -412,6 +416,29 @@ namespace Reclaimer.Controls
         }
         #endregion
 
+        #region Control Events
+        private void txtSearch_SearchChanged(object sender, RoutedEventArgs e)
+        {
+            foreach (var parent in TreeViewItems)
+            {
+                foreach (var child in parent.Items)
+                {
+                    child.Visibility = string.IsNullOrEmpty(txtSearch.Text) || child.Header.ToUpperInvariant().Contains(txtSearch.Text.ToUpperInvariant())
+                        ? Visibility.Visible
+                        : Visibility.Collapsed;
+                }
+
+                parent.Visibility = parent.Items.Any(i => i.IsVisible)
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
+            }
+
+            isWorking = true;
+            foreach (var item in TreeViewItems)
+                SetState(item.Items.First(), false);
+            isWorking = false;
+        }
+
         private void btnToggleDetails_Click(object sender, RoutedEventArgs e)
         {
             var toggle = sender as ToggleButton;
@@ -428,12 +455,29 @@ namespace Reclaimer.Controls
             }
         }
 
+        private void PosLabel_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            var label = sender as Label;
+            if (label == null)
+                return;
+
+            var anim = new DoubleAnimation
+            {
+                From = 0,
+                To = 1,
+                Duration = TimeSpan.FromSeconds(1)
+            };
+
+            Clipboard.SetText(label.Content?.ToString());
+            label.BeginAnimation(OpacityProperty, anim);
+        } 
+        #endregion
+
         #region IDisposable
         public void Dispose()
         {
             TreeViewItems.Clear();
             modelGroup.Children.Clear();
-
             sceneManager.Dispose();
             renderer.Dispose();
             GC.Collect();
