@@ -16,6 +16,8 @@ namespace Reclaimer.Plugins
     {
         public override string Name => "DXViewer";
 
+        internal static DXViewerSettings Settings;
+
         public override bool CanOpenFile(OpenFileArgs args)
         {
             return args.File.Any(i => i is IRenderGeometry)
@@ -25,8 +27,15 @@ namespace Reclaimer.Plugins
 
         public override void Initialise()
         {
-            foreach(var f in Directory.GetFiles($"{Substrate.PluginsDirectory}\\DXViewer", "*.dll"))
+            Settings = LoadSettings<DXViewerSettings>();
+
+            foreach (var f in Directory.GetFiles($"{Substrate.PluginsDirectory}\\DXViewer", "*.dll"))
                 Assembly.LoadFile(f);
+        }
+
+        public override void Suspend()
+        {
+            SaveSettings(Settings);
         }
 
         public override void OpenFile(OpenFileArgs args)
@@ -155,6 +164,18 @@ namespace Reclaimer.Plugins
             {
                 LogError($"Error loading model: {fileName}", e);
             }
+        }
+    }
+
+    internal class DXViewerSettings
+    {
+        public string DefaultSaveFormat { get; set; }
+        public double DefaultFieldOfView { get; set; }
+
+        public DXViewerSettings()
+        {
+            DefaultSaveFormat = "amf";
+            DefaultFieldOfView = 45;
         }
     }
 }

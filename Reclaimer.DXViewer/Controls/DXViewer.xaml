@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:Reclaimer.Controls"
              xmlns:c="clr-namespace:Reclaimer.Controls;assembly=Reclaimer"
              xmlns:s="clr-namespace:Studio.Controls;assembly=Studio"
+             xmlns:su="clr-namespace:Studio.Utilities;assembly=Studio"
              xmlns:u="clr-namespace:Reclaimer.Utilities;assembly=Reclaimer"
              mc:Ignorable="d" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
              d:DesignHeight="500" d:DesignWidth="900">
@@ -18,6 +19,7 @@
 
             <u:ToStringConverter x:Key="stringConverter" />
             <u:RadToDegConverter x:Key="radToDegConverter" />
+            <su:VisibilityConverter x:Key="visibilityConverter" />
 
             <Style x:Key="showHideStyle" TargetType="ToggleButton">
                 <Setter Property="Background" Value="LightGray" />
@@ -68,15 +70,19 @@
                         ToolTip="Select none">
                     <ContentControl Template="{StaticResource ic_CheckboxList_16x}" />
                 </Button>
-                <!--<Separator />
-                <Button Click="btnSaveBitmaps_Click"
-                        ToolTip="Save Bitmaps">
+                <Separator Visibility="{Binding IsExportable, Converter={StaticResource visibilityConverter}}" />
+                <Button Click="btnSaveBitmaps_Click" ToolTip="Save Bitmaps"
+                        Visibility="{Binding IsExportable, Converter={StaticResource visibilityConverter}}">
                     <ContentControl Template="{StaticResource ic_ImageStack_16x}" />
-                </Button>-->
-                <!--<Button Click="btnSave_Click"
-                        ToolTip="Save Model">
+                </Button>
+                <Button Click="btnExportSelected_Click" ToolTip="Export selected geometry"
+                        Visibility="{Binding IsExportable, Converter={StaticResource visibilityConverter}}">
                     <ContentControl Template="{StaticResource ic_Save_16x}" />
-                </Button>-->
+                </Button>
+                <Button Click="btnExportAll_Click" ToolTip="Export all geometry"
+                        Visibility="{Binding IsExportable, Converter={StaticResource visibilityConverter}}">
+                    <ContentControl Template="{StaticResource ic_Save_16x}" />
+                </Button>
             </ToolBar>
         </ToolBarTray>
         <ToolBarTray DockPanel.Dock="Bottom" IsLocked="True">

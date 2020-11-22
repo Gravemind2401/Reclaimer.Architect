@@ -29,6 +29,7 @@ namespace Reclaimer.Controls
             var builder = new MeshBuilder();
             builder.AddOctahedron(new Vector3(0f, 0f, 0.25f), Vector3.UnitX, Vector3.UnitZ, 0.75f, 0.5f);
             builder.AddOctahedron(new Vector3(0f, 0f, -0.25f), Vector3.UnitX, -Vector3.UnitZ, 0.75f, 0.5f);
+            builder.Scale(0.75, 0.75, 0.75);
             errorGeometry = builder.ToMesh();
         }
 

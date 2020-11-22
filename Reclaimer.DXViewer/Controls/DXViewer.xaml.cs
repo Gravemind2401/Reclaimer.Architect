@@ -1,8 +1,10 @@
 ﻿using Adjutant.Blam.Common;
 using Adjutant.Geometry;
 using Adjutant.Utilities;
+using Microsoft.Win32;
 using Reclaimer.Geometry;
 using Reclaimer.Models;
+using Reclaimer.Plugins;
 using Reclaimer.Utilities;
 using Studio.Controls;
 using System;
@@ -34,8 +36,10 @@ namespace Reclaimer.Controls
     /// </summary>
     public partial class DXViewer : IDisposable
     {
-        //private delegate bool GetDataFolder(out string dataFolder);
-        //private delegate bool SaveImage(IBitmap bitmap, string baseDir);
+        private delegate IEnumerable<string> GetExportFormats();
+        private delegate void WriteModelFile(IGeometryModel model, string fileName, string formatId);
+        private delegate bool GetDataFolder(out string dataFolder);
+        private delegate bool SaveImage(IBitmap bitmap, string baseDir);
 
         private static readonly string[] DirectContentTags = new[] { "mode", "mod2", "sbsp" };
 
@@ -51,6 +55,9 @@ namespace Reclaimer.Controls
         public static readonly DependencyProperty SelectedLodProperty =
             DependencyProperty.Register(nameof(SelectedLod), typeof(int), typeof(DXViewer), new PropertyMetadata(0, SelectedLodChanged));
 
+        public static readonly DependencyProperty IsExportableProperty =
+            DependencyProperty.Register(nameof(IsExportable), typeof(bool), typeof(DXViewer), new PropertyMetadata(false));
+
         public IEnumerable<string> AvailableLods
         {
             get { return (IEnumerable<string>)GetValue(AvailableLodsProperty); }
@@ -61,6 +68,12 @@ namespace Reclaimer.Controls
         {
             get { return (int)GetValue(SelectedLodProperty); }
             set { SetValue(SelectedLodProperty, value); }
+        }
+
+        public bool IsExportable
+        {
+            get { return (bool)GetValue(IsExportableProperty); }
+            set { SetValue(IsExportableProperty, value); }
         }
 
         public static void SelectedLodChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -80,6 +93,7 @@ namespace Reclaimer.Controls
         private int modelId;
         private Helix.Element3D element;
         private ModelFactory modelFactory;
+        private IRenderGeometry renderGeometry;
 
         private RenderModel3D renderModel => element as RenderModel3D;
         private ObjectModel3D objectModel => element as ObjectModel3D;
@@ -116,6 +130,9 @@ namespace Reclaimer.Controls
 
             AvailableLods = AllLods.Take(geometry.LodCount);
             SetLod(0);
+
+            renderGeometry = geometry;
+            IsExportable = true;
         }
 
         public void LoadGeometry(IIndexItem modelTag, string fileName)
@@ -145,6 +162,9 @@ namespace Reclaimer.Controls
             AvailableLods = objectModel.Variants;
             modelGroup.Children.Add(element);
             SetVariant(Math.Max(0, AvailableLods.ToList().IndexOf(objectModel.DefaultVariant)));
+
+            renderGeometry = null;
+            IsExportable = false;
         }
 
         private void SetLod(int index)
@@ -269,66 +289,115 @@ namespace Reclaimer.Controls
                 item.IsChecked = false;
         }
 
-        private void btnSave_Click(object sender, RoutedEventArgs e)
+        #region Export Functions
+        private bool PromptFileSave(IGeometryModel model, out string fileName, out string formatId)
         {
-            //var exportFormats = ModelViewerPlugin.GetExportFormats()
-            //    .Select(f => new
-            //    {
-            //        FormatId = f,
-            //        Extension = ModelViewerPlugin.GetFormatExtension(f),
-            //        Description = ModelViewerPlugin.GetFormatDescription(f)
-            //    }).ToList();
+            var getExportFormats = Substrate.GetSharedFunction<GetExportFormats>("Reclaimer.Plugins.ModelViewerPlugin.GetExportFormats");
 
-            //var filter = string.Join("|", exportFormats.Select(f => $"{f.Description}|*.{f.Extension}"));
+            var exportFormats = getExportFormats()
+                .Select(f => new
+                {
+                    FormatId = f,
+                    Extension = ModelViewerPlugin.GetFormatExtension(f),
+                    Description = ModelViewerPlugin.GetFormatDescription(f)
+                }).ToList();
 
-            //var sfd = new SaveFileDialog
-            //{
-            //    OverwritePrompt = true,
-            //    FileName = model.Name,
-            //    Filter = filter,
-            //    FilterIndex = 1 + exportFormats.TakeWhile(f => f.FormatId != ModelViewerPlugin.Settings.DefaultSaveFormat).Count(),
-            //    AddExtension = true
-            //};
+            var filter = string.Join("|", exportFormats.Select(f => $"{f.Description}|*.{f.Extension}"));
 
-            //if (sfd.ShowDialog() != true)
-            //    return;
+            var sfd = new SaveFileDialog
+            {
+                OverwritePrompt = true,
+                FileName = model.Name,
+                Filter = filter,
+                FilterIndex = 1 + exportFormats.TakeWhile(f => f.FormatId != DXViewerPlugin.Settings.DefaultSaveFormat).Count(),
+                AddExtension = true
+            };
 
-            //var option = exportFormats[sfd.FilterIndex - 1];
+            if (sfd.ShowDialog() != true)
+            {
+                fileName = formatId = null;
+                return false;
+            }
 
-            //ModelViewerPlugin.WriteModelFile(model, sfd.FileName, option.FormatId);
-            //ModelViewerPlugin.Settings.DefaultSaveFormat = option.FormatId;
+            fileName = sfd.FileName;
+            formatId = exportFormats[sfd.FilterIndex - 1].FormatId;
+            DXViewerPlugin.Settings.DefaultSaveFormat = formatId;
+            return true;
+        }
+
+        private void btnExportAll_Click(object sender, RoutedEventArgs e)
+        {
+            using (var model = renderGeometry.ReadGeometry(SelectedLod))
+            {
+                var writeModelFile = Substrate.GetSharedFunction<WriteModelFile>("Reclaimer.Plugins.ModelViewerPlugin.WriteModelFile");
+
+                string fileName, formatId;
+                if (!PromptFileSave(model, out fileName, out formatId))
+                    return;
+
+                writeModelFile(model, fileName, formatId);
+            }
+        }
+
+        private void btnExportSelected_Click(object sender, RoutedEventArgs e)
+        {
+            using (var model = renderGeometry.ReadGeometry(SelectedLod))
+            {
+                var writeModelFile = Substrate.GetSharedFunction<WriteModelFile>("Reclaimer.Plugins.ModelViewerPlugin.WriteModelFile");
+
+                string fileName, formatId;
+                if (!PromptFileSave(model, out fileName, out formatId))
+                    return;
+
+                var selectedPerms = new List<IGeometryPermutation>();
+                foreach (var parent in TreeViewItems.Zip(model.Regions, (a, b) => new { Node = a, Region = b }))
+                {
+                    if (parent.Node.IsChecked == false)
+                        continue;
+
+                    foreach (var child in parent.Node.Items.Zip(parent.Region.Permutations, (a, b) => new { Node = a, Permutation = b }))
+                    {
+                        if (child.Node.IsChecked == true)
+                            selectedPerms.Add(child.Permutation);
+                    }
+                }
+
+                var masked = new MaskedGeometryModel(model, selectedPerms);
+                writeModelFile(masked, fileName, formatId);
+            }
         }
 
         private void btnSaveBitmaps_Click(object sender, RoutedEventArgs e)
         {
-            //var getFolder = Substrate.GetSharedFunction<GetDataFolder>("Reclaimer.Plugins.BatchExtractPlugin.GetDataFolder");
+            var getFolder = Substrate.GetSharedFunction<GetDataFolder>("Reclaimer.Plugins.BatchExtractPlugin.GetDataFolder");
 
-            //string folder;
-            //if (!getFolder(out folder))
-            //    return;
+            string folder;
+            if (!getFolder(out folder))
+                return;
 
-            //Task.Run(() =>
-            //{
-            //    var saveImage = Substrate.GetSharedFunction<SaveImage>("Reclaimer.Plugins.BatchExtractPlugin.SaveImage");
+            Task.Run(() =>
+            {
+                var saveImage = Substrate.GetSharedFunction<SaveImage>("Reclaimer.Plugins.BatchExtractPlugin.SaveImage");
 
-            //    foreach (var bitm in geometry.GetAllBitmaps())
-            //    {
-            //        try
-            //        {
-            //            SetStatus($"Extracting {bitm.Name}");
-            //            saveImage(bitm, folder);
-            //            LogOutput($"Extracted {bitm.Name}.{bitm.Class}");
-            //        }
-            //        catch (Exception ex)
-            //        {
-            //            LogError($"Error extracting {bitm.Name}.{bitm.Class}", ex);
-            //        }
-            //    }
+                foreach (var bitm in renderGeometry.GetAllBitmaps())
+                {
+                    try
+                    {
+                        SetStatus($"Extracting {bitm.Name}");
+                        saveImage(bitm, folder);
+                        LogOutput($"Extracted {bitm.Name}.{bitm.Class}");
+                    }
+                    catch (Exception ex)
+                    {
+                        LogError($"Error extracting {bitm.Name}.{bitm.Class}", ex);
+                    }
+                }
 
-            //    ClearStatus();
-            //    LogOutput($"Recursive bitmap extract complete for {geometry.Name}.{geometry.Class}");
-            //});
-        }
+                ClearStatus();
+                LogOutput($"Recursive bitmap extract complete for {renderGeometry.Name}.{renderGeometry.Class}");
+            });
+        } 
+        #endregion
         #endregion
 
         #region Control Events
