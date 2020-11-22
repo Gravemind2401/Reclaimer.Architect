@@ -133,7 +133,8 @@ namespace Reclaimer.Plugins
                         Width = 1600,
                         Height = 900,
                         WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner,
-                        Owner = System.Windows.Application.Current.MainWindow
+                        Owner = System.Windows.Application.Current.MainWindow,
+                        Title = "Reclaimer Architect"
                     };
 
                     wnd.Show();

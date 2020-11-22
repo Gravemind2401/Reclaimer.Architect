@@ -30,7 +30,7 @@ namespace Reclaimer.Controls
         public HierarchyView()
         {
             InitializeComponent();
-            TabModel = new TabModel(this, Studio.Controls.TabItemType.Tool) { Header = "Hierarchy" };
+            TabModel = new TabModel(this, Studio.Controls.TabItemType.Tool) { Header = "Hierarchy", ToolTip = "Hierarchy View" };
         }
 
         public void ClearScenario()

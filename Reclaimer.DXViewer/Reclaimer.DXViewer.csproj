@@ -277,6 +277,9 @@
   <ItemGroup>
     <Resource Include="Resources\MetadataXML\Halo3Metadata.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\MetadataXML\Minimize.xslt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>echo F | xcopy ".\$(TargetFileName)" "Plugins\DXViewer\DXViewer.dll" /Y

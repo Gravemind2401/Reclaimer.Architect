@@ -60,7 +60,7 @@ namespace Reclaimer.Controls
             InitializeComponent();
             valuesById = new Dictionary<string, MetaValueBase>();
             Metadata = new ObservableCollection<MetaValueBase>();
-            TabModel = new TabModel(this, Studio.Controls.TabItemType.Tool) { Header = "Properties" };
+            TabModel = new TabModel(this, Studio.Controls.TabItemType.Tool) { Header = "Properties", ToolTip = "Property View" };
             DataContext = this;
         }
 
