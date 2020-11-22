@@ -258,7 +258,7 @@ namespace Reclaimer.Controls
         private void Viewport_OnRendered(object sender, EventArgs e)
         {
             Viewport.OnRendered -= Viewport_OnRendered;
-            (Viewport.Camera as Helix.PerspectiveCamera).FieldOfView = Plugins.DXViewerPlugin.Settings.DefaultFieldOfView;
+            (Viewport.Camera as Helix.PerspectiveCamera).FieldOfView = Plugins.ArchitectPlugin.Settings.DefaultFieldOfView;
             ScaleToContent();
         }
 

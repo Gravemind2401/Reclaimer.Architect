@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reclaimer.DXViewer", "Reclaimer.DXViewer\Reclaimer.DXViewer.csproj", "{D785CA27-13CA-4A16-8268-DBAB4330B123}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reclaimer.Architect", "Reclaimer.DXViewer\Reclaimer.Architect.csproj", "{D785CA27-13CA-4A16-8268-DBAB4330B123}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reclaimer", "..\Reclaimer\Reclaimer\Reclaimer.csproj", "{F05A3EB2-3336-47BC-8F5A-0DBB4E2EDABB}"
 EndProject

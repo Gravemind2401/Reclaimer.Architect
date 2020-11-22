@@ -179,7 +179,7 @@
     <Compile Include="Utilities\SharpDXVectorConverter.cs" />
     <Compile Include="Utilities\Extensions.cs" />
     <Compile Include="Utilities\NativeMethods.cs" />
-    <Compile Include="Plugins\DXViewerPlugin.cs" />
+    <Compile Include="Plugins\ArchitectPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -282,10 +282,10 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>echo F | xcopy ".\$(TargetFileName)" "Plugins\DXViewer\DXViewer.dll" /Y
-echo D | xcopy ".\SharpDX*" "Plugins\DXViewer" /Y
-echo D | xcopy ".\HelixToolkit*" "Plugins\DXViewer" /Y
-echo D | xcopy ".\Cyotek*" "Plugins\DXViewer" /Y
+    <PostBuildEvent>echo F | xcopy ".\$(TargetFileName)" "Plugins\Architect\Architect.dll" /Y
+echo D | xcopy ".\SharpDX*" "Plugins\Architect" /Y
+echo D | xcopy ".\HelixToolkit*" "Plugins\Architect" /Y
+echo D | xcopy ".\Cyotek*" "Plugins\Architect" /Y
 del ".\SharpDX*"
 del ".\HelixToolkit*"
 del ".\Cyotek*"</PostBuildEvent>

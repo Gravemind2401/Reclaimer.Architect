@@ -12,9 +12,9 @@ using System.Threading.Tasks;
 
 namespace Reclaimer.Plugins
 {
-    public class DXViewerPlugin : Plugin
+    public class ArchitectPlugin : Plugin
     {
-        public override string Name => "DXViewer";
+        public override string Name => "Architect";
 
         internal static DXViewerSettings Settings;
 
@@ -29,7 +29,7 @@ namespace Reclaimer.Plugins
         {
             Settings = LoadSettings<DXViewerSettings>();
 
-            foreach (var f in Directory.GetFiles($"{Substrate.PluginsDirectory}\\DXViewer", "*.dll"))
+            foreach (var f in Directory.GetFiles($"{Substrate.PluginsDirectory}\\Architect", "*.dll"))
                 Assembly.LoadFile(f);
         }
 
@@ -134,7 +134,7 @@ namespace Reclaimer.Plugins
                         Height = 900,
                         WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner,
                         Owner = System.Windows.Application.Current.MainWindow,
-                        Title = "Reclaimer Architect"
+                        Title = "Reclaimer - Architect"
                     };
 
                     wnd.Show();
