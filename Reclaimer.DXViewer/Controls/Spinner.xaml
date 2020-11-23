@@ -1,0 +1,137 @@
+﻿<UserControl x:Class="Reclaimer.Controls.Spinner"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Reclaimer.Controls"
+             mc:Ignorable="d" Foreground="Black"
+             DataContext="{Binding RelativeSource={RelativeSource Self}}"
+             d:DesignHeight="300" d:DesignWidth="300">
+
+    <!-- https://stackoverflow.com/a/45941268/12034691 -->
+
+    <UserControl.Resources>
+        <Style x:Key="BusyAnimationStyle" TargetType="Control">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Control">
+                        <ControlTemplate.Resources>
+                            <Storyboard x:Key="Animation0" BeginTime="00:00:00.0" RepeatBehavior="Forever">
+                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ellipseN" Storyboard.TargetProperty="Opacity">
+                                    <LinearDoubleKeyFrame KeyTime="00:00:00.0" Value="1" />
+                                    <LinearDoubleKeyFrame KeyTime="00:00:01.6" Value="0" />
+                                </DoubleAnimationUsingKeyFrames>
+                            </Storyboard>
+
+                            <Storyboard x:Key="Animation1" BeginTime="00:00:00.2" RepeatBehavior="Forever">
+                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ellipseNE" Storyboard.TargetProperty="Opacity">
+                                    <LinearDoubleKeyFrame KeyTime="00:00:00.0" Value="1" />
+                                    <LinearDoubleKeyFrame KeyTime="00:00:01.6" Value="0" />
+                                </DoubleAnimationUsingKeyFrames>
+                            </Storyboard>
+
+                            <Storyboard x:Key="Animation2" BeginTime="00:00:00.4" RepeatBehavior="Forever">
+                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ellipseE" Storyboard.TargetProperty="Opacity">
+                                    <LinearDoubleKeyFrame KeyTime="00:00:00.0" Value="1" />
+                                    <LinearDoubleKeyFrame KeyTime="00:00:01.6" Value="0" />
+                                </DoubleAnimationUsingKeyFrames>
+                            </Storyboard>
+
+                            <Storyboard x:Key="Animation3" BeginTime="00:00:00.6" RepeatBehavior="Forever">
+                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ellipseSE" Storyboard.TargetProperty="Opacity">
+                                    <LinearDoubleKeyFrame KeyTime="00:00:00.0" Value="1" />
+                                    <LinearDoubleKeyFrame KeyTime="00:00:01.6" Value="0" />
+                                </DoubleAnimationUsingKeyFrames>
+                            </Storyboard>
+
+                            <Storyboard x:Key="Animation4" BeginTime="00:00:00.8" RepeatBehavior="Forever">
+                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ellipseS" Storyboard.TargetProperty="Opacity">
+                                    <LinearDoubleKeyFrame KeyTime="00:00:00.0" Value="1" />
+                                    <LinearDoubleKeyFrame KeyTime="00:00:01.6" Value="0" />
+                                </DoubleAnimationUsingKeyFrames>
+                            </Storyboard>
+
+                            <Storyboard x:Key="Animation5" BeginTime="00:00:01.0" RepeatBehavior="Forever">
+                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ellipseSW" Storyboard.TargetProperty="Opacity">
+                                    <LinearDoubleKeyFrame KeyTime="00:00:00.0" Value="1" />
+                                    <LinearDoubleKeyFrame KeyTime="00:00:01.6" Value="0" />
+                                </DoubleAnimationUsingKeyFrames>
+                            </Storyboard>
+
+                            <Storyboard x:Key="Animation6" BeginTime="00:00:01.2" RepeatBehavior="Forever">
+                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ellipseW" Storyboard.TargetProperty="Opacity">
+                                    <LinearDoubleKeyFrame KeyTime="00:00:00.0" Value="1" />
+                                    <LinearDoubleKeyFrame KeyTime="00:00:01.6" Value="0" />
+                                </DoubleAnimationUsingKeyFrames>
+                            </Storyboard>
+
+                            <Storyboard x:Key="Animation7" BeginTime="00:00:01.4" RepeatBehavior="Forever">
+                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ellipseNW" Storyboard.TargetProperty="Opacity">
+                                    <LinearDoubleKeyFrame KeyTime="00:00:00.0" Value="1" />
+                                    <LinearDoubleKeyFrame KeyTime="00:00:01.6" Value="0" />
+                                </DoubleAnimationUsingKeyFrames>
+                            </Storyboard>
+                        </ControlTemplate.Resources>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsVisible" Value="True">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard Storyboard="{StaticResource Animation0}" x:Name="Storyboard0" />
+                                    <BeginStoryboard Storyboard="{StaticResource Animation1}" x:Name="Storyboard1" />
+                                    <BeginStoryboard Storyboard="{StaticResource Animation2}" x:Name="Storyboard2" />
+                                    <BeginStoryboard Storyboard="{StaticResource Animation3}" x:Name="Storyboard3" />
+                                    <BeginStoryboard Storyboard="{StaticResource Animation4}" x:Name="Storyboard4" />
+                                    <BeginStoryboard Storyboard="{StaticResource Animation5}" x:Name="Storyboard5" />
+                                    <BeginStoryboard Storyboard="{StaticResource Animation6}" x:Name="Storyboard6" />
+                                    <BeginStoryboard Storyboard="{StaticResource Animation7}" x:Name="Storyboard7" />
+                                </Trigger.EnterActions>
+
+                                <Trigger.ExitActions>
+                                    <StopStoryboard BeginStoryboardName="Storyboard0" />
+                                    <StopStoryboard BeginStoryboardName="Storyboard1" />
+                                    <StopStoryboard BeginStoryboardName="Storyboard2" />
+                                    <StopStoryboard BeginStoryboardName="Storyboard3" />
+                                    <StopStoryboard BeginStoryboardName="Storyboard4" />
+                                    <StopStoryboard BeginStoryboardName="Storyboard5" />
+                                    <StopStoryboard BeginStoryboardName="Storyboard6" />
+                                    <StopStoryboard BeginStoryboardName="Storyboard7" />
+                                </Trigger.ExitActions>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+
+                        <Border BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Background="{TemplateBinding Background}">
+                            <Grid>
+                                <Canvas>
+                                    <Canvas.Resources>
+                                        <Style TargetType="Ellipse">
+                                            <Setter Property="Width" Value="{Binding EllipseSize}" />
+                                            <Setter Property="Height" Value="{Binding EllipseSize}" />
+                                            <Setter Property="Fill" Value="{Binding Foreground}" />
+                                        </Style>
+                                    </Canvas.Resources>
+
+                                    <Ellipse x:Name="ellipseN" Canvas.Left="{Binding EllipseN.Left}" Canvas.Top="{Binding EllipseN.Top}" />
+                                    <Ellipse x:Name="ellipseNE" Canvas.Left="{Binding EllipseNE.Left}" Canvas.Top="{Binding EllipseNE.Top}" />
+                                    <Ellipse x:Name="ellipseE" Canvas.Left="{Binding EllipseE.Left}" Canvas.Top="{Binding EllipseE.Top}" />
+                                    <Ellipse x:Name="ellipseSE" Canvas.Left="{Binding EllipseSE.Left}" Canvas.Top="{Binding EllipseSE.Top}" />
+                                    <Ellipse x:Name="ellipseS" Canvas.Left="{Binding EllipseS.Left}" Canvas.Top="{Binding EllipseS.Top}" />
+                                    <Ellipse x:Name="ellipseSW" Canvas.Left="{Binding EllipseSW.Left}" Canvas.Top="{Binding EllipseSW.Top}" />
+                                    <Ellipse x:Name="ellipseW" Canvas.Left="{Binding EllipseW.Left}" Canvas.Top="{Binding EllipseW.Top}" />
+                                    <Ellipse x:Name="ellipseNW" Canvas.Left="{Binding EllipseNW.Left}" Canvas.Top="{Binding EllipseNW.Top}" />
+
+                                </Canvas>
+                                <Label Content="{Binding Path=Text}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+    <Border>
+        <Control Style="{StaticResource BusyAnimationStyle}" />
+    </Border>
+</UserControl>

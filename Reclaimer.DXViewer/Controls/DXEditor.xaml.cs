@@ -201,6 +201,9 @@ namespace Reclaimer.Controls
 
         public void LoadScenario()
         {
+            IsEnabled = false;
+            spinner.Visibility = Visibility.Visible;
+
             Task.Run(async () =>
             {
                 await Task.WhenAll(sceneManager.ReadScenario(scenario));
@@ -294,6 +297,8 @@ namespace Reclaimer.Controls
                     #endregion
 
                     isReady = true;
+                    IsEnabled = true;
+                    spinner.Visibility = Visibility.Collapsed;
                 });
             });
         }

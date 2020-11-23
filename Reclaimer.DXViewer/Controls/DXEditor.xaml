@@ -215,6 +215,9 @@
                 </TreeView>
             </DockPanel>
             <Grid>
+                <local:Spinner x:Name="spinner" x:FieldModifier="private"
+                               Panel.ZIndex="1" EllipseSize="16" 
+                               Width="80" Height="80" Foreground="AliceBlue" />
                 <local:DXRenderer x:Name="renderer"
                             x:FieldModifier="private" 
                             Background="CornflowerBlue"
