@@ -25,6 +25,7 @@ using static HelixToolkit.Wpf.SharpDX.CameraExtensions;
 using Numerics = System.Numerics;
 using Helix = HelixToolkit.Wpf.SharpDX;
 using Media3D = System.Windows.Media.Media3D;
+using Reclaimer.Plugins;
 
 namespace Reclaimer.Controls
 {
@@ -32,7 +33,7 @@ namespace Reclaimer.Controls
     public class DXRenderer : Control, IDisposable
     {
         private const string PART_Viewport = "PART_Viewport";
-        private const double SpeedMultipler = 0.001;
+        private const double SpeedMultipler = 0.0013;
 
         private static readonly Helix.EffectsManager effectsManager = new Helix.DefaultEffectsManager();
 
@@ -98,13 +99,25 @@ namespace Reclaimer.Controls
             DependencyProperty.Register(nameof(ManipulationEnabled), typeof(bool), typeof(DXRenderer), new PropertyMetadata(false));
 
         public static readonly DependencyProperty ManipulationFlagsProperty =
-            DependencyProperty.Register(nameof(ManipulationFlags), typeof(ManipulationFlags), typeof(DXRenderer), new PropertyMetadata(ManipulationFlags.ManipulateAll));
+            DependencyProperty.Register(nameof(ManipulationFlags), typeof(ManipulationFlags), typeof(DXRenderer), new PropertyMetadata(ManipulationFlags.ManipulateAll, (d, e) =>
+            {
+                var c = (d as DXRenderer);
+                c.manipulator.ManipulationFlags = c.ManipulationFlags;
+            }));
 
         public static readonly DependencyProperty HighlightMaterialProperty =
             DependencyProperty.Register(nameof(HighlightMaterial), typeof(Helix.Material), typeof(DXRenderer), new PropertyMetadata(Helix.DiffuseMaterials.Yellow));
 
         public static readonly DependencyProperty SelectionMaterialProperty =
             DependencyProperty.Register(nameof(SelectionMaterial), typeof(Helix.Material), typeof(DXRenderer), new PropertyMetadata(Helix.DiffuseMaterials.Jade));
+
+        public static readonly DependencyProperty GlobalManipulationAxesProperty =
+            DependencyProperty.Register(nameof(GlobalManipulationAxes), typeof(bool), typeof(DXRenderer), new PropertyMetadata(true, (d, e) =>
+            {
+                var c = (d as DXRenderer);
+                c.manipulator.LocalAxes = !c.GlobalManipulationAxes;
+                ArchitectPlugin.Settings.EditorGlobalAxes = c.GlobalManipulationAxes;
+            }));
 
         public bool ManipulationEnabled
         {
@@ -129,6 +142,13 @@ namespace Reclaimer.Controls
             get { return (Helix.Material)GetValue(SelectionMaterialProperty); }
             set { SetValue(SelectionMaterialProperty, value); }
         }
+
+        public bool GlobalManipulationAxes
+        {
+            get { return (bool)GetValue(GlobalManipulationAxesProperty); }
+            set { SetValue(GlobalManipulationAxesProperty, value); }
+        }
+
         #endregion
 
         #endregion
@@ -164,11 +184,13 @@ namespace Reclaimer.Controls
             Loaded += DXRenderer_Loaded;
             Unloaded += DXRenderer_Unloaded;
 
-            timer = new DispatcherTimer(DispatcherPriority.Send) { Interval = new TimeSpan(0, 0, 0, 0, 10) };
+            timer = new DispatcherTimer(DispatcherPriority.Send) { Interval = new TimeSpan(0, 0, 0, 0, 15) };
             timer.Tick += Timer_Tick;
 
-            var binding = new Binding(nameof(ManipulationFlags)) { Source = this };
-            BindingOperations.SetBinding(manipulator, TransformManipulatorEx3D.ManipulationFlagsProperty, binding);
+            GlobalManipulationAxes = ArchitectPlugin.Settings.EditorGlobalAxes;
+
+            manipulator.ManipulationFlags = ManipulationFlags;
+            manipulator.LocalAxes = !GlobalManipulationAxes;
         }
 
         #region Overrides
@@ -502,8 +524,8 @@ namespace Reclaimer.Controls
             if (!IsMouseCaptured || lastPoint.Equals(mousePos))
                 return;
 
-            var deltaX = (float)(mousePos.X - lastPoint.X) * 0.002f;
-            var deltaY = (float)(mousePos.Y - lastPoint.Y) * 0.002f;
+            var deltaX = (float)(mousePos.X - lastPoint.X) * (float)SpeedMultipler * 2;
+            var deltaY = (float)(mousePos.Y - lastPoint.Y) * (float)SpeedMultipler * 2;
 
             var upAnchor = Viewport.ModelUpDirection.ToNumericsVector3();
             var upVector = Numerics.Vector3.Normalize(Viewport.Camera.UpDirection.ToNumericsVector3());

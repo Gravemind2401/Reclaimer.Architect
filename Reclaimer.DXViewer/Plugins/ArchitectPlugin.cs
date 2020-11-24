@@ -176,6 +176,7 @@ namespace Reclaimer.Plugins
         public bool EditorTranslation { get; set; }
         public bool EditorRotation { get; set; }
         public bool EditorScaling { get; set; }
+        public bool EditorGlobalAxes { get; set; }
 
         public DXViewerSettings()
         {
@@ -183,6 +184,7 @@ namespace Reclaimer.Plugins
             DefaultFieldOfView = 45;
 
             EditorTranslation = EditorRotation = EditorScaling = true;
+            EditorGlobalAxes = true;
         }
     }
 }

@@ -91,6 +91,11 @@
                     <ContentControl Template="{StaticResource ic_Scale_16x}" />
                 </ToggleButton>
                 <Separator />
+                <ToggleButton IsChecked="{Binding GlobalManipulationAxes, ElementName=renderer}"
+                              ToolTip="Use global axis">
+                    <ContentControl Template="{StaticResource ic_DimensionTranslationView_16x}" />
+                </ToggleButton>
+                <Separator />
                 <Button Click="btnBringToCamera_Click"
                         ToolTip="Bring to camera">
                     <ContentControl Template="{StaticResource ic_BringtoFront_16x}" />

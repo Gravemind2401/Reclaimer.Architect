@@ -181,6 +181,17 @@ namespace Reclaimer.Controls
                 (d as TransformManipulatorEx3D).UpdateVisibleGeometry();
             }));
 
+        public bool LocalAxes
+        {
+            get { return (bool)GetValue(LocalAxesProperty); }
+            set { SetValue(LocalAxesProperty, value); }
+        }
+
+        public static readonly DependencyProperty LocalAxesProperty =
+            DependencyProperty.Register(nameof(LocalAxes), typeof(bool), typeof(TransformManipulatorEx3D), new PropertyMetadata(false, (d, e) =>
+            {
+                (d as TransformManipulatorEx3D).OnUpdateSelfTransform();
+            }));
         #endregion
 
         #region Variables
@@ -417,17 +428,17 @@ namespace Reclaimer.Controls
             else if (e.HitTestResult.ModelHit == translationXY)
             {
                 manipulationType = ManipulationType.TranslationXY;
-                direction = Vector3.UnitX + Vector3.UnitY;
+                direction = Vector3.Normalize(Vector3.UnitX + Vector3.UnitY);
             }
             else if (e.HitTestResult.ModelHit == translationYZ)
             {
                 manipulationType = ManipulationType.TranslationYZ;
-                direction = Vector3.UnitY + Vector3.UnitZ;
+                direction = Vector3.Normalize(Vector3.UnitY + Vector3.UnitZ);
             }
             else if (e.HitTestResult.ModelHit == translationXZ)
             {
                 manipulationType = ManipulationType.TranslationXZ;
-                direction = Vector3.UnitX + Vector3.UnitZ;
+                direction = Vector3.Normalize(Vector3.UnitX + Vector3.UnitZ);
             }
             else
             {
@@ -466,27 +477,35 @@ namespace Reclaimer.Controls
             {
                 var moveDir = hit - currentHit;
                 currentHit = hit;
+
+                var moveVector = Vector3.Zero;
                 switch (manipulationType)
                 {
                     case ManipulationType.TranslationX:
-                        translationVector += new Vector3(moveDir.X, 0, 0);
+                        moveVector = new Vector3(moveDir.X, 0, 0);
                         break;
                     case ManipulationType.TranslationY:
-                        translationVector += new Vector3(0, moveDir.Y, 0);
+                        moveVector = new Vector3(0, moveDir.Y, 0);
                         break;
                     case ManipulationType.TranslationZ:
-                        translationVector += new Vector3(0, 0, moveDir.Z);
+                        moveVector = new Vector3(0, 0, moveDir.Z);
                         break;
                     case ManipulationType.TranslationXY:
-                        translationVector += new Vector3(moveDir.X, moveDir.Y, 0);
+                        moveVector = new Vector3(moveDir.X, moveDir.Y, 0);
                         break;
                     case ManipulationType.TranslationYZ:
-                        translationVector += new Vector3(0, moveDir.Y, moveDir.Z);
+                        moveVector = new Vector3(0, moveDir.Y, moveDir.Z);
                         break;
                     case ManipulationType.TranslationXZ:
-                        translationVector += new Vector3(moveDir.X, 0, moveDir.Z);
+                        moveVector = new Vector3(moveDir.X, 0, moveDir.Z);
                         break;
                 }
+
+                if (LocalAxes)
+                    moveVector = Vector3.TransformNormal(moveVector, rotationMatrix);
+
+                translationVector += moveVector;
+
                 OnUpdateSelfTransform();
                 OnUpdateTargetMatrix();
             }
@@ -567,18 +586,23 @@ namespace Reclaimer.Controls
                         axis = Vector3.UnitZ;
                         break;
                 }
+
+                var rotateAxis = axis;
+                if (LocalAxes)
+                    rotateAxis = Vector3.TransformNormal(rotateAxis, rotationMatrix);
+
                 var sign = -Vector3.Dot(axis, currentAxis);
                 var theta = (float)(Math.Sign(sign) * Math.Asin(currentAxis.Length()));
                 switch (manipulationType)
                 {
                     case ManipulationType.RotationX:
-                        rotationMatrix *= Matrix.RotationX(theta);
+                        rotationMatrix *= Matrix.RotationAxis(rotateAxis, theta);
                         break;
                     case ManipulationType.RotationY:
-                        rotationMatrix *= Matrix.RotationY(theta);
+                        rotationMatrix *= Matrix.RotationAxis(rotateAxis, theta);
                         break;
                     case ManipulationType.RotationZ:
-                        rotationMatrix *= Matrix.RotationZ(theta);
+                        rotationMatrix *= Matrix.RotationAxis(rotateAxis, theta);
                         break;
                 }
                 OnUpdateTargetMatrix();
@@ -645,33 +669,33 @@ namespace Reclaimer.Controls
             {
                 var moveDir = hit - currentHit;
                 currentHit = hit;
-                var orgAxis = Vector3.Zero;
+                var scaleVector = Vector3.Zero;
                 float scale = 1;
                 switch (manipulationType)
                 {
                     case ManipulationType.ScaleX:
-                        orgAxis = Vector3.UnitX;
+                        scaleVector = Vector3.UnitX;
                         scale = moveDir.X;
                         break;
                     case ManipulationType.ScaleY:
-                        orgAxis = Vector3.UnitY;
+                        scaleVector = Vector3.UnitY;
                         scale = moveDir.Y;
                         break;
                     case ManipulationType.ScaleZ:
-                        orgAxis = Vector3.UnitZ;
+                        scaleVector = Vector3.UnitZ;
                         scale = moveDir.Z;
                         break;
                 }
 
                 if (UniformScaling)
-                    orgAxis = Vector3.One;
+                    scaleVector = Vector3.One;
 
                 var axisX = Vector3.TransformNormal(Vector3.UnitX, rotationMatrix);
                 var axisY = Vector3.TransformNormal(Vector3.UnitY, rotationMatrix);
                 var axisZ = Vector3.TransformNormal(Vector3.UnitZ, rotationMatrix);
-                var dotX = Vector3.Dot(axisX, orgAxis);
-                var dotY = Vector3.Dot(axisY, orgAxis);
-                var dotZ = Vector3.Dot(axisZ, orgAxis);
+                var dotX = Vector3.Dot(axisX, scaleVector);
+                var dotY = Vector3.Dot(axisY, scaleVector);
+                var dotZ = Vector3.Dot(axisZ, scaleVector);
                 scaleMatrix.M11 += scale * Math.Abs(dotX);
                 scaleMatrix.M22 += scale * Math.Abs(dotY);
                 scaleMatrix.M33 += scale * Math.Abs(dotZ);
@@ -749,12 +773,19 @@ namespace Reclaimer.Controls
 
             targetMatrix = Matrix.Translation(-centerOffset) * scaleMatrix * rotationMatrix * Matrix.Translation(centerOffset) * Matrix.Translation(translationVector);
             target.Transform = new Media3D.MatrixTransform3D(targetMatrix.ToMatrix3D());
+
+            if (LocalAxes)
+                OnUpdateSelfTransform();
         }
 
         private void OnUpdateSelfTransform()
         {
             var m = Matrix.Translation(centerOffset + translationVector);
             m.M11 = m.M22 = m.M33 = (float)sizeScale;
+
+            if (LocalAxes)
+                m = rotationMatrix * m;
+
             ctrlGroup.Transform = new Media3D.MatrixTransform3D(m.ToMatrix3D());
         }
 
