@@ -1,6 +1,7 @@
 ﻿using Adjutant.Blam.Common;
 using Reclaimer.Geometry;
 using Reclaimer.Models;
+using Reclaimer.Plugins;
 using Reclaimer.Utilities;
 using Studio.Controls;
 using System;
@@ -76,6 +77,10 @@ namespace Reclaimer.Controls
             if (editor.CanScale) flags |= ManipulationFlags.Scale;
 
             editor.renderer.ManipulationFlags = flags;
+
+            ArchitectPlugin.Settings.EditorTranslation = editor.CanTranslate;
+            ArchitectPlugin.Settings.EditorRotation = editor.CanRotate;
+            ArchitectPlugin.Settings.EditorScaling = editor.CanScale;
         }
         #endregion
 
@@ -104,6 +109,10 @@ namespace Reclaimer.Controls
 
             modelGroup.Visibility = Visibility.Collapsed;
             renderer.AddChild(modelGroup);
+
+            CanTranslate = ArchitectPlugin.Settings.EditorTranslation;
+            CanRotate = ArchitectPlugin.Settings.EditorRotation;
+            CanScale = ArchitectPlugin.Settings.EditorScaling;
         }
 
         public void ClearScenario()

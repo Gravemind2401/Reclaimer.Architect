@@ -16,7 +16,8 @@ namespace Reclaimer.Plugins
     {
         public override string Name => "Architect";
 
-        internal static DXViewerSettings Settings;
+        //this needs to have a value at design time because the editor control uses it
+        internal static DXViewerSettings Settings = new DXViewerSettings();
 
         public override bool CanOpenFile(OpenFileArgs args)
         {
@@ -172,11 +173,16 @@ namespace Reclaimer.Plugins
     {
         public string DefaultSaveFormat { get; set; }
         public double DefaultFieldOfView { get; set; }
+        public bool EditorTranslation { get; set; }
+        public bool EditorRotation { get; set; }
+        public bool EditorScaling { get; set; }
 
         public DXViewerSettings()
         {
             DefaultSaveFormat = "amf";
             DefaultFieldOfView = 45;
+
+            EditorTranslation = EditorRotation = EditorScaling = true;
         }
     }
 }
