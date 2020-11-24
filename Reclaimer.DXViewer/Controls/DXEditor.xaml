@@ -103,6 +103,7 @@
                     <Style TargetType="Label">
                         <Setter Property="Padding" Value="4,0,6,2" />
                         <Setter Property="VerticalAlignment" Value="Center" />
+                        <Setter Property="Foreground" Value="{DynamicResource CommonControls.TextBox.Text}" />
                     </Style>
                 </ToolBar.Resources>
                 <ComboBox ItemsSource="{Binding AvailableLods}"
