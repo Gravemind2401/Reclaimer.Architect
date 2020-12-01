@@ -116,7 +116,7 @@ namespace Reclaimer.Controls
             {
                 var c = (d as DXRenderer);
                 c.manipulator.LocalAxes = !c.GlobalManipulationAxes;
-                ArchitectPlugin.Settings.EditorGlobalAxes = c.GlobalManipulationAxes;
+                ArchitectSettingsPlugin.Settings.EditorGlobalAxes = c.GlobalManipulationAxes;
             }));
 
         public bool ManipulationEnabled
@@ -187,7 +187,7 @@ namespace Reclaimer.Controls
             timer = new DispatcherTimer(DispatcherPriority.Send) { Interval = new TimeSpan(0, 0, 0, 0, 15) };
             timer.Tick += Timer_Tick;
 
-            GlobalManipulationAxes = ArchitectPlugin.Settings.EditorGlobalAxes;
+            GlobalManipulationAxes = ArchitectSettingsPlugin.Settings.EditorGlobalAxes;
 
             manipulator.ManipulationFlags = ManipulationFlags;
             manipulator.LocalAxes = !GlobalManipulationAxes;
@@ -280,7 +280,7 @@ namespace Reclaimer.Controls
         private void Viewport_OnRendered(object sender, EventArgs e)
         {
             Viewport.OnRendered -= Viewport_OnRendered;
-            (Viewport.Camera as Helix.PerspectiveCamera).FieldOfView = Plugins.ArchitectPlugin.Settings.DefaultFieldOfView;
+            (Viewport.Camera as Helix.PerspectiveCamera).FieldOfView = ArchitectSettingsPlugin.Settings.DefaultFieldOfView;
             ScaleToContent();
         }
 

@@ -166,6 +166,8 @@
     <Compile Include="Models\StartPosition.cs" />
     <Compile Include="Models\TriggerVolume.cs" />
     <Compile Include="Models\ModelConfig.cs" />
+    <Compile Include="Plugins\ArchitectViewerPlugin.cs" />
+    <Compile Include="Plugins\ArchitectEditorPlugin.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -181,7 +183,7 @@
     <Compile Include="Utilities\SharpDXVectorConverter.cs" />
     <Compile Include="Utilities\Extensions.cs" />
     <Compile Include="Utilities\NativeMethods.cs" />
-    <Compile Include="Plugins\ArchitectPlugin.cs" />
+    <Compile Include="Plugins\ArchitectSettingsPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

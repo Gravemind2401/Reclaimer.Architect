@@ -75,9 +75,9 @@ namespace Reclaimer.Controls
 
             editor.renderer.ManipulationFlags = flags;
 
-            ArchitectPlugin.Settings.EditorTranslation = editor.CanTranslate;
-            ArchitectPlugin.Settings.EditorRotation = editor.CanRotate;
-            ArchitectPlugin.Settings.EditorScaling = editor.CanScale;
+            ArchitectSettingsPlugin.Settings.EditorTranslation = editor.CanTranslate;
+            ArchitectSettingsPlugin.Settings.EditorRotation = editor.CanRotate;
+            ArchitectSettingsPlugin.Settings.EditorScaling = editor.CanScale;
         }
         #endregion
 
@@ -102,9 +102,9 @@ namespace Reclaimer.Controls
             modelGroup.Visibility = Visibility.Collapsed;
             renderer.AddChild(modelGroup);
 
-            CanTranslate = ArchitectPlugin.Settings.EditorTranslation;
-            CanRotate = ArchitectPlugin.Settings.EditorRotation;
-            CanScale = ArchitectPlugin.Settings.EditorScaling;
+            CanTranslate = ArchitectSettingsPlugin.Settings.EditorTranslation;
+            CanRotate = ArchitectSettingsPlugin.Settings.EditorRotation;
+            CanScale = ArchitectSettingsPlugin.Settings.EditorScaling;
         }
 
         public void ClearScenario()

@@ -309,7 +309,7 @@ namespace Reclaimer.Controls
                 OverwritePrompt = true,
                 FileName = model.Name,
                 Filter = filter,
-                FilterIndex = 1 + exportFormats.TakeWhile(f => f.FormatId != ArchitectPlugin.Settings.DefaultSaveFormat).Count(),
+                FilterIndex = 1 + exportFormats.TakeWhile(f => f.FormatId != ArchitectSettingsPlugin.Settings.DefaultSaveFormat).Count(),
                 AddExtension = true
             };
 
@@ -321,7 +321,7 @@ namespace Reclaimer.Controls
 
             fileName = sfd.FileName;
             formatId = exportFormats[sfd.FilterIndex - 1].FormatId;
-            ArchitectPlugin.Settings.DefaultSaveFormat = formatId;
+            ArchitectSettingsPlugin.Settings.DefaultSaveFormat = formatId;
             return true;
         }
 
