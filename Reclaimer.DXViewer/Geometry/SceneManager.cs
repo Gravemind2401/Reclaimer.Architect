@@ -78,10 +78,10 @@ namespace Reclaimer.Geometry
                 throw new InvalidOperationException();
 
             foreach (var bsp in scenario.Bsps)
-                BspHolder.Elements.Add(factory.CreateRenderModel(bsp.Tag.Id));
+                BspHolder.Elements.Add(bsp.Tag == null ? null :  factory.CreateRenderModel(bsp.Tag.Id));
 
             foreach (var sky in scenario.Skies)
-                SkyHolder.Elements.Add(factory.CreateObjectModel(sky.Tag.Id));
+                SkyHolder.Elements.Add(sky.Tag == null ? null : factory.CreateObjectModel(sky.Tag.Id));
 
             foreach (var holder in PaletteHolders.Values)
             {

@@ -266,7 +266,7 @@ namespace Reclaimer.Controls
                         if (bsp == null)
                             continue;
 
-                        var permNode = new TreeItemModel { Header = tag.FileName(), IsChecked = true, Tag = bsp };
+                        var permNode = new TreeItemModel { Header = tag?.FileName() ?? "<null>", IsChecked = true, Tag = bsp };
                         bspNode.Items.Add(permNode);
                     }
 
@@ -281,7 +281,7 @@ namespace Reclaimer.Controls
                         if (sky == null)
                             continue;
 
-                        var permNode = new TreeItemModel { Header = tag.FileName(), IsChecked = true, Tag = sky };
+                        var permNode = new TreeItemModel { Header = tag?.FileName() ?? "<null>", IsChecked = true, Tag = sky };
                         skyNode.Items.Add(permNode);
                     }
 
