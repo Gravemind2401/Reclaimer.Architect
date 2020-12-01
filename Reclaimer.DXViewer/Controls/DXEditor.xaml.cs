@@ -34,9 +34,6 @@ namespace Reclaimer.Controls
     /// </summary>
     public partial class DXEditor : IScenarioRenderView, IDisposable
     {
-        //private delegate bool GetDataFolder(out string dataFolder);
-        //private delegate bool SaveImage(IBitmap bitmap, string baseDir);
-
         public static bool CanOpenTag(IIndexItem tag) => tag.ClassCode.ToLower() == "scnr";
 
         #region Dependency Properties
@@ -92,11 +89,6 @@ namespace Reclaimer.Controls
 
         public TabModel TabModel { get; }
         public ObservableCollection<TreeItemModel> TreeViewItems { get; }
-
-        public Action<string> LogOutput { get; set; }
-        public Action<string, Exception> LogError { get; set; }
-        public Action<string> SetStatus { get; set; }
-        public Action ClearStatus { get; set; }
 
         public DXEditor()
         {
@@ -387,36 +379,6 @@ namespace Reclaimer.Controls
         {
             foreach (var item in TreeViewItems)
                 item.IsChecked = false;
-        }
-
-        private void btnSave_Click(object sender, RoutedEventArgs e)
-        {
-            //var exportFormats = ModelViewerPlugin.GetExportFormats()
-            //    .Select(f => new
-            //    {
-            //        FormatId = f,
-            //        Extension = ModelViewerPlugin.GetFormatExtension(f),
-            //        Description = ModelViewerPlugin.GetFormatDescription(f)
-            //    }).ToList();
-
-            //var filter = string.Join("|", exportFormats.Select(f => $"{f.Description}|*.{f.Extension}"));
-
-            //var sfd = new SaveFileDialog
-            //{
-            //    OverwritePrompt = true,
-            //    FileName = model.Name,
-            //    Filter = filter,
-            //    FilterIndex = 1 + exportFormats.TakeWhile(f => f.FormatId != ModelViewerPlugin.Settings.DefaultSaveFormat).Count(),
-            //    AddExtension = true
-            //};
-
-            //if (sfd.ShowDialog() != true)
-            //    return;
-
-            //var option = exportFormats[sfd.FilterIndex - 1];
-
-            //ModelViewerPlugin.WriteModelFile(model, sfd.FileName, option.FormatId);
-            //ModelViewerPlugin.Settings.DefaultSaveFormat = option.FormatId;
         }
 
         private void btnBringToCamera_Click(object sender, RoutedEventArgs e)
