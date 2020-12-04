@@ -97,7 +97,7 @@ namespace Reclaimer.Geometry
             }
         }
 
-        public virtual Helix.GroupModel3D GenerateModel(Action<Helix.MeshGeometryModel3D, int> applyMaterial)
+        public Helix.GroupModel3D GenerateModelNoInstance(Action<Helix.MeshGeometryModel3D, int> applyMaterial)
         {
             var group = new Helix.GroupModel3D();
 
@@ -113,6 +113,11 @@ namespace Reclaimer.Geometry
             }
 
             return group;
+        }
+
+        public virtual Helix.GroupModel3D GenerateModel(Action<Helix.MeshGeometryModel3D, int> applyMaterial)
+        {
+            return GenerateModelNoInstance(applyMaterial);
         }
 
 

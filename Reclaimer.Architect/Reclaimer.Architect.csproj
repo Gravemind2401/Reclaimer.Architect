@@ -192,7 +192,8 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Utilities\TransformConverter.cs" />
+    <Compile Include="Utilities\MatrixTransformConverter.cs" />
+    <Compile Include="Utilities\EulerTransformConverter.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

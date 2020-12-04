@@ -47,6 +47,17 @@ namespace Reclaimer.Controls
             return model;
         }
 
+        public static RenderModel3D FromElement(Element3D element)
+        {
+            var permutations = new List<Permutation>();
+            permutations.Add(new Permutation(element, nameof(Permutation)));
+
+            var regions = new List<Region>();
+            regions.Add(new Region(nameof(Region), permutations));
+
+            return new RenderModel3D(nameof(RenderModel3D), regions, Enumerable.Empty<InstanceGroup>());
+        }
+
         private readonly List<GroupElement3D> regionGroups;
         private readonly List<GroupElement3D> instanceGroups;
 
@@ -169,6 +180,8 @@ namespace Reclaimer.Controls
             {
                 return Element.GetTotalBounds();
             }
+
+            public override string ToString() => Name;
         }
 
         public class Permutation : BindableBase, IMeshNode
@@ -198,6 +211,8 @@ namespace Reclaimer.Controls
             {
                 return Element.GetTotalBounds();
             }
+
+            public override string ToString() => Name;
         }
 
         public class InstanceGroup : BindableBase, IMeshNode
@@ -240,6 +255,8 @@ namespace Reclaimer.Controls
             {
                 return Instances.Select(i => i.GetNodeBounds()).GetTotalBounds();
             }
+
+            public override string ToString() => Name;
         }
 
         public class Instance : BindableBase, IMeshNode
@@ -274,6 +291,8 @@ namespace Reclaimer.Controls
             {
                 return Parent.Template.GetInstanceBounds(Id);
             }
+
+            public override string ToString() => Name;
         }
     }
 }

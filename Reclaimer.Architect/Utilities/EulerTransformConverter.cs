@@ -15,11 +15,11 @@ using Adjutant.Geometry;
 
 namespace Reclaimer.Utilities
 {
-    public class TransformConverter : IMultiValueConverter
+    public class EulerTransformConverter : IMultiValueConverter
     {
-        public static TransformConverter Instance { get; } = new TransformConverter();
+        public static EulerTransformConverter Instance { get; } = new EulerTransformConverter();
 
-        private TransformConverter() { }
+        private EulerTransformConverter() { }
 
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {

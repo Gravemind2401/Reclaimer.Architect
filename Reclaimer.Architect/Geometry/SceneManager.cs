@@ -185,7 +185,7 @@ namespace Reclaimer.Geometry
 
         private void BindPlacement(ObjectPlacement placement, Helix.Element3D model)
         {
-            var binding = new MultiBinding { Converter = TransformConverter.Instance, Mode = BindingMode.TwoWay };
+            var binding = new MultiBinding { Converter = EulerTransformConverter.Instance, Mode = BindingMode.TwoWay };
             binding.Bindings.Add(new Binding(nameof(ObjectPlacement.Position)) { Mode = BindingMode.TwoWay });
             binding.Bindings.Add(new Binding(nameof(ObjectPlacement.Rotation)) { Mode = BindingMode.TwoWay });
             binding.Bindings.Add(new Binding(nameof(ObjectPlacement.Scale)) { Mode = BindingMode.TwoWay });
@@ -196,7 +196,7 @@ namespace Reclaimer.Geometry
 
         private void BindStartPosition(StartPosition pos, Helix.Element3D model)
         {
-            var binding = new MultiBinding { Converter = TransformConverter.Instance, Mode = BindingMode.TwoWay };
+            var binding = new MultiBinding { Converter = EulerTransformConverter.Instance, Mode = BindingMode.TwoWay };
             binding.Bindings.Add(new Binding(nameof(StartPosition.Position)) { Mode = BindingMode.TwoWay });
             binding.Bindings.Add(new Binding(nameof(StartPosition.Orientation)) { Mode = BindingMode.TwoWay });
 

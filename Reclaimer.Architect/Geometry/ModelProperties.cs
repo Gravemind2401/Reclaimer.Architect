@@ -15,6 +15,10 @@ namespace Reclaimer.Geometry
         public IReadOnlyList<IGeometryNode> Nodes { get; }
         public IReadOnlyList<IGeometryMaterial> Materials { get; }
 
+        public int MeshCount { get; }
+        public IReadOnlyList<int> StandardMeshes { get; }
+        public IReadOnlyList<int> InstanceMeshes { get; }
+
         public ModelProperties(IGeometryModel source)
         {
             Name = source.Name;
@@ -22,6 +26,20 @@ namespace Reclaimer.Geometry
             MarkerGroups = source.MarkerGroups.ToList();
             Nodes = source.Nodes.ToList();
             Materials = source.Materials.ToList();
+
+            var standard = new List<int>();
+            var instances = new List<int>();
+
+            for (int i = 0; i < source.Meshes.Count; i++)
+            {
+                if (source.Meshes[i].IsInstancing)
+                    instances.Add(i);
+                else standard.Add(i);
+            }
+
+            MeshCount = source.Meshes.Count;
+            StandardMeshes = standard;
+            InstanceMeshes = instances;
         }
     }
 }

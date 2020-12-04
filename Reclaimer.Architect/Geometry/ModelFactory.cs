@@ -18,6 +18,7 @@ using Adjutant.Blam.Common;
 using Adjutant.Utilities;
 using Reclaimer.Models;
 using Reclaimer.Utilities;
+using System.Numerics;
 
 namespace Reclaimer.Geometry
 {
@@ -226,6 +227,23 @@ namespace Reclaimer.Geometry
             return RenderModel3D.Error(id.ToString());
         }
 
+        public RenderModel3D CreateModelSection(int id, int lod, int meshIndex, int meshCount) => CreateModelSection(id, lod, meshIndex, meshCount, 1f, Matrix4x4.Identity);
+
+        public RenderModel3D CreateModelSection(int id, int lod, int meshIndex, int meshCount, float scale, Matrix4x4 transform)
+        {
+            try
+            {
+                if (geometryCache.ContainsKey(id))
+                {
+                    var geom = geometryCache[id];
+                    return geom.BuildSection(lod, meshIndex, meshCount, scale, transform);
+                }
+            }
+            catch { }
+
+            return RenderModel3D.Error(id.ToString());
+        }
+
         public ModelProperties GetProperties(int id) => GetProperties(id, 0);
 
         public ModelProperties GetProperties(int id, int lod)
@@ -336,7 +354,7 @@ namespace Reclaimer.Geometry
 
                                 var allTransforms = region.Permutations
                                     .Where(p => p.MeshIndex == i)
-                                    .Select(p => new KeyValuePair<string, SharpDX.Matrix>(p.Name, GetTransform(p).ToMatrix()));
+                                    .Select(p => new KeyValuePair<string, SharpDX.Matrix>(p.Name, GetTransform(p.TransformScale, p.Transform).ToMatrix()));
 
                                 instances.Add(new RenderModel3D.InstanceGroup(region.Name, elements[0], (InstancedMeshTemplate)template, allTransforms));
 
@@ -359,7 +377,7 @@ namespace Reclaimer.Geometry
                                 permutationRoot.Children.Add(e);
                         }
 
-                        permutationRoot.Transform = GetTransform(permutation);
+                        permutationRoot.Transform = GetTransform(permutation.TransformScale, permutation.Transform);
                         permutations.Add(new RenderModel3D.Permutation(permutationRoot, permutation.Name));
                     }
 
@@ -369,21 +387,65 @@ namespace Reclaimer.Geometry
                 return new RenderModel3D(model.Name, regions, instances);
             }
 
-            private Media3D.Transform3D GetTransform(IGeometryPermutation perm)
+            //builds a single permutation and ignores instancing
+            public RenderModel3D BuildSection(int lod, int meshIndex, int meshCount, float scale, Matrix4x4 transform)
+            {
+                var model = LodProperties[lod];
+                var elements = new List<Helix.GroupElement3D>();
+
+                for (int i = meshIndex; i < meshIndex + meshCount; i++)
+                {
+                    var template = templates[lod][i];
+
+                    if (template.IsEmpty)
+                        continue;
+
+                    elements.Add(template.GenerateModelNoInstance((mesh, matIndex) =>
+                    {
+                        if (matIndex < 0 || matIndex >= model.Materials.Count)
+                        {
+                            mesh.IsTransparent = false;
+                            mesh.Material = ErrorMaterial;
+                        }
+
+                        bool isTransparent;
+                        var mat = factory.CreateMaterial(model.Materials[matIndex], out isTransparent);
+
+                        mesh.IsTransparent = isTransparent;
+                        mesh.Material = mat;
+                    }));
+                }
+
+                Helix.GroupElement3D permutationRoot;
+                if (elements.Count == 1)
+                    permutationRoot = elements[0];
+                else
+                {
+                    permutationRoot = new Helix.GroupModel3D();
+                    foreach (var e in elements)
+                        permutationRoot.Children.Add(e);
+                }
+
+                permutationRoot.Transform = GetTransform(scale, transform);
+
+                return RenderModel3D.FromElement(permutationRoot);
+            }
+
+            private Media3D.Transform3D GetTransform(float scale, Matrix4x4 transform)
             {
                 var tGroup = new Media3D.Transform3DGroup();
 
-                if (perm.TransformScale != 1)
+                if (scale != 1)
                 {
-                    var tform = new Media3D.ScaleTransform3D(perm.TransformScale, perm.TransformScale, perm.TransformScale);
+                    var tform = new Media3D.ScaleTransform3D(scale, scale, scale);
 
                     tform.Freeze();
                     tGroup.Children.Add(tform);
                 }
 
-                if (!perm.Transform.IsIdentity)
+                if (!transform.IsIdentity)
                 {
-                    var tform = new Media3D.MatrixTransform3D(perm.Transform.ToMatrix3D());
+                    var tform = new Media3D.MatrixTransform3D(transform.ToMatrix3D());
 
                     tform.Freeze();
                     tGroup.Children.Add(tform);

@@ -1,5 +1,6 @@
 ﻿using Adjutant.Geometry;
 using Adjutant.Spatial;
+using Reclaimer.Controls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,8 +10,6 @@ using System.Threading.Tasks;
 using Numerics = System.Numerics;
 using Media3D = System.Windows.Media.Media3D;
 using Helix = HelixToolkit.Wpf.SharpDX;
-using Reclaimer.Geometry;
-using Reclaimer.Controls;
 
 namespace Reclaimer.Utilities
 {
@@ -73,6 +72,28 @@ namespace Reclaimer.Utilities
                 OffsetX = m.M41,
                 OffsetY = m.M42,
                 OffsetZ = m.M43
+            };
+        }
+
+        public static Numerics.Matrix4x4 ToNumericsMatrix4x4(this SharpDX.Matrix m)
+        {
+            return new Numerics.Matrix4x4
+            {
+                M11 = m.M11,
+                M12 = m.M12,
+                M13 = m.M13,
+
+                M21 = m.M21,
+                M22 = m.M22,
+                M23 = m.M23,
+
+                M31 = m.M31,
+                M32 = m.M32,
+                M33 = m.M33,
+
+                M41 = m.M41,
+                M42 = m.M42,
+                M43 = m.M43
             };
         }
 
