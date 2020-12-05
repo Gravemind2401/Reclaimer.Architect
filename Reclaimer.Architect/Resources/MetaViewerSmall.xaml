@@ -17,6 +17,7 @@
 
     <Thickness x:Key="containerMargin">1,20,1,1</Thickness>
     <sys:Double x:Key="pageWidth">450</sys:Double>
+    <sys:Double x:Key="nameColWidthXS">115</sys:Double>
     <sys:Double x:Key="nameColWidthS">130</sys:Double>
     <sys:Double x:Key="nameColWidth">150</sys:Double>
     <sys:Double x:Key="valueColWidthS">85</sys:Double>

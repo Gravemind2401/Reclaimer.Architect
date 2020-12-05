@@ -18,7 +18,8 @@ namespace Reclaimer.Plugins
 
         public override bool CanOpenFile(OpenFileArgs args)
         {
-            return args.File.OfType<IIndexItem>().Any(i => Controls.DXEditor.CanOpenTag(i));
+            return args.File.OfType<IIndexItem>().Any(i => Controls.DXEditor.CanOpenTag(i))
+                || args.File.OfType<IIndexItem>().Any(i => Controls.BspEditor.CanOpenTag(i));
         }
 
         public override void OpenFile(OpenFileArgs args)
@@ -36,52 +37,104 @@ namespace Reclaimer.Plugins
 
             try
             {
-                var hierarchyView = new Controls.HierarchyView();
-                var propertyView = new Controls.PropertyView();
-                var renderView = new Controls.DXEditor();
-
-                var model = new ScenarioModel(modelTag)
+                if (Controls.DXEditor.CanOpenTag(modelTag))
                 {
-                    HierarchyView = hierarchyView,
-                    PropertyView = propertyView,
-                    RenderView = renderView,
-                    LogError = LogError
-                };
+                    var hierarchyView = new Controls.HierarchyView();
+                    var propertyView = new Controls.PropertyView();
+                    var renderView = new Controls.DXEditor();
 
-                var layout = new DockContainerModel();
-                var docPanel = new DocumentPanelModel();
+                    var model = new ScenarioModel(modelTag)
+                    {
+                        HierarchyView = hierarchyView,
+                        PropertyView = propertyView,
+                        RenderView = renderView,
+                        LogError = LogError
+                    };
 
-                var mainSplit = new SplitPanelModel();
-                mainSplit.Item1 = docPanel;
+                    var layout = new DockContainerModel();
+                    var docPanel = new DocumentPanelModel();
 
-                var toolSplit = new SplitPanelModel { Orientation = System.Windows.Controls.Orientation.Vertical };
-                var tool1 = new ToolWellModel();
-                tool1.Children.Add(hierarchyView.TabModel);
-                var tool2 = new ToolWellModel();
-                tool2.Children.Add(propertyView.TabModel);
-                toolSplit.Item1 = tool1;
-                toolSplit.Item2 = tool2;
+                    var mainSplit = new SplitPanelModel();
+                    mainSplit.Item1 = docPanel;
 
-                mainSplit.Item2 = toolSplit;
-                toolSplit.PanelSize = new System.Windows.GridLength(500);
-                docPanel.AddItem(renderView.TabModel);
-                layout.Content = mainSplit;
+                    var toolSplit = new SplitPanelModel { Orientation = System.Windows.Controls.Orientation.Vertical };
+                    var tool1 = new ToolWellModel();
+                    tool1.Children.Add(hierarchyView.TabModel);
+                    var tool2 = new ToolWellModel();
+                    tool2.Children.Add(propertyView.TabModel);
+                    toolSplit.Item1 = tool1;
+                    toolSplit.Item2 = tool2;
 
-                var wnd = new RaftedWindow(layout, docPanel)
+                    mainSplit.Item2 = toolSplit;
+                    toolSplit.PanelSize = new System.Windows.GridLength(500);
+                    docPanel.AddItem(renderView.TabModel);
+                    layout.Content = mainSplit;
+
+                    var wnd = new RaftedWindow(layout, docPanel)
+                    {
+                        Width = 1600,
+                        Height = 900,
+                        WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner,
+                        Owner = System.Windows.Application.Current.MainWindow,
+                        Title = "Reclaimer - Architect"
+                    };
+
+                    wnd.Show();
+                    wnd.Activate();
+
+                    wnd.Owner = null;
+
+                    renderView.LoadScenario();
+                }
+                else
                 {
-                    Width = 1600,
-                    Height = 900,
-                    WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner,
-                    Owner = System.Windows.Application.Current.MainWindow,
-                    Title = "Reclaimer - Architect"
-                };
+                    var hierarchyView = new Controls.HierarchyView();
+                    var propertyView = new Controls.InstancePropertyView();
+                    var renderView = new Controls.BspEditor();
 
-                wnd.Show();
-                wnd.Activate();
+                    var model = new StructureBspModel(modelTag)
+                    {
+                        //HierarchyView = hierarchyView,
+                        PropertyView = propertyView,
+                        RenderView = renderView,
+                        LogError = LogError
+                    };
 
-                wnd.Owner = null;
+                    var layout = new DockContainerModel();
+                    var docPanel = new DocumentPanelModel();
 
-                renderView.LoadScenario();
+                    var mainSplit = new SplitPanelModel();
+                    mainSplit.Item1 = docPanel;
+
+                    var toolSplit = new SplitPanelModel { Orientation = System.Windows.Controls.Orientation.Vertical };
+                    var tool1 = new ToolWellModel();
+                    tool1.Children.Add(hierarchyView.TabModel);
+                    var tool2 = new ToolWellModel();
+                    tool2.Children.Add(propertyView.TabModel);
+                    toolSplit.Item1 = tool1;
+                    toolSplit.Item2 = tool2;
+
+                    mainSplit.Item2 = toolSplit;
+                    toolSplit.PanelSize = new System.Windows.GridLength(500);
+                    docPanel.AddItem(renderView.TabModel);
+                    layout.Content = mainSplit;
+
+                    var wnd = new RaftedWindow(layout, docPanel)
+                    {
+                        Width = 1600,
+                        Height = 900,
+                        WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner,
+                        Owner = System.Windows.Application.Current.MainWindow,
+                        Title = "Reclaimer - Architect"
+                    };
+
+                    wnd.Show();
+                    wnd.Activate();
+
+                    wnd.Owner = null;
+
+                    renderView.LoadStructureBsp();
+                }
 
                 LogOutput($"Loaded tag: {fileName}");
             }

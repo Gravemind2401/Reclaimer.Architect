@@ -193,6 +193,19 @@ namespace Reclaimer.Controls
             manipulator.LocalAxes = !GlobalManipulationAxes;
         }
 
+        private IRendererHost GetHost()
+        {
+            var target = Parent as FrameworkElement;
+            while (target != null)
+            {
+                var host = target as IRendererHost;
+                if (host != null) return host;
+                target = target.Parent as FrameworkElement;
+            }
+
+            return null;
+        }
+
         #region Overrides
         public override void OnApplyTemplate()
         {
@@ -373,6 +386,8 @@ namespace Reclaimer.Controls
                 manipulator.Visibility = Visibility.Collapsed;
 
             manipulator.Target = selector.Target = model;
+
+            GetHost()?.OnElementSelected(model);
         }
 
         #endregion

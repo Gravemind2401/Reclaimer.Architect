@@ -1,0 +1,144 @@
+﻿<UserControl x:Class="Reclaimer.Controls.InstancePropertyView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Reclaimer.Controls"
+             mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300"
+             DataContext="{Binding CurrentItem, RelativeSource={RelativeSource Self}}">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Reclaimer.DXViewer;component/Resources/MetaViewerSmall.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    
+    <DockPanel>
+        <ScrollViewer VerticalScrollBarVisibility="Visible"
+                      HorizontalScrollBarVisibility="Auto">
+            <StackPanel Margin="5,0">
+                <Grid Margin="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition MinWidth="{StaticResource nameColWidth}" MaxWidth="{StaticResource nameColWidth}" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0">
+                        <TextBlock Text="Scale" TextTrimming="CharacterEllipsis" />
+                    </Label>
+                    <TextBox Grid.Column="1" Width="{StaticResource valueColWidthS}"
+                             Text="{Binding TransformScale}" />
+                </Grid>
+                <Grid>
+                    <Grid.Resources>
+                        <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
+                            <Setter Property="MinWidth" Value="35" />
+                        </Style>
+                        <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                            <Setter Property="Width" Value="{StaticResource valueColWidthS}" />
+                        </Style>
+                    </Grid.Resources>
+
+                    <Grid Margin="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition MinWidth="{StaticResource nameColWidthXS}" MaxWidth="{StaticResource nameColWidthXS}" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Label Grid.Column="0" Width="{StaticResource nameColWidthXS}">
+                            <TextBlock Text="Transform" TextTrimming="CharacterEllipsis" />
+                        </Label>
+                        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="m11" />
+                                <TextBox Text="{Binding M11, StringFormat='0.######'}" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="m12" />
+                                <TextBox Text="{Binding M12, StringFormat='0.######'}" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="m13" />
+                                <TextBox Text="{Binding M13, StringFormat='0.######'}" />
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="m21" />
+                                <TextBox Text="{Binding M21, StringFormat='0.######'}" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="m22" />
+                                <TextBox Text="{Binding M22, StringFormat='0.######'}" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="m23" />
+                                <TextBox Text="{Binding M23, StringFormat='0.######'}" />
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="m31" />
+                                <TextBox Text="{Binding M31, StringFormat='0.######'}" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="m32" />
+                                <TextBox Text="{Binding M32, StringFormat='0.######'}" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="m33" />
+                                <TextBox Text="{Binding M33, StringFormat='0.######'}" />
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal">
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="m41" />
+                                <TextBox Text="{Binding M41, StringFormat='0.######'}" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="m42" />
+                                <TextBox Text="{Binding M42, StringFormat='0.######'}" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="m43" />
+                                <TextBox Text="{Binding M43, StringFormat='0.######'}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+                <Grid Margin="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition MinWidth="{StaticResource nameColWidth}" MaxWidth="{StaticResource nameColWidth}" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0">
+                        <TextBlock Text="Section Index" TextTrimming="CharacterEllipsis" />
+                    </Label>
+                    <TextBox Grid.Column="1" Width="{StaticResource valueColWidthS}"
+                             Text="{Binding SectionIndex}" />
+                </Grid>
+                <Grid Margin="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition MinWidth="{StaticResource nameColWidth}" MaxWidth="{StaticResource nameColWidth}" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0">
+                        <TextBlock Text="Name" TextTrimming="CharacterEllipsis" />
+                    </Label>
+                    <TextBox Grid.Column="1" Width="{StaticResource valueColWidthM}"
+                             Text="{Binding Name}" IsReadOnly="True" />
+                </Grid>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>

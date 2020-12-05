@@ -97,4 +97,52 @@ namespace Reclaimer.Geometry
             }
         }
     }
+
+    public class InstanceHolder : ObjectHolder
+    {
+        private readonly int sectionIndex;
+
+        public override string Name => $"Instances {sectionIndex:D3}";
+        public List<TreeItemModel> TreeItems { get; }
+        public List<InstancePlacement> Placements { get; }
+
+        public Helix.GroupModel3D GroupElement { get; internal set; }
+
+        public InstanceHolder(int sectionIndex, ModelProperties props)
+        {
+            this.sectionIndex = sectionIndex;
+            TreeItems = new List<TreeItemModel>();
+            Placements = new List<InstancePlacement>();
+
+            var perms = props.Regions.SelectMany(r => r.Permutations)
+                .Where(p => p.MeshIndex == sectionIndex);
+
+            foreach (var p in perms)
+            {
+                Placements.Add(new InstancePlacement
+                {
+                    Name = p.Name,
+                    SectionIndex = p.MeshIndex,
+                    TransformScale = p.TransformScale,
+                    Transform = p.Transform
+                });
+            }
+
+            SetCapacity(Placements.Count);
+        }
+
+        public void SetCapacity(int newSize)
+        {
+            Elements.Resize(newSize);
+            TreeItems.Resize(newSize);
+            Placements.Resize(newSize);
+        }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+            GroupElement.Dispose();
+            GroupElement = null;
+        }
+    }
 }
