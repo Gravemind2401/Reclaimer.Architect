@@ -56,7 +56,7 @@
                     <ContentControl Template="{StaticResource ic_EditDropDownList_16x}" />
                 </Button>
                 <Separator />
-                <Button Click="btnSave_Click" ToolTip="Save Model">
+                <Button Click="btnSave_Click" ToolTip="Save Changes">
                     <ContentControl Template="{StaticResource ic_Save_16x}" />
                 </Button>
             </ToolBar>
