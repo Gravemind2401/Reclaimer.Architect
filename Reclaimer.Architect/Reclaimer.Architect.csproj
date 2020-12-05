@@ -141,6 +141,7 @@
     <Compile Include="Controls\IMetaViewerHost.cs" />
     <Compile Include="Controls\IRendererHost.cs" />
     <Compile Include="Controls\ManipulationFlags.cs" />
+    <Compile Include="Controls\MarkerGeometry3D.cs" />
     <Compile Include="Controls\ObjectModel3D.cs" />
     <Compile Include="Controls\PaletteEditorWindow.xaml.cs">
       <DependentUpon>PaletteEditorWindow.xaml</DependentUpon>
@@ -152,6 +153,7 @@
     <Compile Include="Controls\Spinner.xaml.cs">
       <DependentUpon>Spinner.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\LightFixture3D.cs" />
     <Compile Include="Controls\StartPosition3D.cs" />
     <Compile Include="Controls\TransformManipulatorEx3D.cs" />
     <Compile Include="Controls\PropertyView.xaml.cs">

@@ -61,13 +61,18 @@ namespace Reclaimer.Geometry
 
             foreach (var definition in scenario.Palettes.Values)
             {
+                //not fully implemented yet
+                if (definition.Name == PaletteType.LightFixture)
+                    continue;
+
                 var holder = new PaletteHolder(definition);
                 PaletteHolders.Add(holder.Name, holder);
 
                 yield return Task.Run(() =>
                 {
                     for (int i = 0; i < definition.Palette.Count; i++)
-                        factory.LoadTag(definition.Palette[i].Tag, false);
+                        if (ModelFactory.IsTagSupported(definition.Palette[i].Tag))
+                            factory.LoadTag(definition.Palette[i].Tag, false);
                 });
             }
         }
@@ -78,7 +83,7 @@ namespace Reclaimer.Geometry
                 throw new InvalidOperationException();
 
             foreach (var bsp in scenario.Bsps)
-                BspHolder.Elements.Add(bsp.Tag == null ? null :  factory.CreateRenderModel(bsp.Tag.Id));
+                BspHolder.Elements.Add(bsp.Tag == null ? null : factory.CreateRenderModel(bsp.Tag.Id));
 
             foreach (var sky in scenario.Skies)
                 SkyHolder.Elements.Add(sky.Tag == null ? null : factory.CreateObjectModel(sky.Tag.Id));
@@ -141,11 +146,17 @@ namespace Reclaimer.Geometry
                 return;
             }
 
-            var inst = factory.CreateObjectModel(tag.Id);
-            if (inst == null)
+            Helix.Element3D inst;
+            if (holder.Definition.Name == PaletteType.LightFixture)
+                inst = new LightFixture3D();
+            else
             {
-                holder.Elements[index] = null;
-                return;
+                inst = factory.CreateObjectModel(tag.Id);
+                if (inst == null)
+                {
+                    holder.Elements[index] = null;
+                    return;
+                }
             }
 
             BindPlacement(placement, inst);

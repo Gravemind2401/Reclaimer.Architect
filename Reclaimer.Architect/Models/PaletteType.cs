@@ -16,6 +16,7 @@ namespace Reclaimer.Models
         public const string Weapon = "weapon";
         public const string Machine = "machine";
         public const string Control = "control";
+        public const string LightFixture = "lightfixture";
         public const string Crate = "crate";
 
         private static Dictionary<NodeType, string> ByNodeType = new Dictionary<NodeType, string>
@@ -27,6 +28,7 @@ namespace Reclaimer.Models
             { NodeType.Weapons, PaletteType.Weapon },
             { NodeType.Machines, PaletteType.Machine },
             { NodeType.Controls, PaletteType.Control },
+            { NodeType.LightFixtures, PaletteType.LightFixture },
             { NodeType.Crates, PaletteType.Crate }
         };
 

@@ -33,7 +33,7 @@ namespace Reclaimer.Geometry
         private readonly ConcurrentDictionary<int, ModelType> modelTypes = new ConcurrentDictionary<int, ModelType>();
         private readonly ConcurrentDictionary<int, ModelConfig> configCache = new ConcurrentDictionary<int, ModelConfig>();
 
-        public static bool IsTagSupported(IIndexItem tag) => directContentTags.Union(compositeTags).Any(s => tag.ClassCode.ToLower() == s);
+        public static bool IsTagSupported(IIndexItem tag) => directContentTags.Union(compositeTags).Any(s => tag?.ClassCode.ToLower() == s);
 
         public Helix.Material CreateMaterial(IGeometryMaterial mat, out bool isTransparent)
         {

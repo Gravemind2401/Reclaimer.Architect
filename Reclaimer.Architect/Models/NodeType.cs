@@ -14,7 +14,7 @@ namespace Reclaimer.Models
         // Devices
         Machines,
         Controls,
-        LightFixtrures,
+        LightFixtures,
         DeviceGroups,
 
         // Items

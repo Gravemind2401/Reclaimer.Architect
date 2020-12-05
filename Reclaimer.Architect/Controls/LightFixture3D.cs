@@ -11,12 +11,12 @@ using Media = System.Windows.Media;
 
 namespace Reclaimer.Controls
 {
-    public sealed class StartPosition3D : MarkerGeometry3D
+    public sealed class LightFixture3D : MarkerGeometry3D
     {
         private static readonly Material MarkerMaterial = DiffuseMaterials.LightBlue;
         private static readonly Geometry3D MarkerGeometry;
 
-        static StartPosition3D()
+        static LightFixture3D()
         {
             var builder = new MeshBuilder();
 
@@ -29,8 +29,6 @@ namespace Reclaimer.Controls
 
             MarkerGeometry = builder.ToMesh();
         }
-
-        public override ManipulationFlags ManipulationFlags => ManipulationFlags.Translate | ManipulationFlags.RotateYZ;
 
         protected override MeshGeometryModel3D GetMeshGeometry()
         {
