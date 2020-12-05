@@ -119,10 +119,10 @@ namespace Reclaimer.Geometry
 
             foreach (var p in perms)
             {
-                Placements.Add(new InstancePlacement
+                Placements.Add(new InstancePlacement(p.SourceIndex)
                 {
                     Name = p.Name,
-                    SectionIndex = p.MeshIndex,
+                    MeshIndex = p.MeshIndex,
                     TransformScale = p.TransformScale,
                     Transform = p.Transform
                 });

@@ -121,10 +121,10 @@
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
                     <Label Grid.Column="0">
-                        <TextBlock Text="Section Index" TextTrimming="CharacterEllipsis" />
+                        <TextBlock Text="Mesh Index" TextTrimming="CharacterEllipsis" />
                     </Label>
                     <TextBox Grid.Column="1" Width="{StaticResource valueColWidthS}"
-                             Text="{Binding SectionIndex}" />
+                             Text="{Binding MeshIndex}" />
                 </Grid>
                 <Grid Margin="1">
                     <Grid.ColumnDefinitions>

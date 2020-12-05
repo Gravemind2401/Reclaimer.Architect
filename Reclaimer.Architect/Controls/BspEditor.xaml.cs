@@ -127,6 +127,8 @@ namespace Reclaimer.Controls
         //    bspManager.RefreshObject(paletteKey, placement, fieldId);
         //}
 
+        public IEnumerable<InstancePlacement> GetPlacements() => bspManager.InstanceHolders.SelectMany(p => p.Value.Placements);
+
         public void LoadStructureBsp()
         {
             IsEnabled = false;
@@ -294,6 +296,11 @@ namespace Reclaimer.Controls
             obj.M41 = (float)camPos.X;
             obj.M42 = (float)camPos.Y;
             obj.M43 = (float)camPos.Z;
+        }
+
+        private void btnSave_Click(object sender, RoutedEventArgs e)
+        {
+            bspModel.SaveChanges();
         }
         #endregion
 

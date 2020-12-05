@@ -24,6 +24,6 @@ namespace Reclaimer.Models
 
     public interface IStructureBspRenderView : IStructureBspHandler
     {
-
+        IEnumerable<InstancePlacement> GetPlacements();
     }
 }

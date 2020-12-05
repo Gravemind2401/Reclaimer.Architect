@@ -12,6 +12,8 @@ namespace Reclaimer.Models
 {
     public class InstancePlacement : BindableBase
     {
+        public int SourceIndex { get; }
+
         private float transformScale;
         public float TransformScale
         {
@@ -115,11 +117,11 @@ namespace Reclaimer.Models
         }
         #endregion
 
-        private int sectionIndex;
-        public int SectionIndex
+        private int meshIndex;
+        public int MeshIndex
         {
-            get { return sectionIndex; }
-            set { SetProperty(ref sectionIndex, value); }
+            get { return meshIndex; }
+            set { SetProperty(ref meshIndex, value); }
         }
 
         private string name;
@@ -127,6 +129,11 @@ namespace Reclaimer.Models
         {
             get { return name; }
             set { SetProperty(ref name, value); }
+        }
+
+        public InstancePlacement(int sourceIndex)
+        {
+            SourceIndex = sourceIndex;
         }
 
         private void SetTransformProperty<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)

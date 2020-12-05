@@ -87,7 +87,7 @@ namespace Reclaimer.Geometry
 
             var placement = holder.Placements[index];
 
-            var inst = factory.CreateModelSection(tagId, 0, placement.SectionIndex, 1);
+            var inst = factory.CreateModelSection(tagId, 0, placement.MeshIndex, 1);
             if (inst == null)
             {
                 holder.Elements[index] = null;

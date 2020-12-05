@@ -100,6 +100,10 @@
                         ToolTip="Bring to camera">
                     <ContentControl Template="{StaticResource ic_BringtoFront_16x}" />
                 </Button>
+                <Separator />
+                <Button Click="btnSave_Click" ToolTip="Save changes">
+                    <ContentControl Template="{StaticResource ic_Save_16x}" />
+                </Button>
             </ToolBar>
         </ToolBarTray>
         <ToolBarTray DockPanel.Dock="Bottom" IsLocked="True">
