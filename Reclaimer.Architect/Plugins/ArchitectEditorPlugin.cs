@@ -18,14 +18,31 @@ namespace Reclaimer.Plugins
 
         public override bool CanOpenFile(OpenFileArgs args)
         {
+#if DEBUG
             return args.File.OfType<IIndexItem>().Any(i => Controls.DXEditor.CanOpenTag(i))
                 || args.File.OfType<IIndexItem>().Any(i => Controls.BspEditor.CanOpenTag(i));
+#else
+            return args.File.OfType<IIndexItem>().Any(i => Controls.DXEditor.CanOpenTag(i));
+#endif
         }
 
         public override void OpenFile(OpenFileArgs args)
         {
             var modelTag = args.File.OfType<IIndexItem>().FirstOrDefault();
             DisplayModel(args.TargetWindow, modelTag, args.FileName);
+        }
+
+        private IEnumerable<TabOwnerModelBase> EnumerateChildren(TabOwnerModelBase obj)
+        {
+            var container = obj as DockContainerModel;
+            if (container != null)
+                return EnumerateChildren(container.Content);
+
+            var panel = obj as SplitPanelModel;
+            if (panel != null)
+                return panel.Items.Union(panel.Items.SelectMany(i => EnumerateChildren(i)));
+
+            return Enumerable.Repeat(obj, 1);
         }
 
         [SharedFunction]
@@ -51,87 +68,50 @@ namespace Reclaimer.Plugins
                         LogError = LogError
                     };
 
-                    var layout = new DockContainerModel();
-                    var docPanel = new DocumentPanelModel();
+                    var existingToolWells = EnumerateChildren(targetWindow.DockContainer)
+                        .OfType<ToolWellModel>()
+                        .ToList();
 
-                    var mainSplit = new SplitPanelModel();
-                    mainSplit.Item1 = docPanel;
+                    targetWindow.DocumentPanel.AddItem(renderView.TabModel);
+                    targetWindow.DockContainer.AddTool(hierarchyView.TabModel, null, System.Windows.Controls.Dock.Right);
+                    targetWindow.DockContainer.AddTool(propertyView.TabModel, hierarchyView.TabModel.Parent, System.Windows.Controls.Dock.Bottom);
 
-                    var toolSplit = new SplitPanelModel { Orientation = System.Windows.Controls.Orientation.Vertical };
-                    var tool1 = new ToolWellModel();
-                    tool1.Children.Add(hierarchyView.TabModel);
-                    var tool2 = new ToolWellModel();
-                    tool2.Children.Add(propertyView.TabModel);
-                    toolSplit.Item1 = tool1;
-                    toolSplit.Item2 = tool2;
+                    //the panels attempt to size to the contents but since the controls havent loaded yet
+                    //they will have no size - we need to set a size for them.
+                    hierarchyView.TabModel.Parent.PanelSize = new System.Windows.GridLength(1, System.Windows.GridUnitType.Star);
+                    propertyView.TabModel.Parent.PanelSize = new System.Windows.GridLength(1, System.Windows.GridUnitType.Star);
+                    hierarchyView.TabModel.Parent.Parent.PanelSize = new System.Windows.GridLength(500);
 
-                    mainSplit.Item2 = toolSplit;
-                    toolSplit.PanelSize = new System.Windows.GridLength(500);
-                    docPanel.AddItem(renderView.TabModel);
-                    layout.Content = mainSplit;
-
-                    var wnd = new RaftedWindow(layout, docPanel)
-                    {
-                        Width = 1600,
-                        Height = 900,
-                        WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner,
-                        Owner = System.Windows.Application.Current.MainWindow,
-                        Title = "Reclaimer - Architect"
-                    };
-
-                    wnd.Show();
-                    wnd.Activate();
-
-                    wnd.Owner = null;
+                    foreach (var well in existingToolWells)
+                        well.TogglePinStatusCommand.Execute(null);
 
                     renderView.LoadScenario();
                 }
                 else
                 {
-                    var hierarchyView = new Controls.HierarchyView();
                     var propertyView = new Controls.InstancePropertyView();
                     var renderView = new Controls.BspEditor();
 
                     var model = new StructureBspModel(modelTag)
                     {
-                        //HierarchyView = hierarchyView,
                         PropertyView = propertyView,
                         RenderView = renderView,
                         LogError = LogError
                     };
 
-                    var layout = new DockContainerModel();
-                    var docPanel = new DocumentPanelModel();
+                    var existingToolWells = EnumerateChildren(targetWindow.DockContainer)
+                        .OfType<ToolWellModel>()
+                        .ToList();
 
-                    var mainSplit = new SplitPanelModel();
-                    mainSplit.Item1 = docPanel;
+                    targetWindow.DocumentPanel.AddItem(renderView.TabModel);
+                    targetWindow.DockContainer.AddTool(propertyView.TabModel, null, System.Windows.Controls.Dock.Right);
 
-                    var toolSplit = new SplitPanelModel { Orientation = System.Windows.Controls.Orientation.Vertical };
-                    var tool1 = new ToolWellModel();
-                    tool1.Children.Add(hierarchyView.TabModel);
-                    var tool2 = new ToolWellModel();
-                    tool2.Children.Add(propertyView.TabModel);
-                    toolSplit.Item1 = tool1;
-                    toolSplit.Item2 = tool2;
+                    //the panels attempt to size to the contents but since the controls havent loaded yet
+                    //they will have no size - we need to set a size for them.
+                    propertyView.TabModel.Parent.PanelSize = new System.Windows.GridLength(500);
 
-                    mainSplit.Item2 = toolSplit;
-                    toolSplit.PanelSize = new System.Windows.GridLength(500);
-                    docPanel.AddItem(renderView.TabModel);
-                    layout.Content = mainSplit;
-
-                    var wnd = new RaftedWindow(layout, docPanel)
-                    {
-                        Width = 1600,
-                        Height = 900,
-                        WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner,
-                        Owner = System.Windows.Application.Current.MainWindow,
-                        Title = "Reclaimer - Architect"
-                    };
-
-                    wnd.Show();
-                    wnd.Activate();
-
-                    wnd.Owner = null;
+                    foreach (var well in existingToolWells)
+                        well.TogglePinStatusCommand.Execute(null);
 
                     renderView.LoadStructureBsp();
                 }
