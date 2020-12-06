@@ -138,6 +138,7 @@
     <Compile Include="Controls\HierarchyView.xaml.cs">
       <DependentUpon>HierarchyView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\IManipulatable.cs" />
     <Compile Include="Controls\IMeshNode.cs" />
     <Compile Include="Controls\IMetaViewerHost.cs" />
     <Compile Include="Controls\IRendererHost.cs" />

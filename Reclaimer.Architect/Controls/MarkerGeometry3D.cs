@@ -12,12 +12,14 @@ using Media = System.Windows.Media;
 
 namespace Reclaimer.Controls
 {
-    public abstract class MarkerGeometry3D : GroupElement3D, IMeshNode
+    public abstract class MarkerGeometry3D : GroupElement3D, IMeshNode, IManipulatable
     {
         public MarkerGeometry3D()
         {
             Children.Add(GetMeshGeometry());
         }
+
+        public virtual ManipulationFlags ManipulationFlags => ManipulationFlags.ManipulateAll;
 
         protected abstract MeshGeometryModel3D GetMeshGeometry();
 

@@ -382,6 +382,10 @@ namespace Reclaimer.Controls
         {
             var flags = ManipulationFlags;
 
+            var obj = Target as IManipulatable;
+            if (obj != null)
+                flags &= obj.ManipulationFlags;
+
             translationX.IsRendering = flags.HasFlag(ManipulationFlags.TranslateX);
             translationY.IsRendering = flags.HasFlag(ManipulationFlags.TranslateY);
             translationZ.IsRendering = flags.HasFlag(ManipulationFlags.TranslateZ);
