@@ -93,7 +93,8 @@
                     </HierarchicalDataTemplate>
                 </TreeView.ItemTemplate>
             </TreeView>
-            <ListBox s:SplitPanel.DesiredSize="200"
+            <ListBox x:Name="list" x:FieldModifier="private"
+                     s:SplitPanel.DesiredSize="200"
                      ItemsSource="{Binding Items}"
                      SelectedIndex="{Binding SelectedItemIndex, Mode=TwoWay}">
                 <ListBox.Resources>

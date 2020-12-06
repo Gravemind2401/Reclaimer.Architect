@@ -32,7 +32,7 @@ namespace Reclaimer.Controls
     /// <summary>
     /// Interaction logic for DXViewer.xaml
     /// </summary>
-    public partial class DXEditor : IScenarioRenderView, IDisposable
+    public partial class DXEditor : IScenarioRenderView, IRendererHost, IDisposable
     {
         public static bool CanOpenTag(IIndexItem tag) => tag.ClassCode.ToLower() == "scnr";
 
@@ -198,6 +198,26 @@ namespace Reclaimer.Controls
         {
             renderer.SetSelectedElement(null);
             sceneManager.RefreshObject(paletteKey, placement, fieldId);
+        }
+
+        public void OnElementSelected(Helix.Element3D element)
+        {
+            if (element?.DataContext == null)
+                return;
+
+            var nodeType = (NodeType)scenario.SelectedNode.Tag;
+
+            if (nodeType == NodeType.StartPositions)
+                scenario.SelectedItemIndex = scenario.StartingPositions.IndexOf(element.DataContext as StartPosition);
+            else if (nodeType == NodeType.TriggerVolumes)
+            {
+
+            }
+            else
+            {
+                var paletteKey = PaletteType.FromNodeType(nodeType);
+                scenario.SelectedItemIndex = scenario.Palettes[paletteKey].Placements.IndexOf(element.DataContext as ObjectPlacement);
+            }
         }
 
         public void LoadScenario()
@@ -446,7 +466,7 @@ namespace Reclaimer.Controls
 
             Clipboard.SetText(label.Content?.ToString());
             label.BeginAnimation(OpacityProperty, anim);
-        } 
+        }
         #endregion
 
         #region IDisposable

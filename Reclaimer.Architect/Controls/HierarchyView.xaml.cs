@@ -43,6 +43,11 @@ namespace Reclaimer.Controls
             DataContext = this.scenario = scenario;
         }
 
+        public void ShowCurrentSelection()
+        {
+            list.ScrollIntoView(list.SelectedItem);
+        }
+
         private void tv_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             scenario.SelectedNode = tv.SelectedItem as TreeItemModel;

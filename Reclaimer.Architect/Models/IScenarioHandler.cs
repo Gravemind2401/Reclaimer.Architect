@@ -14,7 +14,7 @@ namespace Reclaimer.Models
 
     public interface IScenarioHierarchyView : IScenarioHandler
     {
-
+        void ShowCurrentSelection();
     }
 
     public interface IScenarioPropertyView : IScenarioHandler

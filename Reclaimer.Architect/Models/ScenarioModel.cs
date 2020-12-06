@@ -450,6 +450,7 @@ namespace Reclaimer.Models
 
         private void OnSelectedItemChanged()
         {
+            HierarchyView.ShowCurrentSelection();
             PropertyView?.ShowProperties(SelectedNodeType, SelectedItemIndex);
             RenderView?.SelectObject(SelectedNodeType, SelectedItemIndex);
         }
