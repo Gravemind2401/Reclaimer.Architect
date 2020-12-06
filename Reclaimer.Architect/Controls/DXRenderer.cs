@@ -175,7 +175,7 @@ namespace Reclaimer.Controls
         private readonly TransformManipulatorEx3D manipulator = new TransformManipulatorEx3D
         {
             UniformScaling = true,
-            SizeScale = 1,
+            AutoSizeScale = true,
             Visibility = Visibility.Collapsed
         };
 
@@ -378,7 +378,6 @@ namespace Reclaimer.Controls
 
             if (model != null)
             {
-                manipulator.SizeScale = Math.Max(0.5, model.GetTotalBounds(true).Size.Length() * 0.35);
                 manipulator.CenterOffset = model.GetTotalBounds(true).Center;
                 manipulator.Visibility = Visibility.Visible;
             }

@@ -13,6 +13,7 @@ using Media = System.Windows.Media;
 using HelixToolkit.Wpf.SharpDX;
 using HelixToolkit.Wpf.SharpDX.Model.Scene;
 using HelixToolkit.Wpf.SharpDX.Utilities;
+using Reclaimer.Utilities;
 
 namespace Reclaimer.Controls
 {
@@ -167,6 +168,18 @@ namespace Reclaimer.Controls
             DependencyProperty.Register(nameof(SizeScale), typeof(double), typeof(TransformManipulatorEx3D), new PropertyMetadata(1.0, (d, e) =>
             {
                 (d as TransformManipulatorEx3D).sizeScale = (double)e.NewValue;
+            }));
+
+        public bool AutoSizeScale
+        {
+            get { return (bool)GetValue(AutoSizeScaleProperty); }
+            set { SetValue(AutoSizeScaleProperty, value); }
+        }
+
+        public static readonly DependencyProperty AutoSizeScaleProperty =
+            DependencyProperty.Register(nameof(AutoSizeScale), typeof(bool), typeof(TransformManipulatorEx3D), new PropertyMetadata(false, (d, e) =>
+            {
+                (d as TransformManipulatorEx3D).OnUpdateSelfTransform();
             }));
 
         public ManipulationFlags ManipulationFlags
@@ -410,6 +423,8 @@ namespace Reclaimer.Controls
             if (target == null || !CanBeginTransform(e))
                 return;
 
+            var overrideNormal = false;
+
             if (e.HitTestResult.ModelHit == translationX)
             {
                 manipulationType = ManipulationType.TranslationX;
@@ -428,17 +443,20 @@ namespace Reclaimer.Controls
             else if (e.HitTestResult.ModelHit == translationXY)
             {
                 manipulationType = ManipulationType.TranslationXY;
-                direction = Vector3.Normalize(Vector3.UnitX + Vector3.UnitY);
+                direction = Vector3.UnitZ;
+                overrideNormal = true;
             }
             else if (e.HitTestResult.ModelHit == translationYZ)
             {
                 manipulationType = ManipulationType.TranslationYZ;
-                direction = Vector3.Normalize(Vector3.UnitY + Vector3.UnitZ);
+                direction = -Vector3.UnitX;
+                overrideNormal = true;
             }
             else if (e.HitTestResult.ModelHit == translationXZ)
             {
                 manipulationType = ManipulationType.TranslationXZ;
-                direction = Vector3.Normalize(Vector3.UnitX + Vector3.UnitZ);
+                direction = -Vector3.UnitY;
+                overrideNormal = true;
             }
             else
             {
@@ -447,6 +465,9 @@ namespace Reclaimer.Controls
                 return;
             }
 
+            if (LocalAxes)
+                direction = Vector3.TransformNormal(direction, rotationMatrix);
+
             HideAllGeometry();
             (e.HitTestResult.ModelHit as GeometryModel3D).IsRendering = true;
 
@@ -454,10 +475,16 @@ namespace Reclaimer.Controls
             currentColor = material.DiffuseColor;
             material.DiffuseColor = Color.Yellow;
             currentViewport = e.Viewport;
-            var cameraNormal = Vector3.Normalize(e.Viewport.Camera.CameraInternal.LookDirection);
-            this.lastHitPosWS = e.HitTestResult.PointHit;
-            var up = Vector3.Cross(cameraNormal, direction);
-            normal = Vector3.Cross(up, direction);
+
+            if (overrideNormal)
+                normal = direction;
+            else
+            {
+                var cameraNormal = Vector3.Normalize(e.Viewport.Camera.CameraInternal.LookDirection);
+                lastHitPosWS = e.HitTestResult.PointHit;
+                var up = Vector3.Cross(cameraNormal, direction);
+                normal = Vector3.Cross(up, direction);
+            }
 
             Vector3 hit;
             if (currentViewport.UnProjectOnPlane(e.Position.ToVector2(), lastHitPosWS, normal, out hit))
@@ -699,6 +726,10 @@ namespace Reclaimer.Controls
                 scaleMatrix.M11 += scale * Math.Abs(dotX);
                 scaleMatrix.M22 += scale * Math.Abs(dotY);
                 scaleMatrix.M33 += scale * Math.Abs(dotZ);
+
+                if (AutoSizeScale)
+                    OnUpdateSelfTransform();
+
                 OnUpdateTargetMatrix();
             }
         }
@@ -780,8 +811,12 @@ namespace Reclaimer.Controls
 
         private void OnUpdateSelfTransform()
         {
+            var scale = AutoSizeScale && target != null
+                ? Math.Max(0.5, target.GetTotalBounds().Size.Length() * 0.35)
+                : sizeScale;
+
             var m = Matrix.Translation(centerOffset + translationVector);
-            m.M11 = m.M22 = m.M33 = (float)sizeScale;
+            m.M11 = m.M22 = m.M33 = (float)scale;
 
             if (LocalAxes)
                 m = rotationMatrix * m;
