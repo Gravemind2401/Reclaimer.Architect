@@ -124,6 +124,38 @@ namespace Reclaimer.Models
             set { SetProperty(ref meshIndex, value); }
         }
 
+        #region Bounding Sphere Properties
+
+        private float sphereX;
+        public float SphereX
+        {
+            get { return sphereX; }
+            set { SetProperty(ref sphereX, value); }
+        }
+
+        private float sphereY;
+        public float SphereY
+        {
+            get { return sphereY; }
+            set { SetProperty(ref sphereY, value); }
+        }
+
+        private float sphereZ;
+        public float SphereZ
+        {
+            get { return sphereZ; }
+            set { SetProperty(ref sphereZ, value); }
+        }
+
+        private float sphereRadius;
+        public float SphereRadius
+        {
+            get { return sphereRadius; }
+            set { SetProperty(ref sphereRadius, value); }
+        }
+
+        #endregion
+
         private string name;
         public string Name
         {

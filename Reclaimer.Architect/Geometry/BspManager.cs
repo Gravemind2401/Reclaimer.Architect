@@ -1,26 +1,18 @@
 ﻿using Adjutant.Blam.Common;
-using Adjutant.Geometry;
-using Adjutant.Spatial;
-using Adjutant.Utilities;
 using Reclaimer.Models;
 using Reclaimer.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Drawing.Dds;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Data;
 
 using static HelixToolkit.Wpf.SharpDX.Media3DExtension;
 
 using Media = System.Windows.Media;
 using Media3D = System.Windows.Media.Media3D;
 using Helix = HelixToolkit.Wpf.SharpDX;
-using System.Windows.Data;
-using Reclaimer.Controls;
-using System.Collections.Concurrent;
-using Reclaimer.Resources;
 
 namespace Reclaimer.Geometry
 {
@@ -47,8 +39,9 @@ namespace Reclaimer.Geometry
                 factory.LoadTag(bspModel.StructureBspTag, false);
                 modelProps = factory.GetProperties(tagId);
 
+                var instanceData = ReadInstanceData();
                 foreach (var i in modelProps.InstanceMeshes)
-                    InstanceHolders.Add(i, new InstanceHolder(i, modelProps));
+                    InstanceHolders.Add(i, new InstanceHolder(i, modelProps, instanceData));
             });
         }
 
@@ -57,7 +50,7 @@ namespace Reclaimer.Geometry
             if (bspModel == null)
                 throw new InvalidOperationException();
 
-            foreach(var index in modelProps.StandardMeshes)
+            foreach (var index in modelProps.StandardMeshes)
                 ClusterHolder.Elements.Add(factory.CreateModelSection(tagId, 0, index, 1));
 
             foreach (var holder in InstanceHolders.Values)
@@ -68,6 +61,29 @@ namespace Reclaimer.Geometry
                 for (int i = 0; i < holder.Placements.Count; i++)
                     ConfigurePlacement(holder, i);
             }
+        }
+
+        private List<IBspGeometryInstanceBlock> ReadInstanceData()
+        {
+            switch (bspModel.StructureBspTag.CacheFile.CacheType)
+            {
+                case CacheType.Halo3Beta:
+                case CacheType.Halo3Retail:
+                case CacheType.Halo3ODST:
+                case CacheType.MccHalo3:
+                case CacheType.MccHalo3ODST:
+                    return ReadInstanceDataHalo3();
+                default:
+                    throw new NotSupportedException();
+            }
+        }
+
+        private List<IBspGeometryInstanceBlock> ReadInstanceDataHalo3()
+        {
+            var meta = bspModel.StructureBspTag.ReadMetadata<Reclaimer.Blam.Halo3.scenario_structure_bsp>();
+            var result = new List<IBspGeometryInstanceBlock>(meta.GeometryInstances.Count);
+            result.AddRange(meta.GeometryInstances);
+            return result;
         }
 
         private void RemovePlacement(InstanceHolder holder, int index)

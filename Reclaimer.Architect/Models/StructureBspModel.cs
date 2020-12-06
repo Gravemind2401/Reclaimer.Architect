@@ -109,6 +109,12 @@ namespace Reclaimer.Models
                     writer.Write(placement.M42);
                     writer.Write(placement.M43);
                     writer.Write((short)placement.MeshIndex);
+
+                    writer.Seek(baseAddress + 120 * placement.SourceIndex + 64, SeekOrigin.Begin);
+                    writer.Write(placement.SphereX);
+                    writer.Write(placement.SphereY);
+                    writer.Write(placement.SphereZ);
+                    writer.Write(placement.SphereRadius);
                 }
             }
         }

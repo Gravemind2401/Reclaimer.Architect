@@ -108,7 +108,7 @@ namespace Reclaimer.Geometry
 
         public Helix.GroupModel3D GroupElement { get; internal set; }
 
-        public InstanceHolder(int sectionIndex, ModelProperties props)
+        public InstanceHolder(int sectionIndex, ModelProperties props, IList<IBspGeometryInstanceBlock> instanceData)
         {
             this.sectionIndex = sectionIndex;
             TreeItems = new List<TreeItemModel>();
@@ -119,12 +119,17 @@ namespace Reclaimer.Geometry
 
             foreach (var p in perms)
             {
+                var source = instanceData[p.SourceIndex];
                 Placements.Add(new InstancePlacement(p.SourceIndex)
                 {
                     Name = p.Name,
                     MeshIndex = p.MeshIndex,
                     TransformScale = p.TransformScale,
-                    Transform = p.Transform
+                    Transform = p.Transform,
+                    SphereX = source.BoundingSpherePosition.X,
+                    SphereY = source.BoundingSpherePosition.Y,
+                    SphereZ = source.BoundingSpherePosition.Z,
+                    SphereRadius = source.BoundingSphereRadius
                 });
             }
 

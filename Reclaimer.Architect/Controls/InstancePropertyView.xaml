@@ -138,6 +138,53 @@
                     <TextBox Grid.Column="1" Width="{StaticResource valueColWidthM}"
                              Text="{Binding Name}" IsReadOnly="True" />
                 </Grid>
+                <Grid>
+                    <Grid.Resources>
+                        <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
+                            <Setter Property="MinWidth" Value="35" />
+                        </Style>
+                        <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                            <Setter Property="Width" Value="{StaticResource valueColWidthS}" />
+                        </Style>
+                    </Grid.Resources>
+
+                    <Grid Margin="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition MinWidth="{StaticResource nameColWidthXS}" MaxWidth="{StaticResource nameColWidthXS}" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Width="{StaticResource nameColWidthXS}">
+                            <TextBlock Text="Bounding Sphere" TextTrimming="CharacterEllipsis" />
+                        </Label>
+                        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="X" HorizontalContentAlignment="Right" />
+                                <TextBox Text="{Binding SphereX, StringFormat='0.######'}" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="Y" HorizontalContentAlignment="Right" />
+                                <TextBox Text="{Binding SphereY, StringFormat='0.######'}" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="Z" HorizontalContentAlignment="Right" />
+                                <TextBox Text="{Binding SphereZ, StringFormat='0.######'}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+                <Grid Margin="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition MinWidth="{StaticResource nameColWidth}" MaxWidth="{StaticResource nameColWidth}" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0">
+                        <TextBlock Text="Bounding Sphere Radius" TextTrimming="CharacterEllipsis" />
+                    </Label>
+                    <TextBox Grid.Column="1" Width="{StaticResource valueColWidthS}"
+                             Text="{Binding SphereRadius}" />
+                </Grid>
             </StackPanel>
         </ScrollViewer>
     </DockPanel>
