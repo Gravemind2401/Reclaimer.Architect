@@ -22,7 +22,7 @@
 
     <DockPanel>
         <ToolBarTray DockPanel.Dock="Top" IsLocked="True">
-            <ToolBar Margin="3,1">
+            <ToolBar>
                 <ToolBar.Resources>
                     <Style x:Key="{x:Static ToolBar.ButtonStyleKey}" TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
                         <Style.Triggers>

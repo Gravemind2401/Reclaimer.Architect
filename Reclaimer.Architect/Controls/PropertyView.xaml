@@ -16,7 +16,7 @@
 
     <DockPanel>
         <ToolBarTray DockPanel.Dock="Top" IsLocked="True">
-            <ToolBar Margin="3,1">
+            <ToolBar>
                 <Button Click="btnReload_Click" ToolTip="Reload data">
                     <ContentControl Template="{StaticResource ic_Refresh_16x}" />
                 </Button>

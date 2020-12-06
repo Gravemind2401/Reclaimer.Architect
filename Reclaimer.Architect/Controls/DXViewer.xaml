@@ -53,7 +53,7 @@
 
     <DockPanel>
         <ToolBarTray DockPanel.Dock="Top" IsLocked="True">
-            <ToolBar Margin="3,1">
+            <ToolBar>
                 <Button Click="btnCollapseAll_Click"
                         ToolTip="Collapse all">
                     <ContentControl Template="{StaticResource ic_CollapseGroup_16x}" />
