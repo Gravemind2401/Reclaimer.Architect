@@ -66,13 +66,20 @@ namespace Reclaimer.Geometry
             textureCache.TryGetValue(key, out tex);
             if (tex == null)
             {
-                var stream = new System.IO.MemoryStream();
-                if (mat.Flags.HasFlag(MaterialFlags.Transparent))
-                    sub.Bitmap.ToDds(0).WriteToStream(stream, System.Drawing.Imaging.ImageFormat.Png, DecompressOptions.Default);
-                else sub.Bitmap.ToDds(0).WriteToStream(stream, System.Drawing.Imaging.ImageFormat.Png, DecompressOptions.Bgr24);
-                tex = new Helix.TextureModel(stream);
-                if (!textureCache.TryAdd(key, tex))
-                    stream.Dispose(); //another thread beat us to it
+                try
+                {
+                    var stream = new System.IO.MemoryStream();
+                    if (mat.Flags.HasFlag(MaterialFlags.Transparent))
+                        sub.Bitmap.ToDds(0).WriteToStream(stream, System.Drawing.Imaging.ImageFormat.Png, DecompressOptions.Default);
+                    else sub.Bitmap.ToDds(0).WriteToStream(stream, System.Drawing.Imaging.ImageFormat.Png, DecompressOptions.Bgr24);
+                    tex = new Helix.TextureModel(stream);
+                    if (!textureCache.TryAdd(key, tex))
+                        stream.Dispose(); //another thread beat us to it
+                }
+                catch
+                {
+                    return null;
+                }
             }
 
             return tex;
