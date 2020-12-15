@@ -166,7 +166,7 @@ namespace Reclaimer.Controls
         private readonly List<Helix.Element3D> children = new List<Helix.Element3D>();
 
         private readonly ElementHighlighter3D selector = new ElementHighlighter3D();
-        private readonly ElementHighlighter3D highlighter = new ElementHighlighter3D()
+        private readonly ElementHighlighter3D highlighter = new ElementHighlighter3D
         {
             HighlightColor = SharpDX.Color.Gold,
             EnableXRayGrid = false
@@ -188,6 +188,9 @@ namespace Reclaimer.Controls
             timer.Tick += Timer_Tick;
 
             GlobalManipulationAxes = ArchitectSettingsPlugin.Settings.EditorGlobalAxes;
+
+            if (!ArchitectSettingsPlugin.Settings.HighlightSelection)
+                selector.HighlightColor = SharpDX.Color.Transparent;
 
             manipulator.ManipulationFlags = ManipulationFlags;
             manipulator.LocalAxes = !GlobalManipulationAxes;
@@ -385,6 +388,7 @@ namespace Reclaimer.Controls
                 manipulator.Visibility = Visibility.Collapsed;
 
             manipulator.Target = selector.Target = model;
+            highlighter.Target = null;
 
             GetHost()?.OnElementSelected(model);
         }

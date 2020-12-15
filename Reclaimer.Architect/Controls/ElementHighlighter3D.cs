@@ -110,6 +110,9 @@ namespace Reclaimer.Controls
                         .Aggregate((a, b) => a * b);
                 }
 
+                if (HighlightColor.A == byte.MinValue)
+                    return;
+
                 meshGroup.Children.Add(new MeshGeometryModel3D
                 {
                     CullMode = SharpDX.Direct3D11.CullMode.Back,

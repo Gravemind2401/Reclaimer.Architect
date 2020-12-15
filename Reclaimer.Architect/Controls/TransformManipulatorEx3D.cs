@@ -815,9 +815,14 @@ namespace Reclaimer.Controls
 
         private void OnUpdateSelfTransform()
         {
-            var scale = AutoSizeScale && target != null
-                ? Math.Max(0.5, target.GetTotalBounds().Size.Length() * 0.35)
-                : sizeScale;
+            var scale = sizeScale;
+            if (target != null && AutoSizeScale)
+            {
+                var bounds = target.GetTotalBounds();
+                var minBound = Math.Min(Math.Min(bounds.Width, bounds.Height), bounds.Depth);
+
+                scale = Math.Max(0.3, minBound);
+            }
 
             var m = Matrix.Translation(centerOffset + translationVector);
             m.M11 = m.M22 = m.M33 = (float)scale;
