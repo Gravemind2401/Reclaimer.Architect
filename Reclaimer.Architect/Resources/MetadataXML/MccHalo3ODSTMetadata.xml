@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin game="ODSTMCC" baseSize="0x840">
+  <tagblock offset="0x14" elementSize="0x6C"/>
+  <tagblock offset="0x4C" elementSize="0x14"/>
+  <tagblock offset="0x58" elementSize="0x2C">
+    <tagblock offset="0x8" elementSize="0x4"/>
+    <tagblock offset="0x14" elementSize="0x54">
+      <tagblock offset="0x0" elementSize="0xC">
+        <tagblock offset="0x0" elementSize="0xC">
+          <tagblock offset="0x0" elementSize="0x4"/>
+        </tagblock>
+      </tagblock>
+      <tagblock offset="0xC" elementSize="0xC">
+        <tagblock offset="0x0" elementSize="0xC">
+          <tagblock offset="0x0" elementSize="0x4"/>
+        </tagblock>
+      </tagblock>
+      <tagblock offset="0x18" elementSize="0x1"/>
+      <tagblock offset="0x24" elementSize="0x1"/>
+      <tagblock offset="0x30" elementSize="0x4"/>
+      <tagblock offset="0x3C" elementSize="0x4"/>
+      <tagblock offset="0x48" elementSize="0x4"/>
+    </tagblock>
+    <tagblock offset="0x20" elementSize="0x18">
+      <tagblock offset="0x0" elementSize="0xC"/>
+      <tagblock offset="0xC" elementSize="0x2"/>
+    </tagblock>
+  </tagblock>
+  <tagblock offset="0x64" elementSize="0x64">
+    <tagblock offset="0x10" elementSize="0x4"/>
+    <tagblock offset="0x1C" elementSize="0x4"/>
+    <tagblock offset="0x28" elementSize="0x4"/>
+    <tagblock offset="0x34" elementSize="0x1"/>
+    <tagblock offset="0x40" elementSize="0x8"/>
+    <tagblock offset="0x4C" elementSize="0x8"/>
+    <tagblock offset="0x58" elementSize="0x2"/>
+  </tagblock>
+  <tagblock offset="0x70" elementSize="0x24"/>
+  <tagblock offset="0x7C" elementSize="0xC"/>
+  <tagblock offset="0x88" elementSize="0x4"/>
+  <tagblock offset="0xD8" elementSize="0x24"/>
+  <tagblock offset="0xE4" elementSize="0xB4">
+    <tagblock offset="0x24" elementSize="0x1C">
+      <tagblock offset="0x4" elementSize="0x1"/>
+      <tagblock offset="0x10" elementSize="0x2"/>
+      <tagblock offset="0x4" elementSize="0x4"/>
+      <tagblock offset="0x10" elementSize="0x8"/>
+    </tagblock>
+    <tagblock offset="0x70" elementSize="0x4"/>
+  </tagblock>
+  <tagblock offset="0xF0" elementSize="0x30"/>
+  <tagblock offset="0xFC" elementSize="0x74">
+    <tagblock offset="0x24" elementSize="0x1C">
+      <tagblock offset="0x4" elementSize="0x1"/>
+      <tagblock offset="0x10" elementSize="0x2"/>
+      <tagblock offset="0x4" elementSize="0x4"/>
+      <tagblock offset="0x10" elementSize="0x8"/>
+    </tagblock>
+  </tagblock>
+  <tagblock offset="0x108" elementSize="0x30"/>
+  <tagblock offset="0x114" elementSize="0xA8">
+    <tagblock offset="0x24" elementSize="0x1C">
+      <tagblock offset="0x4" elementSize="0x1"/>
+      <tagblock offset="0x10" elementSize="0x2"/>
+      <tagblock offset="0x4" elementSize="0x4"/>
+      <tagblock offset="0x10" elementSize="0x8"/>
+    </tagblock>
+  </tagblock>
+  <tagblock offset="0x120" elementSize="0x30"/>
+  <tagblock offset="0x12C" elementSize="0x8C">
+    <tagblock offset="0x24" elementSize="0x1C">
+      <tagblock offset="0x4" elementSize="0x1"/>
+      <tagblock offset="0x10" elementSize="0x2"/>
+      <tagblock offset="0x4" elementSize="0x4"/>
+      <tagblock offset="0x10" elementSize="0x8"/>
+    </tagblock>
+  </tagblock>
+  <tagblock offset="0x138" elementSize="0x30"/>
+  <tagblock offset="0x144" elementSize="0xA8">
+    <tagblock offset="0x24" elementSize="0x1C">
+      <tagblock offset="0x4" elementSize="0x1"/>
+      <tagblock offset="0x10" elementSize="0x2"/>
+      <tagblock offset="0x4" elementSize="0x4"/>
+      <tagblock offset="0x10" elementSize="0x8"/>
+    </tagblock>
+  </tagblock>
+  <tagblock offset="0x150" elementSize="0x30"/>
+  <tagblock offset="0x15C" elementSize="0x2C"/>
+  <tagblock offset="0x168" elementSize="0x88">
+    <tagblock offset="0x24" elementSize="0x1C">
+      <tagblock offset="0x4" elementSize="0x1"/>
+      <tagblock offset="0x10" elementSize="0x2"/>
+      <tagblock offset="0x4" elementSize="0x4"/>
+      <tagblock offset="0x10" elementSize="0x8"/>
+    </tagblock>
+    <tagblock offset="0x78" elementSize="0x4"/>
+  </tagblock>
+  <tagblock offset="0x174" elementSize="0x30"/>
+  <tagblock offset="0x180" elementSize="0x78">
+    <tagblock offset="0x24" elementSize="0x1C">
+      <tagblock offset="0x4" elementSize="0x1"/>
+      <tagblock offset="0x10" elementSize="0x2"/>
+      <tagblock offset="0x4" elementSize="0x4"/>
+      <tagblock offset="0x10" elementSize="0x8"/>
+    </tagblock>
+  </tagblock>
+  <tagblock offset="0x18C" elementSize="0x30"/>
+  <tagblock offset="0x198" elementSize="0xB8">
+    <tagblock offset="0x24" elementSize="0x1C">
+      <tagblock offset="0x4" elementSize="0x1"/>
+      <tagblock offset="0x10" elementSize="0x2"/>
+      <tagblock offset="0x4" elementSize="0x4"/>
+      <tagblock offset="0x10" elementSize="0x8"/>
+    </tagblock>
+  </tagblock>
+  <tagblock offset="0x1A4" elementSize="0x30"/>
+  <tagblock offset="0x1B0" elementSize="0x7C">
+    <tagblock offset="0x24" elementSize="0x1C">
+      <tagblock offset="0x4" elementSize="0x1"/>
+      <tagblock offset="0x10" elementSize="0x2"/>
+      <tagblock offset="0x4" elementSize="0x4"/>
+      <tagblock offset="0x10" elementSize="0x8"/>
+    </tagblock>
+  </tagblock>
+  <tagblock offset="0x1BC" elementSize="0x30"/>
+  <tagblock offset="0x1C8" elementSize="0x70">
+    <tagblock offset="0x24" elementSize="0x1C">
+      <tagblock offset="0x4" elementSize="0x1"/>
+      <tagblock offset="0x10" elementSize="0x2"/>
+      <tagblock offset="0x4" elementSize="0x4"/>
+      <tagblock offset="0x10" elementSize="0x8"/>
+    </tagblock>
+  </tagblock>
+  <tagblock offset="0x1D4" elementSize="0x30"/>
+  <tagblock offset="0x1E0" elementSize="0x84">
+    <tagblock offset="0x24" elementSize="0x1C">
+      <tagblock offset="0x4" elementSize="0x1"/>
+      <tagblock offset="0x10" elementSize="0x2"/>
+      <tagblock offset="0x4" elementSize="0x4"/>
+      <tagblock offset="0x10" elementSize="0x8"/>
+    </tagblock>
+    <tagblock offset="0x78" elementSize="0x4"/>
+  </tagblock>
+  <tagblock offset="0x1EC" elementSize="0x30"/>
+  <tagblock offset="0x1F8" elementSize="0x54">
+    <tagblock offset="0x24" elementSize="0x1C">
+      <tagblock offset="0x4" elementSize="0x1"/>
+      <tagblock offset="0x10" elementSize="0x2"/>
+      <tagblock offset="0x4" elementSize="0x4"/>
+      <tagblock offset="0x10" elementSize="0x8"/>
+    </tagblock>
+  </tagblock>
+  <tagblock offset="0x204" elementSize="0x30"/>
+  <tagblock offset="0x210" elementSize="0x8C">
+    <tagblock offset="0x24" elementSize="0x1C">
+      <tagblock offset="0x4" elementSize="0x1"/>
+      <tagblock offset="0x10" elementSize="0x2"/>
+      <tagblock offset="0x4" elementSize="0x4"/>
+      <tagblock offset="0x10" elementSize="0x8"/>
+    </tagblock>
+  </tagblock>
+  <tagblock offset="0x21C" elementSize="0x30"/>
+  <tagblock offset="0x228" elementSize="0x30"/>
+  <tagblock offset="0x234" elementSize="0x30"/>
+  <tagblock offset="0x240" elementSize="0x30"/>
+  <tagblock offset="0x24C" elementSize="0x30"/>
+  <tagblock offset="0x258" elementSize="0x30"/>
+  <tagblock offset="0x264" elementSize="0x30"/>
+  <tagblock offset="0x270" elementSize="0x30"/>
+  <tagblock offset="0x27C" elementSize="0xC"/>
+  <tagblock offset="0x288" elementSize="0x58"/>
+  <tagblock offset="0x294" elementSize="0x1C"/>
+  <tagblock offset="0x2A0" elementSize="0x7C">
+    <tagblock offset="0x44" elementSize="0x14"/>
+    <tagblock offset="0x50" elementSize="0x50"/>
+  </tagblock>
+  <tagblock offset="0x2B8" elementSize="0xC"/>
+  <tagblock offset="0x390" elementSize="0x24"/>
+  <tagblock offset="0x39C" elementSize="0x10"/>
+  <tagblock offset="0x3B4" elementSize="0x10"/>
+  <tagblock offset="0x3C0" elementSize="0x28"/>
+  <tagblock offset="0x3CC" elementSize="0x68">
+    <tagblock offset="0x30" elementSize="0x6C">
+      <tagblock offset="0x60" elementSize="0x38"/>
+    </tagblock>
+    <tagblock offset="0x3C" elementSize="0x90">
+      <tagblock offset="0x84" elementSize="0x38"/>
+    </tagblock>
+    <tagblock offset="0x50" elementSize="0x84">
+      <tagblock offset="0x14" elementSize="0x10"/>
+      <tagblock offset="0x20" elementSize="0x10"/>
+      <tagblock offset="0x2C" elementSize="0x10"/>
+      <tagblock offset="0x38" elementSize="0x10"/>
+    </tagblock>
+    <tagblock offset="0x5C" elementSize="0x84">
+      <tagblock offset="0x14" elementSize="0x10"/>
+      <tagblock offset="0x20" elementSize="0x10"/>
+      <tagblock offset="0x2C" elementSize="0x10"/>
+      <tagblock offset="0x38" elementSize="0x10"/>
+    </tagblock>
+  </tagblock>
+  <tagblock offset="0x3D8" elementSize="0x3C">
+    <tagblock offset="0x24" elementSize="0x28"/>
+    <tagblock offset="0x30" elementSize="0xA8">
+      <tagblock offset="0x60" elementSize="0x8"/>
+      <tagblock offset="0x6C" elementSize="0x18"/>
+    </tagblock>
+  </tagblock>
+  <tagblock offset="0x3E4" elementSize="0x2C">
+    <tagblock offset="0x4" elementSize="0x4"/>
+    <tagblock offset="0x10" elementSize="0x14"/>
+    <tagblock offset="0x1C" elementSize="0x10">
+      <tagblock offset="0x4" elementSize="0x14"/>
+    </tagblock>
+  </tagblock>
+  <tagblock offset="0x3FC" elementSize="0x10"/>
+  <tagblock offset="0x414" elementSize="0x6C">
+    <tagblock offset="0x0" elementSize="0x24"/>
+    <tagblock offset="0xC" elementSize="0x48"/>
+    <tagblock offset="0x18" elementSize="0x8"/>
+    <tagblock offset="0x24" elementSize="0x8"/>
+    <tagblock offset="0x3C" elementSize="0xC">
+      <tagblock offset="0x0" elementSize="0xC"/>
+    </tagblock>
+    <tagblock offset="0x48" elementSize="0x7C">
+      <tagblock offset="0x44" elementSize="0x14"/>
+    </tagblock>
+    <tagblock offset="0x54" elementSize="0x18">
+      <tagblock offset="0xC" elementSize="0x28"/>
+    </tagblock>
+    <tagblock offset="0x60" elementSize="0x4"/>
+  </tagblock>
+  <tagblock offset="0x440" elementSize="0x34">
+    <tagblock offset="0x28" elementSize="0x24"/>
+  </tagblock>
+  <tagblock offset="0x44C" elementSize="0x28"/>
+  <tagblock offset="0x458" elementSize="0x10"/>
+  <tagblock offset="0x470" elementSize="0x84">
+    <tagblock offset="0x0" elementSize="0x38">
+      <tagblock offset="0x20" elementSize="0x3C"/>
+    </tagblock>
+  </tagblock>
+  <tagblock offset="0x47C" elementSize="0x20"/>
+  <tagblock offset="0x488" elementSize="0x40"/>
+  <tagblock offset="0x494" elementSize="0x28"/>
+  <tagblock offset="0x4C0" elementSize="0x28">
+    <tagblock offset="0x4" elementSize="0x10"/>
+    <tagblock offset="0x10" elementSize="0x10"/>
+    <tagblock offset="0x1C" elementSize="0x16C">
+      <tagblock offset="0x10" elementSize="0x10"/>
+      <tagblock offset="0x2C" elementSize="0x10"/>
+      <tagblock offset="0x98" elementSize="0x10"/>
+      <tagblock offset="0xC4" elementSize="0x10"/>
+      <tagblock offset="0x140" elementSize="0x10"/>
+    </tagblock>
+  </tagblock>
+  <tagblock offset="0x4CC" elementSize="0xC"/>
+  <tagblock offset="0x4D8" elementSize="0x2"/>
+  <tagblock offset="0x4E4" elementSize="0x2"/>
+  <tagblock offset="0x4F0" elementSize="0x18"/>
+  <tagblock offset="0x514" elementSize="0x58"/>
+  <tagblock offset="0x538" elementSize="0x78"/>
+  <tagblock offset="0x544" elementSize="0x8"/>
+  <tagblock offset="0x580" elementSize="0x68">
+    <tagblock offset="0x10" elementSize="0x4"/>
+    <tagblock offset="0x1C" elementSize="0x4"/>
+    <tagblock offset="0x28" elementSize="0x4"/>
+    <tagblock offset="0x38" elementSize="0xC"/>
+    <tagblock offset="0x44" elementSize="0x4"/>
+    <tagblock offset="0x50" elementSize="0x4"/>
+    <tagblock offset="0x5C" elementSize="0x4"/>
+  </tagblock>
+  <tagblock offset="0x618" elementSize="0x6C">
+    <tagblock offset="0x48" elementSize="0x10"/>
+    <tagblock offset="0x54" elementSize="0x30"/>
+    <tagblock offset="0x60" elementSize="0x30"/>
+  </tagblock>
+  <tagblock offset="0x634" elementSize="0xB0">
+    <tagblock offset="0x24" elementSize="0x1C">
+      <tagblock offset="0x4" elementSize="0x1"/>
+      <tagblock offset="0x10" elementSize="0x2"/>
+      <tagblock offset="0x4" elementSize="0x4"/>
+      <tagblock offset="0x10" elementSize="0x8"/>
+    </tagblock>
+    <tagblock offset="0x70" elementSize="0x4"/>
+  </tagblock>
+  <tagblock offset="0x640" elementSize="0x30"/>
+  <tagblock offset="0x64C" elementSize="0x10"/>
+  <tagblock offset="0x658" elementSize="0x48">
+    <tagblock offset="0x10" elementSize="0x24"/>
+    <tagblock offset="0x1C" elementSize="0x10"/>
+  </tagblock>
+  <tagblock offset="0x680" elementSize="0x30"/>
+  <tagblock offset="0x68C" elementSize="0x104"/>
+  <tagblock offset="0x6B0" elementSize="0x10"/>
+  <tagblock offset="0x6CC" elementSize="0x24"/>
+  <tagblock offset="0x6F0" elementSize="0x4"/>
+  <tagblock offset="0x75C" elementSize="0x10"/>
+  <tagblock offset="0x768" elementSize="0x24">
+    <tagblock offset="0x18" elementSize="0xE8">
+      <tagblock offset="0xB0" elementSize="0x124"/>
+      <tagblock offset="0xD0" elementSize="0x10"/>
+      <tagblock offset="0xDC" elementSize="0xC">
+        <tagblock offset="0x0" elementSize="0x10"/>
+      </tagblock>
+    </tagblock>
+  </tagblock>
+  <tagblock offset="0x774" elementSize="0xC8">
+    <tagblock offset="0x8" elementSize="0x2"/>
+    <tagblock offset="0x14" elementSize="0x2"/>
+    <tagblock offset="0x20" elementSize="0x2"/>
+    <tagblock offset="0x2C" elementSize="0x2"/>
+    <tagblock offset="0x38" elementSize="0x2"/>
+    <tagblock offset="0x44" elementSize="0x2"/>
+    <tagblock offset="0x50" elementSize="0x2"/>
+    <tagblock offset="0x5C" elementSize="0x2"/>
+    <tagblock offset="0x68" elementSize="0x2"/>
+    <tagblock offset="0x74" elementSize="0x2"/>
+    <tagblock offset="0x80" elementSize="0x2"/>
+    <tagblock offset="0x8C" elementSize="0x2"/>
+    <tagblock offset="0x98" elementSize="0x2"/>
+    <tagblock offset="0xA4" elementSize="0x2"/>
+    <tagblock offset="0xB0" elementSize="0x2"/>
+  </tagblock>
+  <tagblock offset="0x780" elementSize="0x4"/>
+  <tagblock offset="0x798" elementSize="0x10"/>
+  <tagblock offset="0x7A4" elementSize="0x14"/>
+  <tagblock offset="0x7BC" elementSize="0x1C">
+    <tagblock offset="0x0" elementSize="0x8"/>
+    <tagblock offset="0x10" elementSize="0x8"/>
+  </tagblock>
+  <tagblock offset="0x7C8" elementSize="0x18"/>
+  <tagblock offset="0x7D4" elementSize="0x10"/>
+  <tagblock offset="0x7EC" elementSize="0x14"/>
+  <tagblock offset="0x834" elementSize="0x8"/>
+</plugin>

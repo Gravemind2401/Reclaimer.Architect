@@ -23,6 +23,8 @@ namespace Reclaimer.Models
             {
                 case CacheType.Halo3Retail:
                 case CacheType.MccHalo3:
+                case CacheType.Halo3ODST:
+                case CacheType.MccHalo3ODST:
                     var meta = item.ReadMetadata<Blam.Halo3.model>();
                     return FromMetadata(item, meta);
 

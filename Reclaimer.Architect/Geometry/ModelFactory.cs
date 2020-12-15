@@ -33,7 +33,21 @@ namespace Reclaimer.Geometry
         private readonly ConcurrentDictionary<int, ModelType> modelTypes = new ConcurrentDictionary<int, ModelType>();
         private readonly ConcurrentDictionary<int, ModelConfig> configCache = new ConcurrentDictionary<int, ModelConfig>();
 
-        public static bool IsTagSupported(IIndexItem tag) => directContentTags.Union(compositeTags).Any(s => tag?.ClassCode.ToLower() == s);
+        public static bool IsTagSupported(IIndexItem tag)
+        {
+            if (!directContentTags.Union(compositeTags).Any(s => tag?.ClassCode.ToLower() == s))
+                return false;
+
+            switch (tag.CacheFile.CacheType)
+            {
+                case CacheType.Halo3Retail:
+                case CacheType.MccHalo3:
+                case CacheType.Halo3ODST:
+                case CacheType.MccHalo3ODST:
+                    return true;
+                default: return false;
+            }
+        }
 
         public Helix.Material CreateMaterial(IGeometryMaterial mat, out bool isTransparent)
         {
@@ -197,6 +211,8 @@ namespace Reclaimer.Geometry
             {
                 case CacheType.Halo3Retail:
                 case CacheType.MccHalo3:
+                case CacheType.Halo3ODST:
+                case CacheType.MccHalo3ODST:
                     var meta = source.ReadMetadata<Blam.Halo3.@object>();
                     defaultVariant = meta.DefaultVariant;
                     return meta.Model.Tag;

@@ -313,6 +313,27 @@
   <ItemGroup>
     <Resource Include="Resources\MetadataXML\Minimize.xslt" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\MetadataXML\MccHalo3ODSTMetadata.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\MetadataXML\Halo3ODSTMetadata.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\ScenarioXML\TemplateScenario.xml">
+      <SubType>Designer</SubType>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\ScenarioXML\Halo3ODSTScenario.xml">
+      <SubType>Designer</SubType>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\ScenarioXML\MccHalo3ODSTScenario.xml">
+      <SubType>Designer</SubType>
+    </Resource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>echo F | xcopy ".\$(TargetFileName)" "Plugins\Architect\Architect.dll" /Y

@@ -34,7 +34,21 @@ namespace Reclaimer.Controls
     /// </summary>
     public partial class DXEditor : IScenarioRenderView, IRendererHost, IDisposable
     {
-        public static bool CanOpenTag(IIndexItem tag) => tag.ClassCode.ToLower() == "scnr";
+        public static bool CanOpenTag(IIndexItem tag)
+        {
+            if (tag.ClassCode.ToLower() != "scnr")
+                return false;
+
+            switch (tag.CacheFile.CacheType)
+            {
+                case CacheType.Halo3Retail:
+                case CacheType.MccHalo3:
+                case CacheType.Halo3ODST:
+                case CacheType.MccHalo3ODST:
+                    return true;
+                default: return false;
+            }
+        }
 
         #region Dependency Properties
         public static readonly DependencyProperty CanTranslateProperty =
@@ -116,7 +130,7 @@ namespace Reclaimer.Controls
         {
             this.scenario = scenario;
 
-            var fileName = scenario.ScenarioTag.FileName();
+            var fileName = $"{scenario.ScenarioTag.FileName()}.{scenario.ScenarioTag.ClassName}";
             TabModel.ToolTip = fileName;
             TabModel.Header = Utils.GetFileName(fileName);
         }

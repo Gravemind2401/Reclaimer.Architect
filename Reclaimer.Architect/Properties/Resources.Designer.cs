@@ -61,19 +61,63 @@ namespace Reclaimer.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
         ///&lt;plugin game=&quot;Halo3&quot; baseSize=&quot;0x7B8&quot;&gt;
-        ///  &lt;!-- Automatically generated plugin --&gt;
-        ///  &lt;revisions&gt;
-        ///    &lt;revision author=&quot;Assembly&quot; version=&quot;1&quot;&gt;Generated plugin from scratch.&lt;/revision&gt;
-        ///    &lt;revision author=&quot;-DeToX-&quot; version=&quot;2&quot;&gt;Named most tagblocks, some values...&lt;/revision&gt;
-        ///    &lt;revision author=&quot;-DeToX-&quot; version=&quot;3&quot;&gt;Named alot of things..&lt;/revision&gt;
-        ///    &lt;revision author=&quot;DeadCanadian&quot; version=&quot;4&quot;&gt;added plugins, named some structs, and stuff&lt;/revision&gt;
-        ///    &lt;revisio [rest of string was truncated]&quot;;.
+        ///  &lt;tagblock offset=&quot;0x14&quot; elementSize=&quot;0x6C&quot;/&gt;
+        ///  &lt;tagblock offset=&quot;0x30&quot; elementSize=&quot;0x14&quot;/&gt;
+        ///  &lt;tagblock offset=&quot;0x3C&quot; elementSize=&quot;0x2C&quot;&gt;
+        ///    &lt;tagblock offset=&quot;0x8&quot; elementSize=&quot;0x4&quot;/&gt;
+        ///    &lt;tagblock offset=&quot;0x14&quot; elementSize=&quot;0x54&quot;&gt;
+        ///      &lt;tagblock offset=&quot;0x0&quot; elementSize=&quot;0xC&quot;&gt;
+        ///        &lt;tagblock offset=&quot;0x0&quot; elementSize=&quot;0xC&quot;&gt;
+        ///          &lt;tagblock offset=&quot;0x0&quot; elementSize=&quot;0x4&quot;/&gt;
+        ///        &lt;/tagblock&gt;
+        ///      &lt;/tagblock&gt; [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Halo3Metadata {
             get {
                 return ResourceManager.GetString("Halo3Metadata", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+        ///&lt;plugin game=&quot;ODST&quot; baseSize=&quot;0x834&quot;&gt;
+        ///  &lt;tagblock offset=&quot;0x14&quot; elementSize=&quot;0x6C&quot;/&gt;
+        ///  &lt;tagblock offset=&quot;0x4C&quot; elementSize=&quot;0x14&quot;/&gt;
+        ///  &lt;tagblock offset=&quot;0x58&quot; elementSize=&quot;0x2C&quot;&gt;
+        ///    &lt;tagblock offset=&quot;0x8&quot; elementSize=&quot;0x4&quot;/&gt;
+        ///    &lt;tagblock offset=&quot;0x14&quot; elementSize=&quot;0x54&quot;&gt;
+        ///      &lt;tagblock offset=&quot;0x0&quot; elementSize=&quot;0xC&quot;&gt;
+        ///        &lt;tagblock offset=&quot;0x0&quot; elementSize=&quot;0xC&quot;&gt;
+        ///          &lt;tagblock offset=&quot;0x0&quot; elementSize=&quot;0x4&quot;/&gt;
+        ///        &lt;/tagblock&gt;
+        ///      &lt;/tagblock&gt;        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Halo3ODSTMetadata {
+            get {
+                return ResourceManager.GetString("Halo3ODSTMetadata", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;scenario&gt;
+        ///  &lt;section name=&quot;mission&quot;&gt;
+        ///    &lt;enum8 name=&quot;Map Type&quot; offset=&quot;0x0&quot; visible=&quot;true&quot;&gt;
+        ///      &lt;option name=&quot;Single Player&quot; value=&quot;0x0&quot; /&gt;
+        ///      &lt;option name=&quot;Multiplayer&quot; value=&quot;0x1&quot; /&gt;
+        ///      &lt;option name=&quot;Main Menu&quot; value=&quot;0x2&quot; /&gt;
+        ///    &lt;/enum8&gt;
+        ///    &lt;enum8 name=&quot;Map Sub Type&quot; offset=&quot;0x1&quot; visible=&quot;true&quot;&gt;
+        ///      &lt;option name=&quot;None&quot; value=&quot;0x0&quot; /&gt;
+        ///      &lt;option name=&quot;Hub&quot; value=&quot;0x1&quot; /&gt;
+        ///      &lt;option name=&quot;Level&quot; value=&quot;0x2&quot; /&gt;
+        ///      &lt;option name=&quot;Scene&quot;  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Halo3ODSTScenario {
+            get {
+                return ResourceManager.GetString("Halo3ODSTScenario", resourceCulture);
             }
         }
         
@@ -96,6 +140,47 @@ namespace Reclaimer.Properties {
         internal static string Halo3Scenario {
             get {
                 return ResourceManager.GetString("Halo3Scenario", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+        ///&lt;plugin game=&quot;ODSTMCC&quot; baseSize=&quot;0x840&quot;&gt;
+        ///  &lt;tagblock offset=&quot;0x14&quot; elementSize=&quot;0x6C&quot;/&gt;
+        ///  &lt;tagblock offset=&quot;0x4C&quot; elementSize=&quot;0x14&quot;/&gt;
+        ///  &lt;tagblock offset=&quot;0x58&quot; elementSize=&quot;0x2C&quot;&gt;
+        ///    &lt;tagblock offset=&quot;0x8&quot; elementSize=&quot;0x4&quot;/&gt;
+        ///    &lt;tagblock offset=&quot;0x14&quot; elementSize=&quot;0x54&quot;&gt;
+        ///      &lt;tagblock offset=&quot;0x0&quot; elementSize=&quot;0xC&quot;&gt;
+        ///        &lt;tagblock offset=&quot;0x0&quot; elementSize=&quot;0xC&quot;&gt;
+        ///          &lt;tagblock offset=&quot;0x0&quot; elementSize=&quot;0x4&quot;/&gt;
+        ///        &lt;/tagblock&gt;
+        ///      &lt;/tagbloc [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string MccHalo3ODSTMetadata {
+            get {
+                return ResourceManager.GetString("MccHalo3ODSTMetadata", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;scenario&gt;
+        ///  &lt;section name=&quot;mission&quot;&gt;
+        ///    &lt;enum8 name=&quot;Map Type&quot; offset=&quot;0x0&quot; visible=&quot;true&quot;&gt;
+        ///      &lt;option name=&quot;Single Player&quot; value=&quot;0x0&quot; /&gt;
+        ///      &lt;option name=&quot;Multiplayer&quot; value=&quot;0x1&quot; /&gt;
+        ///      &lt;option name=&quot;Main Menu&quot; value=&quot;0x2&quot; /&gt;
+        ///    &lt;/enum8&gt;
+        ///    &lt;enum8 name=&quot;Map Sub Type&quot; offset=&quot;0x1&quot; visible=&quot;true&quot;&gt;
+        ///      &lt;option name=&quot;None&quot; value=&quot;0x0&quot; /&gt;
+        ///      &lt;option name=&quot;Hub&quot; value=&quot;0x1&quot; /&gt;
+        ///      &lt;option name=&quot;Level&quot; value=&quot;0x2&quot; /&gt;
+        ///      &lt;option name=&quot;Scene&quot;  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string MccHalo3ODSTScenario {
+            get {
+                return ResourceManager.GetString("MccHalo3ODSTScenario", resourceCulture);
             }
         }
         

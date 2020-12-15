@@ -168,11 +168,17 @@ namespace Reclaimer.Models
         private string GetXmlData(ICacheFile cache, string suffix)
         {
             string prefix;
-            switch(cache.CacheType)
+            switch (cache.CacheType)
             {
                 case CacheType.Halo3Retail:
                 case CacheType.MccHalo3:
                     prefix = "Halo3";
+                    break;
+                case CacheType.Halo3ODST:
+                    prefix = "Halo3ODST";
+                    break;
+                case CacheType.MccHalo3ODST:
+                    prefix = "MccHalo3ODST";
                     break;
                 default: throw new NotSupportedException();
             }
