@@ -123,6 +123,8 @@
     <Compile Include="Blam\Halo3\model.cs" />
     <Compile Include="Blam\Halo3\object.cs" />
     <Compile Include="Blam\Halo3\scenario_structure_bsp.cs" />
+    <Compile Include="Blam\HaloReach\model.cs" />
+    <Compile Include="Blam\HaloReach\object.cs" />
     <Compile Include="Controls\BoxManipulator3D.cs" />
     <Compile Include="Controls\BspEditor.xaml.cs">
       <DependentUpon>BspEditor.xaml</DependentUpon>
@@ -333,6 +335,22 @@
     <Resource Include="Resources\ScenarioXML\MccHalo3ODSTScenario.xml">
       <SubType>Designer</SubType>
     </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\ScenarioXML\MccHaloReachScenario.xml">
+      <SubType>Designer</SubType>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\ScenarioXML\HaloReachScenario.xml">
+      <SubType>Designer</SubType>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\MetadataXML\MccHaloReachMetadata.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\MetadataXML\HaloReachMetadata.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

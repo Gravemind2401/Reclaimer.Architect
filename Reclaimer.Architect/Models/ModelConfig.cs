@@ -25,14 +25,76 @@ namespace Reclaimer.Models
                 case CacheType.MccHalo3:
                 case CacheType.Halo3ODST:
                 case CacheType.MccHalo3ODST:
-                    var meta = item.ReadMetadata<Blam.Halo3.model>();
-                    return FromMetadata(item, meta);
+                    var h3Meta = item.ReadMetadata<Blam.Halo3.model>();
+                    return FromMetadata(item, h3Meta);
+
+                case CacheType.HaloReachRetail:
+                case CacheType.MccHaloReach:
+                case CacheType.MccHaloReachU3:
+                    var reachMeta = item.ReadMetadata<Blam.HaloReach.model>();
+                    return FromMetadata(item, reachMeta);
 
                 default: return null;
             }
         }
 
+        //TODO: make a hlmt interface and unduplicate FromMetadata
+
         private static ModelConfig FromMetadata(IIndexItem item, Blam.Halo3.model hlmt)
+        {
+            var config = new ModelConfig
+            {
+                ModelTag = item,
+                RenderModelTag = hlmt.RenderModel.Tag
+            };
+
+            foreach (var v in hlmt.Variants)
+            {
+                var variant = new VariantConfig
+                {
+                    Name = v.Name,
+                    RegionLookup = v.RuntimeModelRegions
+                };
+
+                config.Variants.Add(variant);
+
+                foreach (var r in v.Regions)
+                {
+                    var region = new VariantRegionConfig
+                    {
+                        Name = r.Name,
+                        ParentVariantIndex = r.ParentVariantIndex,
+                        BaseRegionIndex = r.RuntimeRegionIndex
+                    };
+
+                    variant.Regions.Add(region);
+
+                    foreach (var p in r.Permutations)
+                    {
+                        region.Permutations.Add(new VariantPermutationConfig
+                        {
+                            Name = p.Name,
+                            BasePermutationIndex = p.RenderPermutationIndex
+                        });
+                    }
+                }
+
+                foreach (var att in v.Attachments)
+                {
+                    variant.Attachments.Add(new AttachmentConfig
+                    {
+                        ParentMarker = att.ParentMarker,
+                        ChildMarker = att.ChildMarker,
+                        ChildVariant = att.ChildVariant,
+                        ChildTag = att.ChildObject.Tag
+                    });
+                }
+            }
+
+            return config;
+        }
+
+        private static ModelConfig FromMetadata(IIndexItem item, Blam.HaloReach.model hlmt)
         {
             var config = new ModelConfig
             {

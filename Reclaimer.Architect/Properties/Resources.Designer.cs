@@ -144,6 +144,48 @@ namespace Reclaimer.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;plugin game=&quot;Reach&quot; baseSize=&quot;0x86C&quot;&gt;
+        ///  &lt;tagblock offset=&quot;0x4C&quot; elementSize=&quot;0xAC&quot;/&gt;
+        ///  &lt;tagblock offset=&quot;0x58&quot; elementSize=&quot;0x20&quot;/&gt;
+        ///  &lt;tagblock offset=&quot;0x84&quot; elementSize=&quot;0x30&quot;/&gt;
+        ///  &lt;tagblock offset=&quot;0x90&quot; elementSize=&quot;0x2C&quot;&gt;
+        ///    &lt;tagblock offset=&quot;0x8&quot; elementSize=&quot;0x4&quot;/&gt;
+        ///    &lt;tagblock offset=&quot;0x14&quot; elementSize=&quot;0x48&quot;&gt;
+        ///      &lt;tagblock offset=&quot;0x0&quot; elementSize=&quot;0xC&quot;&gt;
+        ///        &lt;tagblock offset=&quot;0x0&quot; elementSize=&quot;0xC&quot;&gt;
+        ///          &lt;tagblock offset=&quot;0x0&quot; elementSize=&quot;0x4&quot;/&gt;
+        ///        &lt;/tagblock&gt;
+        ///      &lt;/t [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string HaloReachMetadata {
+            get {
+                return ResourceManager.GetString("HaloReachMetadata", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;scenario&gt;
+        ///  &lt;section name=&quot;mission&quot;&gt;
+        ///    &lt;enum16 name=&quot;Map Type&quot; offset=&quot;0x0&quot; visible=&quot;true&quot;&gt;
+        ///      &lt;option name=&quot;Single Player&quot; value=&quot;0x0&quot; /&gt;
+        ///      &lt;option name=&quot;Multiplayer&quot; value=&quot;0x1&quot; /&gt;
+        ///      &lt;option name=&quot;Main Menu&quot; value=&quot;0x2&quot; /&gt;
+        ///    &lt;/enum16&gt;
+        ///    &lt;flags16 name=&quot;Flags&quot; offset=&quot;0x2&quot; visible=&quot;true&quot;&gt;
+        ///      &lt;bit name=&quot;Bit 0&quot; index=&quot;0&quot; /&gt;
+        ///      &lt;bit name=&quot;Bit 1&quot; index=&quot;1&quot; /&gt;
+        ///      &lt;bit name=&quot;Bit 2&quot; index=&quot;2&quot; /&gt;
+        ///      &lt;bit name=&quot;Bit 3&quot; index=&quot;3&quot; /&gt;
+        ///     [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string HaloReachScenario {
+            get {
+                return ResourceManager.GetString("HaloReachScenario", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
         ///&lt;plugin game=&quot;ODSTMCC&quot; baseSize=&quot;0x840&quot;&gt;
         ///  &lt;tagblock offset=&quot;0x14&quot; elementSize=&quot;0x6C&quot;/&gt;
@@ -181,6 +223,48 @@ namespace Reclaimer.Properties {
         internal static string MccHalo3ODSTScenario {
             get {
                 return ResourceManager.GetString("MccHalo3ODSTScenario", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;plugin game=&quot;ReachMCC&quot; baseSize=&quot;0x884&quot;&gt;
+        ///  &lt;tagblock offset=&quot;0x4C&quot; elementSize=&quot;0xAC&quot;/&gt;
+        ///  &lt;tagblock offset=&quot;0x58&quot; elementSize=&quot;0x20&quot;/&gt;
+        ///  &lt;tagblock offset=&quot;0x84&quot; elementSize=&quot;0x30&quot;/&gt;
+        ///  &lt;tagblock offset=&quot;0x90&quot; elementSize=&quot;0x2C&quot;&gt;
+        ///    &lt;tagblock offset=&quot;0x8&quot; elementSize=&quot;0x4&quot;/&gt;
+        ///    &lt;tagblock offset=&quot;0x14&quot; elementSize=&quot;0x48&quot;&gt;
+        ///      &lt;tagblock offset=&quot;0x0&quot; elementSize=&quot;0xC&quot;&gt;
+        ///        &lt;tagblock offset=&quot;0x0&quot; elementSize=&quot;0xC&quot;&gt;
+        ///          &lt;tagblock offset=&quot;0x0&quot; elementSize=&quot;0x4&quot;/&gt;
+        ///        &lt;/tagblock&gt;
+        ///       [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string MccHaloReachMetadata {
+            get {
+                return ResourceManager.GetString("MccHaloReachMetadata", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;scenario&gt;
+        ///  &lt;section name=&quot;mission&quot;&gt;
+        ///    &lt;enum16 name=&quot;Map Type&quot; offset=&quot;0x0&quot; visible=&quot;true&quot;&gt;
+        ///      &lt;option name=&quot;Single Player&quot; value=&quot;0x0&quot; /&gt;
+        ///      &lt;option name=&quot;Multiplayer&quot; value=&quot;0x1&quot; /&gt;
+        ///      &lt;option name=&quot;Main Menu&quot; value=&quot;0x2&quot; /&gt;
+        ///    &lt;/enum16&gt;
+        ///    &lt;flags16 name=&quot;Flags&quot; offset=&quot;0x2&quot; visible=&quot;true&quot;&gt;
+        ///      &lt;bit name=&quot;Bit 0&quot; index=&quot;0&quot; /&gt;
+        ///      &lt;bit name=&quot;Bit 1&quot; index=&quot;1&quot; /&gt;
+        ///      &lt;bit name=&quot;Bit 2&quot; index=&quot;2&quot; /&gt;
+        ///      &lt;bit name=&quot;Bit 3&quot; index=&quot;3&quot; /&gt;
+        ///     [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string MccHaloReachScenario {
+            get {
+                return ResourceManager.GetString("MccHaloReachScenario", resourceCulture);
             }
         }
         

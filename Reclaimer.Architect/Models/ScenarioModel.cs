@@ -180,6 +180,13 @@ namespace Reclaimer.Models
                 case CacheType.MccHalo3ODST:
                     prefix = "MccHalo3ODST";
                     break;
+                case CacheType.HaloReachRetail:
+                    prefix = "HaloReach";
+                    break;
+                case CacheType.MccHaloReach:
+                case CacheType.MccHaloReachU3:
+                    prefix = "MccHaloReach";
+                    break;
                 default: throw new NotSupportedException();
             }
 
@@ -257,7 +264,10 @@ namespace Reclaimer.Models
             for (int i = 0; i < section.TagBlock.Count; i++)
             {
                 reader.Seek(section.TagBlock.Pointer.Address + section.BlockSize * i + nameOffset, SeekOrigin.Begin);
-                ObjectNames.Add(reader.ReadNullTerminatedString(32));
+                if (ScenarioTag.CacheFile.CacheType < CacheType.HaloReachBeta)
+                    ObjectNames.Add(reader.ReadNullTerminatedString(32));
+                else
+                    ObjectNames.Add(reader.ReadObject<StringId>());
             }
         }
 

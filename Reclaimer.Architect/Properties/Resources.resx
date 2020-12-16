@@ -130,11 +130,23 @@
   <data name="Halo3Scenario" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\resources\scenarioxml\halo3scenario.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="HaloReachMetadata" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\metadataxml\haloreachmetadata.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="HaloReachScenario" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\scenarioxml\haloreachscenario.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
   <data name="MccHalo3ODSTMetadata" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\resources\metadataxml\mcchalo3odstmetadata.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
   <data name="MccHalo3ODSTScenario" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\resources\scenarioxml\mcchalo3odstscenario.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="MccHaloReachMetadata" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\metadataxml\mcchaloreachmetadata.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="MccHaloReachScenario" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\scenarioxml\mcchaloreachscenario.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="NodeHierarchy" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\resources\nodehierarchy.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>

@@ -2070,7 +2070,7 @@
       </flags16>
       <int16 name="Unknown" offset="0x52" visible="false" />
       <comment title="Permutation Data" />
-      <stringid name="Variant" offset="0x54" visible="true" />
+      <stringid name="Variant" offset="0x54" visible="true" id="variant" />
       <flags32 name="Active Change Colors" offset="0x58" visible="true">
         <bit name="Primary" index="0" />
         <bit name="Secondary" index="1" />
