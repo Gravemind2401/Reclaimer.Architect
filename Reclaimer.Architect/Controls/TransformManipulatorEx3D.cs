@@ -819,9 +819,11 @@ namespace Reclaimer.Controls
             if (target != null && AutoSizeScale)
             {
                 var bounds = target.GetTotalBounds();
-                var minBound = Math.Min(Math.Min(bounds.Width, bounds.Height), bounds.Depth);
+                
+                //minBound results in tiny manipulator for big thin things like walls
+                //var minBound = Math.Min(Math.Min(bounds.Width, bounds.Height), bounds.Depth);
 
-                scale = Math.Max(0.3, minBound);
+                scale = Math.Max(0.35, bounds.Size.Length() * 0.25);
             }
 
             var m = Matrix.Translation(centerOffset + translationVector);
