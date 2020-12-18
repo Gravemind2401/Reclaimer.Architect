@@ -411,10 +411,10 @@ namespace Reclaimer.Geometry
                         }
 
                         permutationRoot.Transform = GetTransform(permutation.TransformScale, permutation.Transform);
-                        permutations.Add(new RenderModel3D.Permutation(permutationRoot, permutation.Name));
+                        permutations.Add(new RenderModel3D.Permutation(permutationRoot, permutation.SourceIndex, permutation.Name));
                     }
 
-                    regions.Add(new RenderModel3D.Region(region.Name, permutations));
+                    regions.Add(new RenderModel3D.Region(region.SourceIndex, region.Name, permutations));
                 }
 
                 return new RenderModel3D(model.Name, regions, instances);

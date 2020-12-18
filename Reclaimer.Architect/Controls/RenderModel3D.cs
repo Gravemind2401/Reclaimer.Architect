@@ -50,10 +50,10 @@ namespace Reclaimer.Controls
         public static RenderModel3D FromElement(Element3D element)
         {
             var permutations = new List<Permutation>();
-            permutations.Add(new Permutation(element, nameof(Permutation)));
+            permutations.Add(new Permutation(element, 0, nameof(Permutation)));
 
             var regions = new List<Region>();
-            regions.Add(new Region(nameof(Region), permutations));
+            regions.Add(new Region(0, nameof(Region), permutations));
 
             return new RenderModel3D(nameof(RenderModel3D), regions, Enumerable.Empty<InstanceGroup>());
         }
@@ -105,7 +105,7 @@ namespace Reclaimer.Controls
             for (int i = 0; i < Regions.Count; i++)
             {
                 var region = Regions[i];
-                var vRegionIndex = variant?.RegionLookup[i] ?? byte.MaxValue;
+                var vRegionIndex = variant?.RegionLookup[region.SourceIndex] ?? byte.MaxValue;
 
                 for (int j = 0; j < region.Permutations.Count; j++)
                 {
@@ -114,7 +114,7 @@ namespace Reclaimer.Controls
                     if (vRegionIndex != byte.MaxValue)
                     {
                         var vRegion = variant.Regions[vRegionIndex];
-                        if (vRegion.Permutations.Count > 0 && !vRegion.Permutations.Any(vp => vp.BasePermutationIndex == j))
+                        if (vRegion.Permutations.Count > 0 && !vRegion.Permutations.Any(vp => vp.BasePermutationIndex == perm.SourceIndex))
                         {
                             perm.IsVisible = false;
                             continue;
@@ -152,6 +152,7 @@ namespace Reclaimer.Controls
         {
             internal GroupElement3D Element { get; }
 
+            public int SourceIndex { get; }
             public string Name { get; }
             public IReadOnlyList<Permutation> Permutations { get; }
 
@@ -166,8 +167,9 @@ namespace Reclaimer.Controls
                 }
             }
 
-            internal Region(string name, IReadOnlyList<Permutation> permutations)
+            internal Region(int sourceIndex, string name, IReadOnlyList<Permutation> permutations)
             {
+                SourceIndex = sourceIndex;
                 Name = name;
                 Permutations = permutations;
 
@@ -188,6 +190,7 @@ namespace Reclaimer.Controls
         {
             internal Element3D Element;
 
+            public int SourceIndex { get; }
             public string Name { get; }
 
             private bool isVisible = true;
@@ -201,8 +204,9 @@ namespace Reclaimer.Controls
                 }
             }
 
-            internal Permutation(Element3D element, string name)
+            internal Permutation(Element3D element, int sourceIndex, string name)
             {
+                SourceIndex = sourceIndex;
                 Element = element;
                 Name = name;
             }
