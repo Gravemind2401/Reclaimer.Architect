@@ -201,7 +201,7 @@
         <bit name="Bit 31" index="31" />
       </flags32>
       <point3 name="Position" offset="0x8" visible="true" id="position" />
-      <vector3 name="Rotation" offset="0x14" visible="true" id="rotation" />
+      <euler3 name="Rotation" offset="0x14" visible="true" id="rotation" />
       <float32 name="Scale" offset="0x20" visible="true" id="scale" />
       <comment title="Node Positioning">
         This block allows you to "pose" this objects nodes. Used normally for dead bodies. The orientations block has an entry for each checked node flag, skipping unchecked ones.
@@ -486,7 +486,7 @@
         <bit name="Bit 31" index="31" />
       </flags32>
       <point3 name="Position" offset="0x8" visible="true" id="position" />
-      <vector3 name="Rotation" offset="0x14" visible="true" id="rotation" />
+      <euler3 name="Rotation" offset="0x14" visible="true" id="rotation" />
       <float32 name="Scale" offset="0x20" visible="true" id="scale" />
       <comment title="Node Positioning">
         This block allows you to "pose" this objects nodes. Used normally for dead bodies. The orientations block has an entry for each checked node flag, skipping unchecked ones.
@@ -727,7 +727,7 @@
         <bit name="Bit 31" index="31" />
       </flags32>
       <point3 name="Position" offset="0x8" visible="true" id="position" />
-      <vector3 name="Rotation" offset="0x14" visible="true" id="rotation" />
+      <euler3 name="Rotation" offset="0x14" visible="true" id="rotation" />
       <float32 name="Scale" offset="0x20" visible="true" id="scale" />
       <comment title="Node Positioning">
         This block allows you to "pose" this objects nodes. Used normally for dead bodies. The orientations block has an entry for each checked node flag, skipping unchecked ones.
@@ -1029,7 +1029,7 @@
         <bit name="Bit 31" index="31" />
       </flags32>
       <point3 name="Position" offset="0x8" visible="true" id="position" />
-      <vector3 name="Rotation" offset="0x14" visible="true" id="rotation" />
+      <euler3 name="Rotation" offset="0x14" visible="true" id="rotation" />
       <float32 name="Scale" offset="0x20" visible="true" id="scale" />
       <comment title="Node Positioning">
         This block allows you to "pose" this objects nodes. Used normally for dead bodies. The orientations block has an entry for each checked node flag, skipping unchecked ones.
@@ -1315,7 +1315,7 @@
         <bit name="Bit 31" index="31" />
       </flags32>
       <point3 name="Position" offset="0x8" visible="true" id="position" />
-      <vector3 name="Rotation" offset="0x14" visible="true" id="rotation" />
+      <euler3 name="Rotation" offset="0x14" visible="true" id="rotation" />
       <float32 name="Scale" offset="0x20" visible="true" id="scale" />
       <comment title="Node Positioning">
         This block allows you to "pose" this objects nodes. Used normally for dead bodies. The orientations block has an entry for each checked node flag, skipping unchecked ones.
@@ -1618,7 +1618,7 @@
         <bit name="Bit 31" index="31" />
       </flags32>
       <point3 name="Position" offset="0x8" visible="true" id="position" />
-      <vector3 name="Rotation" offset="0x14" visible="true" id="rotation" />
+      <euler3 name="Rotation" offset="0x14" visible="true" id="rotation" />
       <float32 name="Scale" offset="0x20" visible="true" id="scale" />
       <comment title="Node Positioning">
         This block allows you to "pose" this objects nodes. Used normally for dead bodies. The orientations block has an entry for each checked node flag, skipping unchecked ones.
@@ -1967,7 +1967,7 @@
         <bit name="Bit 31" index="31" />
       </flags32>
       <point3 name="Position" offset="0x8" visible="true" id="position" />
-      <vector3 name="Rotation" offset="0x14" visible="true" id="rotation" />
+      <euler3 name="Rotation" offset="0x14" visible="true" id="rotation" />
       <float32 name="Scale" offset="0x20" visible="true" id="scale" />
       <comment title="Node Positioning">
         This block allows you to "pose" this objects nodes. Used normally for dead bodies. The orientations block has an entry for each checked node flag, skipping unchecked ones.
@@ -2308,7 +2308,7 @@
         <bit name="Bit 31" index="31" />
       </flags32>
       <point3 name="Position" offset="0x8" visible="true" id="position" />
-      <vector3 name="Rotation" offset="0x14" visible="true" id="rotation" />
+      <euler3 name="Rotation" offset="0x14" visible="true" id="rotation" />
       <float32 name="Scale" offset="0x20" visible="true" id="scale" />
       <comment title="Node Positioning">
         This block allows you to "pose" this objects nodes. Used normally for dead bodies. The orientations block has an entry for each checked node flag, skipping unchecked ones.
@@ -2564,7 +2564,7 @@
         <bit name="Bit 31" index="31" />
       </flags32>
       <point3 name="Position" offset="0x8" visible="true" id="position" />
-      <vector3 name="Rotation" offset="0x14" visible="true" id="rotation" />
+      <euler3 name="Rotation" offset="0x14" visible="true" id="rotation" />
       <float32 name="Scale" offset="0x20" visible="true" id="scale" />
       <comment title="Node Positioning">
         This block allows you to "pose" this objects nodes. Used normally for dead bodies. The orientations block has an entry for each checked node flag, skipping unchecked ones.

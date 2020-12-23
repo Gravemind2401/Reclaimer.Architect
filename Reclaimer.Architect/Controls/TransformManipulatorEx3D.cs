@@ -30,12 +30,12 @@ namespace Reclaimer.Controls
         {
             var bd = new MeshBuilder();
             float arrowLength = 1.5f;
-            bd.AddArrow(Vector3.UnitX * arrowLength, new Vector3(1.2f * arrowLength, 0, 0), 0.08, 4, 12);
-            bd.AddCylinder(Vector3.Zero, Vector3.UnitX * arrowLength, 0.04, 12);
+            bd.AddArrow(Vector3.UnitX * arrowLength, new Vector3(1.2f * arrowLength, 0, 0), 0.1, 4, 12);
+            bd.AddCylinder(Vector3.Zero, Vector3.UnitX * arrowLength, 0.05, 12);
             TranslationXGeometry = bd.ToMesh();
 
             bd = new MeshBuilder();
-            bd.AddCylinder(new Vector3(0, 0, -0.01f), new Vector3(0, 0, 0.01f), arrowLength * 0.35, 32, true, true);
+            bd.AddCylinder(new Vector3(0, 0, -0.01f), new Vector3(0, 0, 0.01f), arrowLength * 0.3, 32, true, true);
             TranslationXYGeometry = bd.ToMesh();
 
             bd = new MeshBuilder();
@@ -45,7 +45,7 @@ namespace Reclaimer.Controls
             RotationXGeometry = bd.ToMesh();
 
             bd = new MeshBuilder();
-            bd.AddBox(Vector3.UnitX * 0.8f, 0.15, 0.15, 0.15);
+            bd.AddBox(Vector3.UnitX * 0.75f, 0.15, 0.15, 0.15);
             bd.AddCylinder(Vector3.Zero, Vector3.UnitX * 0.8f, 0.02, 4);
             ScalingGeometry = bd.ToMesh();
 

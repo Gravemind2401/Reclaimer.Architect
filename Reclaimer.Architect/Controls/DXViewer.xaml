@@ -18,7 +18,7 @@
             </ResourceDictionary.MergedDictionaries>
 
             <u:ToStringConverter x:Key="stringConverter" />
-            <u:RadToDegConverter x:Key="radToDegConverter" />
+            <u:RadToDeg64Converter x:Key="radToDegConverter" />
             <su:VisibilityConverter x:Key="visibilityConverter" />
 
             <Style x:Key="showHideStyle" TargetType="ToggleButton">
