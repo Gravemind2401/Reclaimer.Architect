@@ -372,6 +372,7 @@ namespace Reclaimer.Geometry
                                 {
                                     mesh.IsTransparent = false;
                                     mesh.Material = ErrorMaterial;
+                                    return;
                                 }
 
                                 bool isTransparent;

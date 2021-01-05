@@ -43,9 +43,11 @@ namespace Reclaimer.Controls
             foreach (var variant in config.Variants)
             {
                 var children = new List<ObjectModel3D>();
-                foreach (var attachment in variant.Attachments)
+                foreach (var attachment in variant.Attachments.Where(att => att.ChildTag != null))
                 {
                     var child = factory.CreateObjectModel(attachment.ChildTag.Id);
+                    if (child.config.RenderModelTag == null)
+                        continue;
 
                     var parentProps = factory.GetProperties(config.RenderModelTag.Id);
                     var childProps = factory.GetProperties(child.config.RenderModelTag.Id);
@@ -75,7 +77,7 @@ namespace Reclaimer.Controls
 
         private Matrix GetMarkerTransform(ModelProperties model, string markerName)
         {
-            var marker = model.MarkerGroups.FirstOrDefault(g => g.Name == markerName)?.Markers.First();
+            var marker = model.MarkerGroups.FirstOrDefault(g => g.Name == markerName)?.Markers.FirstOrDefault();
             if (marker == null)
                 return Matrix.Identity;
 
