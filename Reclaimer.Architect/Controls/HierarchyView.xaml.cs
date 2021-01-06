@@ -50,13 +50,12 @@ namespace Reclaimer.Controls
 
         private void tv_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            scenario.SelectedNode = tv.SelectedItem as TreeItemModel;
+            scenario.SelectedNode = tv.SelectedItem as SceneNodeModel;
         }
 
         private void ListItemMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            var type = (NodeType)scenario.SelectedNode.Tag;
-            scenario.RenderView?.NavigateToObject(type, scenario.SelectedItemIndex);
+            scenario.RenderView?.NavigateToObject(scenario.SelectedNodeType, scenario.SelectedItemIndex);
         }
 
         private void RecursiveToggle(IEnumerable<TreeItemModel> collection, bool value)

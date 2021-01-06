@@ -21,14 +21,14 @@ namespace Reclaimer.Models
 {
     public class ScenarioModel : BindableBase
     {
-        private static TreeItemModel XmlToNode(XmlNode xml)
+        private static SceneNodeModel XmlToNode(XmlNode xml)
         {
             var header = xml.GetStringAttribute("header");
             var type = xml.GetEnumAttribute<NodeType>("type") ?? NodeType.None;
             var visible = xml.GetBoolAttribute("visible") ?? true;
             var visibility = visible ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
 
-            var node = new TreeItemModel(header) { Tag = type, Visibility = visibility };
+            var node = new SceneNodeModel(header, type) { Visibility = visibility };
 
             var children = xml.ChildNodes.OfType<XmlNode>().Select(n => XmlToNode(n));
             foreach (var c in children)
@@ -47,7 +47,7 @@ namespace Reclaimer.Models
         public InMemoryMetadataStream MetadataStream { get; }
 
         public Dictionary<string, ScenarioSection> Sections { get; }
-        public ObservableCollection<TreeItemModel> Hierarchy { get; }
+        public ObservableCollection<SceneNodeModel> Hierarchy { get; }
         public ObservableCollection<ListBoxItem> Items { get; }
 
         public ObservableCollection<TagReference> Bsps { get; }
@@ -103,8 +103,8 @@ namespace Reclaimer.Models
             }
         }
 
-        private TreeItemModel selectedNode;
-        public TreeItemModel SelectedNode
+        private SceneNodeModel selectedNode;
+        public SceneNodeModel SelectedNode
         {
             get { return selectedNode; }
             set
@@ -117,7 +117,7 @@ namespace Reclaimer.Models
             }
         }
 
-        public NodeType SelectedNodeType => SelectedNode?.Tag as NodeType? ?? NodeType.None;
+        public NodeType SelectedNodeType => SelectedNode?.NodeType ?? NodeType.None;
 
         private int selectedItemIndex;
         public int SelectedItemIndex
@@ -139,7 +139,7 @@ namespace Reclaimer.Models
             Xml = new XmlDocument();
             MetadataStream = new InMemoryMetadataStream(item, GetXmlData(ScenarioTag.CacheFile, "Metadata"));
             Sections = new Dictionary<string, ScenarioSection>();
-            Hierarchy = new ObservableCollection<TreeItemModel>();
+            Hierarchy = new ObservableCollection<SceneNodeModel>();
             Items = new ObservableCollection<ListBoxItem>();
 
             Bsps = new ObservableCollection<TagReference>();

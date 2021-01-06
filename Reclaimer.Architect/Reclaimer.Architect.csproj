@@ -178,6 +178,7 @@
     <Compile Include="Models\ObjectPlacement.cs" />
     <Compile Include="Models\PaletteType.cs" />
     <Compile Include="Models\ScenarioListItem.cs" />
+    <Compile Include="Models\SceneNodeModel.cs" />
     <Compile Include="Models\StructureBspModel.cs" />
     <Compile Include="Models\ScenarioModel.cs" />
     <Compile Include="Models\ScenarioObject.cs" />

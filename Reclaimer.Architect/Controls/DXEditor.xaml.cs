@@ -222,17 +222,15 @@ namespace Reclaimer.Controls
             if (element?.DataContext == null)
                 return;
 
-            var nodeType = (NodeType)scenario.SelectedNode.Tag;
-
-            if (nodeType == NodeType.StartPositions)
+            if (scenario.SelectedNodeType == NodeType.StartPositions)
                 scenario.SelectedItemIndex = scenario.StartingPositions.IndexOf(element.DataContext as StartPosition);
-            else if (nodeType == NodeType.TriggerVolumes)
+            else if (scenario.SelectedNodeType == NodeType.TriggerVolumes)
             {
 
             }
             else
             {
-                var paletteKey = PaletteType.FromNodeType(nodeType);
+                var paletteKey = PaletteType.FromNodeType(scenario.SelectedNodeType);
                 scenario.SelectedItemIndex = scenario.Palettes[paletteKey].Placements.IndexOf(element.DataContext as ObjectPlacement);
             }
         }
