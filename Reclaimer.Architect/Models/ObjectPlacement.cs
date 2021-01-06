@@ -81,7 +81,7 @@ namespace Reclaimer.Models
             if (PaletteIndex < 0 || PaletteIndex >= palette.Palette.Count)
                 return "<invalid>";
 
-            if (NameIndex >= 0)
+            if (NameIndex >= 0 && NameIndex < Parent.ObjectNames.Count)
                 return Parent.ObjectNames[NameIndex];
             else return palette.Palette[PaletteIndex].Tag?.FileName() ?? "<null>";
         }
