@@ -282,19 +282,11 @@ namespace Reclaimer.Models
                     PaletteNode = paletteNode
                 };
 
-                var blockRef = paletteDef.PaletteBlockRef = new BlockReference
-                {
-                    Offset = paletteNode.GetIntAttribute("offset") ?? 0,
-                    BlockSize = paletteNode.GetIntAttribute("elementSize", "entrySize", "size") ?? 0
-                };
-
-                reader.Seek(RootAddress + blockRef.Offset, SeekOrigin.Begin);
-                var tagBlock = paletteDef.PaletteBlockRef.TagBlock = reader.ReadObject<TagBlock>();
-
+                var blockRef = paletteDef.PaletteBlockRef = new BlockReference(paletteNode, reader, RootAddress);
                 var refOffset = OffsetById(paletteNode, FieldId.TagReference);
-                for (int i = 0; i < tagBlock.Count; i++)
+                for (int i = 0; i < blockRef.TagBlock.Count; i++)
                 {
-                    reader.Seek(tagBlock.Pointer.Address + blockRef.BlockSize * i + refOffset, SeekOrigin.Begin);
+                    reader.Seek(blockRef.TagBlock.Pointer.Address + blockRef.BlockSize * i + refOffset, SeekOrigin.Begin);
                     paletteDef.Palette.Add(reader.ReadObject<TagReference>());
                 }
 
@@ -311,11 +303,7 @@ namespace Reclaimer.Models
                 var paletteDef = Palettes[paletteName];
                 paletteDef.PlacementsNode = placementNode;
 
-                var blockRef = paletteDef.PlacementBlockRef = new BlockReference
-                {
-                    Offset = placementNode.GetIntAttribute("offset") ?? 0,
-                    BlockSize = placementNode.GetIntAttribute("elementSize", "entrySize", "size") ?? 0
-                };
+                var blockRef = paletteDef.PlacementBlockRef = new BlockReference(placementNode, reader, RootAddress);
 
                 var paletteIndex = OffsetById(placementNode, FieldId.PaletteIndex);
                 var nameIndex = OffsetById(placementNode, FieldId.NameIndex);
@@ -324,13 +312,10 @@ namespace Reclaimer.Models
                 var scale = OffsetById(placementNode, FieldId.Scale);
                 var variant = placementNode.SelectSingleNode($"*[@id='{FieldId.Variant}']")?.GetIntAttribute("offset");
 
-                reader.Seek(RootAddress + blockRef.Offset, SeekOrigin.Begin);
-                var tagBlock = paletteDef.PlacementBlockRef.TagBlock = reader.ReadObject<TagBlock>();
-
-                for (int i = 0; i < tagBlock.Count; i++)
+                for (int i = 0; i < blockRef.TagBlock.Count; i++)
                 {
                     var placement = new ObjectPlacement(this, paletteName);
-                    var baseAddress = tagBlock.Pointer.Address + blockRef.BlockSize * i;
+                    var baseAddress = blockRef.TagBlock.Pointer.Address + blockRef.BlockSize * i;
 
                     reader.Seek(baseAddress + paletteIndex, SeekOrigin.Begin);
                     placement.PaletteIndex = reader.ReadInt16();
@@ -503,6 +488,18 @@ namespace Reclaimer.Models
 
     public class BlockReference
     {
+        public BlockReference()
+        { }
+
+        public BlockReference(XmlNode node, EndianReader reader, long baseAddress)
+        {
+            Offset = node.GetIntAttribute("offset") ?? 0;
+            BlockSize = node.GetIntAttribute("elementSize", "entrySize", "size") ?? 0;
+
+            reader.Seek(baseAddress + Offset, SeekOrigin.Begin);
+            TagBlock = reader.ReadObject<TagBlock>();
+        }
+
         public int Offset { get; set; }
         public int BlockSize { get; set; }
         public TagBlock TagBlock { get; set; }
