@@ -33,6 +33,19 @@ namespace Reclaimer.Models
         StartPositions,
         Comments,
 
+        // AI
+        AiSquadGroups,
+        AiZones,
+        AiZoneItem,
+        AiFiringPositions,
+        AiZoneAreas,
+        AiEncounters, //squads
+        AiEncounterItem,
+        AiSquads, //base squads
+        AiSquadItem,
+        AiStartingLocations,
+
+
         // Sandbox
         ForgeVehicles,
         ForgeWeapons,

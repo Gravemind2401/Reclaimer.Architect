@@ -12,6 +12,13 @@ namespace Reclaimer.Models
 {
     public class ScenarioListItem : BindableBase, IMetaUpdateReceiver
     {
+        public int Index { get; }
+
+        public ScenarioListItem(int index)
+        {
+            Index = index;
+        }
+
         private string name;
         public string Name
         {

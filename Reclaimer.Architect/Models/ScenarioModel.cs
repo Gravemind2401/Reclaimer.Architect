@@ -16,27 +16,12 @@ using System.Runtime.CompilerServices;
 using System.IO;
 using Reclaimer.Resources;
 using Adjutant.Blam.Common.Gen3;
+using Reclaimer.Models.Ai;
 
 namespace Reclaimer.Models
 {
     public class ScenarioModel : BindableBase
     {
-        private static SceneNodeModel XmlToNode(XmlNode xml)
-        {
-            var header = xml.GetStringAttribute("header");
-            var type = xml.GetEnumAttribute<NodeType>("type") ?? NodeType.None;
-            var visible = xml.GetBoolAttribute("visible") ?? true;
-            var visibility = visible ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
-
-            var node = new SceneNodeModel(header, type) { Visibility = visibility };
-
-            var children = xml.ChildNodes.OfType<XmlNode>().Select(n => XmlToNode(n));
-            foreach (var c in children)
-                node.Items.Add(c);
-
-            return node;
-        }
-
         internal bool IsBusy { get; private set; }
         internal Action<string, Exception> LogError { get; set; }
 
@@ -57,6 +42,8 @@ namespace Reclaimer.Models
         public Dictionary<string, PaletteDefinition> Palettes { get; }
         public ObservableCollection<StartPosition> StartingPositions { get; }
         public ObservableCollection<TriggerVolume> TriggerVolumes { get; }
+
+        public AiSquadHierarchy SquadHierarchy { get; }
 
         private IScenarioHierarchyView hierarchyView;
         public IScenarioHierarchyView HierarchyView
@@ -142,6 +129,8 @@ namespace Reclaimer.Models
             Hierarchy = new ObservableCollection<SceneNodeModel>();
             Items = new ObservableCollection<ListBoxItem>();
 
+            SquadHierarchy = new AiSquadHierarchy();
+
             Bsps = new ObservableCollection<TagReference>();
             Skies = new ObservableCollection<TagReference>();
             ObjectNames = new List<string>();
@@ -152,7 +141,14 @@ namespace Reclaimer.Models
             using (var reader = CreateReader())
             {
                 LoadSections(reader);
-                LoadHierarchy();
+                ReadSquadHierarchy(reader);
+
+                //populate hierarchy tree
+                var doc = new XmlDocument();
+                doc.LoadXml(Properties.Resources.NodeHierarchy);
+                Hierarchy.AddRange(XmlToNodes(null, doc.DocumentElement));
+                Hierarchy[0].IsExpanded = true;
+
                 ReadBsps(reader);
                 ReadSkies(reader);
                 ReadObjectNames(reader);
@@ -197,6 +193,30 @@ namespace Reclaimer.Models
         }
 
         #region Initialisation
+        private IEnumerable<SceneNodeModel> XmlToNodes(SceneNodeModel parent, XmlNode xml)
+        {
+            var header = xml.GetStringAttribute("header");
+            var type = xml.GetEnumAttribute<NodeType>("type") ?? NodeType.None;
+            var visible = xml.GetBoolAttribute("visible") ?? true;
+            var visibility = visible ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
+
+            var nodeInstance = new SceneNodeModel(header, type) { Visibility = visibility, Tag = parent?.Tag };
+
+            IEnumerable<SceneNodeModel> nodes;
+            if (xml.Name == "placeholder" && parent != null)
+                nodes = GetPlaceholderInstances(parent, nodeInstance).ToList();
+            else nodes = Enumerable.Repeat(nodeInstance, 1);
+
+            foreach (var node in nodes)
+            {
+                var children = xml.ChildNodes.OfType<XmlNode>().SelectMany(n => XmlToNodes(node, n));
+                foreach (var c in children)
+                    node.Items.Add(c);
+            }
+
+            return nodes;
+        }
+
         private int OffsetById(XmlNode node, string fieldId)
         {
             return node.SelectSingleNode($"*[@id='{fieldId}']").GetIntAttribute("offset") ?? 0;
@@ -223,13 +243,105 @@ namespace Reclaimer.Models
             }
         }
 
-        private void LoadHierarchy()
+        private void ReadSquadHierarchy(EndianReader reader)
         {
-            var doc = new XmlDocument();
-            doc.LoadXml(Properties.Resources.NodeHierarchy);
+            var section = Sections["squads"];
+            var tagBlocks = section.Node.SelectNodes("./tagblock[@id]").OfType<XmlNode>().ToDictionary(n => n.Attributes["id"].Value);
 
-            Hierarchy.Add(XmlToNode(doc.DocumentElement));
-            Hierarchy[0].IsExpanded = true;
+            var zoneNode = tagBlocks["zones"];
+            var zoneBlock = new BlockReference(zoneNode, reader, RootAddress);
+
+            var nameOffset = OffsetById(zoneNode, FieldId.Name);
+
+            for (int i = 0; i < zoneBlock.TagBlock.Count; i++)
+            {
+                var zone = new AiZone();
+                var baseAddress = zoneBlock.TagBlock.Pointer.Address + zoneBlock.BlockSize * i;
+
+                reader.Seek(baseAddress + nameOffset, SeekOrigin.Begin);
+                zone.Name = reader.ReadNullTerminatedString(32);
+
+                ReadFiringPositions(reader, tagBlocks, zone, baseAddress);
+                //ReadAreas
+                ReadEncounters(reader, tagBlocks, zone, RootAddress);
+
+                SquadHierarchy.Zones.Add(zone);
+            }
+        }
+
+        private void ReadFiringPositions(EndianReader reader, Dictionary<string, XmlNode> blockLookup, AiZone owner, long rootAddress)
+        {
+            var blockNode = blockLookup["firingpositions"];
+            var blockRef = new BlockReference(blockNode, reader, rootAddress);
+
+            var position = OffsetById(blockNode, FieldId.Position);
+
+            for (int i = 0; i < blockRef.TagBlock.Count; i++)
+            {
+                var fpos = new AiFiringPosition(this);
+                var baseAddress = blockRef.TagBlock.Pointer.Address + blockRef.BlockSize * i;
+
+                reader.Seek(baseAddress + position, SeekOrigin.Begin);
+                fpos.Position = reader.ReadObject<RealVector3D>();
+
+                owner.FiringPositions.Add(fpos);
+            }
+        }
+
+        private void ReadEncounters(EndianReader reader, Dictionary<string, XmlNode> blockLookup, AiZone owner, long rootAddress)
+        {
+            var blockNode = blockLookup["encounters"];
+            var blockRef = new BlockReference(blockNode, reader, rootAddress);
+
+            var name = OffsetById(blockNode, FieldId.Name);
+
+            for (int i = 0; i < blockRef.TagBlock.Count; i++)
+            {
+                var enc = new AiEncounter();
+                var baseAddress = blockRef.TagBlock.Pointer.Address + blockRef.BlockSize * i;
+
+                reader.Seek(baseAddress + name, SeekOrigin.Begin);
+                enc.Name = reader.ReadNullTerminatedString(32);
+
+                ReadSquads(reader, blockLookup, enc, baseAddress);
+
+                owner.Encounters.Add(enc);
+            }
+        }
+
+        private void ReadSquads(EndianReader reader, Dictionary<string, XmlNode> blockLookup, AiEncounter owner, long rootAddress)
+        {
+            var blockNode = blockLookup["squads"];
+            var blockRef = new BlockReference(blockNode, reader, rootAddress);
+
+            for (int i = 0; i < blockRef.TagBlock.Count; i++)
+            {
+                var squad = new AiSquad { Name = $"Squad {i:D2}" };
+                var baseAddress = blockRef.TagBlock.Pointer.Address + blockRef.BlockSize * i;
+
+                ReadStartingLocations(reader, blockLookup, squad, baseAddress);
+
+                owner.Squads.Add(squad);
+            }
+        }
+
+        private void ReadStartingLocations(EndianReader reader, Dictionary<string, XmlNode> blockLookup, AiSquad owner, long rootAddress)
+        {
+            var blockNode = blockLookup["startinglocations"];
+            var blockRef = new BlockReference(blockNode, reader, rootAddress);
+
+            var name = OffsetById(blockNode, FieldId.Name);
+
+            for (int i = 0; i < blockRef.TagBlock.Count; i++)
+            {
+                var loc = new AiStartingLocation(this);
+                var baseAddress = blockRef.TagBlock.Pointer.Address + blockRef.BlockSize * i;
+
+                reader.Seek(baseAddress + name, SeekOrigin.Begin);
+                loc.Name = reader.ReadObject<StringId>();
+
+                owner.StartingLocations.Add(loc);
+            }
         }
 
         private void ReadBsps(EndianReader reader)
@@ -388,6 +500,21 @@ namespace Reclaimer.Models
                 TriggerVolumes.Add(volume);
             }
         }
+
+        private IEnumerable<SceneNodeModel> GetPlaceholderInstances(SceneNodeModel parent, SceneNodeModel placeholder)
+        {
+            var instances = new List<SceneNodeModel>();
+
+            if (placeholder.NodeType == NodeType.AiZoneItem)
+                return SquadHierarchy.Zones.Select(z => new SceneNodeModel(z.Name, NodeType.AiZoneItem) { Tag = z });
+            else if (placeholder.NodeType == NodeType.AiEncounterItem)
+                return (parent.Tag as AiZone).Encounters.Select(e => new SceneNodeModel(e.Name, NodeType.AiZoneItem) { Tag = e });
+            else if (placeholder.NodeType == NodeType.AiSquadItem)
+                return (parent.Tag as AiEncounter).Squads.Select(s => new SceneNodeModel(s.Name, NodeType.AiSquadItem) { Tag = s });
+            else instances.Add(placeholder);
+
+            return instances;
+        }
         #endregion
 
         private void DisplayItems()
@@ -436,7 +563,7 @@ namespace Reclaimer.Models
                     reader.Seek(baseAddress + nameOffset, SeekOrigin.Begin);
 
                     var name = reader.ReadNullTerminatedString();
-                    var item = new ScenarioListItem { Name = name };
+                    var item = new ScenarioListItem(i) { Name = name };
                     Items.Add(new ListBoxItem { Content = item.Name, Tag = item });
                 }
             }
@@ -493,14 +620,14 @@ namespace Reclaimer.Models
 
         public BlockReference(XmlNode node, EndianReader reader, long baseAddress)
         {
-            Offset = node.GetIntAttribute("offset") ?? 0;
+            var Offset = node.GetIntAttribute("offset") ?? 0;
             BlockSize = node.GetIntAttribute("elementSize", "entrySize", "size") ?? 0;
 
             reader.Seek(baseAddress + Offset, SeekOrigin.Begin);
             TagBlock = reader.ReadObject<TagBlock>();
         }
 
-        public int Offset { get; set; }
+        //public int Offset { get; set; }
         public int BlockSize { get; set; }
         public TagBlock TagBlock { get; set; }
     }

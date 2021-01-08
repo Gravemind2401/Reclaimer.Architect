@@ -20,8 +20,32 @@
     <node header="Sound scenery" type="SoundScenery" visible="False" />
   </node>
   <node header="Player starting positions" type="StartPositions" />
-  <node header="AI" visible="False">
-    
+  <node header="AI">
+    <node header="Squad Groups" type="AiSquadGroups" />
+    <node header="Zones" type="AiZones">
+      <placeholder header="#zone" type="AiZoneItem">
+        <node header="Firing Positions" type="AiFiringPositions" />
+        <node header="Areas" type="AiZoneAreas" visible="False" />
+        <node header="Encounters" type="AiEncounters">
+          <placeholder header="#encounter" type="AiEncounterItem">
+            <node header="Squads" type="AiSquads">
+              <placeholder header="#squad" type="AiSquadItem">
+                <node header="Starting Locations" type="AiStartingLocations" />
+              </placeholder>
+            </node>
+          </placeholder>
+        </node>
+      </placeholder>
+    </node>
+    <node header="Command Lists" visible="False">
+      
+    </node>
+    <node header="Animations" visible="False" />
+    <node header="Scripts" visible="False" />
+    <node header="Recordings" visible="False" />
+    <node header="Conversations" visible="False">
+      
+    </node>
   </node>
   <node header="Comments" type="Comments" visible="False" />
   <node header="Sandbox" visible="False">
