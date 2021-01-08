@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:Reclaimer.Controls"
              xmlns:s="clr-namespace:Studio.Controls;assembly=Studio"
              xmlns:u="clr-namespace:Reclaimer.Utilities"
+             xmlns:m="clr-namespace:Reclaimer.Models"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
 
@@ -77,17 +78,32 @@
                     </Style>
                 </TreeView.Resources>
                 <TreeView.ItemTemplate>
-                    <HierarchicalDataTemplate DataType="m:TreeItemModel" ItemsSource="{Binding Items}">
+                    <HierarchicalDataTemplate DataType="m:SceneNodeModel" ItemsSource="{Binding Items}">
                         <StackPanel Orientation="Horizontal">
                             <ContentControl x:Name="iconHost" Margin="0,2,5,1" Focusable="False" />
                             <TextBlock Text="{Binding Header}" VerticalAlignment="Center" />
                         </StackPanel>
                         <DataTemplate.Triggers>
-                            <DataTrigger Binding="{Binding IsExpanded, RelativeSource={RelativeSource AncestorType=TreeViewItem}}" Value="False">
-                                <Setter TargetName="iconHost" Property="Template" Value="{StaticResource ic_Folder_16x}" />
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding IsExpanded, RelativeSource={RelativeSource AncestorType=TreeViewItem}}" Value="True">
-                                <Setter TargetName="iconHost" Property="Template" Value="{StaticResource ic_FolderOpen_16x}" />
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding IconType}" Value="0" />
+                                    <Condition Binding="{Binding IsExpanded, RelativeSource={RelativeSource AncestorType=TreeViewItem}}" Value="False" />
+                                </MultiDataTrigger.Conditions>
+                                <MultiDataTrigger.Setters>
+                                    <Setter TargetName="iconHost" Property="Template" Value="{StaticResource ic_Folder_16x}" />
+                                </MultiDataTrigger.Setters>
+                            </MultiDataTrigger>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding IconType}" Value="0" />
+                                    <Condition Binding="{Binding IsExpanded, RelativeSource={RelativeSource AncestorType=TreeViewItem}}" Value="True" />
+                                </MultiDataTrigger.Conditions>
+                                <MultiDataTrigger.Setters>
+                                    <Setter TargetName="iconHost" Property="Template" Value="{StaticResource ic_FolderOpen_16x}" />
+                                </MultiDataTrigger.Setters>
+                            </MultiDataTrigger>
+                            <DataTrigger Binding="{Binding IconType}" Value="1">
+                                <Setter TargetName="iconHost" Property="Template" Value="{StaticResource ic_Class_purple_16x}" />
                             </DataTrigger>
                         </DataTemplate.Triggers>
                     </HierarchicalDataTemplate>

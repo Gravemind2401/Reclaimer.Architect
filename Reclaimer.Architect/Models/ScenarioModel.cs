@@ -506,11 +506,11 @@ namespace Reclaimer.Models
             var instances = new List<SceneNodeModel>();
 
             if (placeholder.NodeType == NodeType.AiZoneItem)
-                return SquadHierarchy.Zones.Select(z => new SceneNodeModel(z.Name, NodeType.AiZoneItem) { Tag = z });
+                return SquadHierarchy.Zones.Select(z => new SceneNodeModel(z.Name, NodeType.AiZoneItem) { Tag = z, IconType = 1 });
             else if (placeholder.NodeType == NodeType.AiEncounterItem)
-                return (parent.Tag as AiZone).Encounters.Select(e => new SceneNodeModel(e.Name, NodeType.AiZoneItem) { Tag = e });
+                return (parent.Tag as AiZone).Encounters.Select(e => new SceneNodeModel(e.Name, NodeType.AiZoneItem) { Tag = e, IconType = 1 });
             else if (placeholder.NodeType == NodeType.AiSquadItem)
-                return (parent.Tag as AiEncounter).Squads.Select(s => new SceneNodeModel(s.Name, NodeType.AiSquadItem) { Tag = s });
+                return (parent.Tag as AiEncounter).Squads.Select(s => new SceneNodeModel(s.Name, NodeType.AiSquadItem) { Tag = s, IconType = 1 });
             else instances.Add(placeholder);
 
             return instances;
