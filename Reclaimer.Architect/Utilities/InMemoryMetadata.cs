@@ -76,16 +76,16 @@ namespace Reclaimer.Utilities
                     reader.RegisterInstance(expander);
 
                 reader.Seek(item.MetaPointer.Address, SeekOrigin.Begin);
-                RootBlock = ReadBlocks(reader, doc.DocumentElement, null);
+                RootBlock = ReadBlocks(reader, doc.DocumentElement, null, 0);
                 //var largest = AllBlocks.OrderByDescending(b => b.TotalSize).ToList();
             }
 
             currentBlock = AllBlocks.FirstOrDefault(b => b.ContainsAddress(position));
         }
 
-        private InMemoryBlockCollection ReadBlocks(EndianReader reader, XmlNode node, InMemoryBlockCollection parent)
+        private InMemoryBlockCollection ReadBlocks(EndianReader reader, XmlNode node, InMemoryBlockCollection parent, int parentBlockIndex)
         {
-            var result = new InMemoryBlockCollection(SourceItem, reader, node, parent);
+            var result = new InMemoryBlockCollection(SourceItem, reader, node, parent, parentBlockIndex);
 
             var lastBlock = AllBlocks.LastOrDefault();
             var nextAddress = (lastBlock?.VirtualAddress + lastBlock?.AllocatedSize) ?? 0;
@@ -102,10 +102,11 @@ namespace Reclaimer.Utilities
 
             for (int i = 0; i < result.Count; i++)
             {
+                var indexAddress = blockAddress + result.BlockSize * i;
                 foreach (var childNode in node.SelectNodes("tagblock").OfType<XmlNode>())
                 {
-                    reader.Seek(blockAddress + childNode.GetIntAttribute("offset").Value, SeekOrigin.Begin);
-                    ReadBlocks(reader, childNode, result);
+                    reader.Seek(indexAddress + childNode.GetIntAttribute("offset").Value, SeekOrigin.Begin);
+                    ReadBlocks(reader, childNode, result, i);
                 }
             }
 
@@ -200,6 +201,7 @@ namespace Reclaimer.Utilities
         public InMemoryBlockCollection ParentBlock { get; }
         public List<InMemoryBlockCollection> ChildBlocks { get; }
         public int OffsetInParent { get; }
+        public int ParentBlockIndex { get; }
         public string Name { get; }
         public TagBlock BlockRef { get; }
         public int BlockSize { get; }
@@ -210,10 +212,11 @@ namespace Reclaimer.Utilities
 
         public int TotalSize => BlockSize * Count;
 
-        public InMemoryBlockCollection(IIndexItem sourceItem, EndianReader reader, XmlNode node, InMemoryBlockCollection parent)
+        public InMemoryBlockCollection(IIndexItem sourceItem, EndianReader reader, XmlNode node, InMemoryBlockCollection parent, int parentBlockIndex)
         {
             XmlNode = node;
             ParentBlock = parent;
+            ParentBlockIndex = parentBlockIndex;
             ChildBlocks = new List<InMemoryBlockCollection>();
             ParentBlock?.ChildBlocks.Add(this);
 
@@ -263,10 +266,10 @@ namespace Reclaimer.Utilities
             if (byteOrder == ByteOrder.BigEndian)
                 Array.Reverse(bits);
 
-            ParentBlock.Write(OffsetInParent + 4, bits);
+            ParentBlock.Write(ParentBlock.BlockSize * ParentBlockIndex + OffsetInParent + 4, bits);
         }
 
-        public bool ContainsAddress(long address) => address >= VirtualAddress && address < VirtualAddress + AllocatedSize;
+        public bool ContainsAddress(long address) => address >= VirtualAddress && address < VirtualAddress + TotalSize;
 
         public byte[] Read(int position, int count)
         {
@@ -338,7 +341,7 @@ namespace Reclaimer.Utilities
             //restore original pointers
             foreach (var child in ChildBlocks)
             {
-                writer.Seek(rootAddress + child.OffsetInParent + 4, SeekOrigin.Begin);
+                writer.Seek(rootAddress + BlockSize * child.ParentBlockIndex + child.OffsetInParent + 4, SeekOrigin.Begin);
                 writer.Write(child.BlockRef.Pointer.Value);
             }
         }
