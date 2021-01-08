@@ -1,335 +1,335 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin game="ODST" baseSize="0x834">
-  <tagblock offset="0x14" elementSize="0x6C"/>
-  <tagblock offset="0x4C" elementSize="0x14"/>
-  <tagblock offset="0x58" elementSize="0x2C">
-    <tagblock offset="0x8" elementSize="0x4"/>
-    <tagblock offset="0x14" elementSize="0x54">
-      <tagblock offset="0x0" elementSize="0xC">
-        <tagblock offset="0x0" elementSize="0xC">
-          <tagblock offset="0x0" elementSize="0x4"/>
+  <tagblock name="Structure BSPs" offset="0x14" elementSize="0x6C"/>
+  <tagblock name="Sky References" offset="0x4C" elementSize="0x14"/>
+  <tagblock name="BSP Groups" offset="0x58" elementSize="0x2C">
+    <tagblock name="BSP Checksums" offset="0x8" elementSize="0x4"/>
+    <tagblock name="BSPs" offset="0x14" elementSize="0x54">
+      <tagblock name="Clusters" offset="0x0" elementSize="0xC">
+        <tagblock name="BSPs" offset="0x0" elementSize="0xC">
+          <tagblock name="Unknown" offset="0x0" elementSize="0x4"/>
         </tagblock>
       </tagblock>
-      <tagblock offset="0xC" elementSize="0xC">
-        <tagblock offset="0x0" elementSize="0xC">
-          <tagblock offset="0x0" elementSize="0x4"/>
+      <tagblock name="Clusters" offset="0xC" elementSize="0xC">
+        <tagblock name="BSPs" offset="0x0" elementSize="0xC">
+          <tagblock name="Unknown" offset="0x0" elementSize="0x4"/>
         </tagblock>
       </tagblock>
-      <tagblock offset="0x18" elementSize="0x1"/>
-      <tagblock offset="0x24" elementSize="0x1"/>
-      <tagblock offset="0x30" elementSize="0x4"/>
-      <tagblock offset="0x3C" elementSize="0x4"/>
-      <tagblock offset="0x48" elementSize="0x4"/>
+      <tagblock name="Cluster Skies" offset="0x18" elementSize="0x1"/>
+      <tagblock name="Cluster Visible Skies" offset="0x24" elementSize="0x1"/>
+      <tagblock name="Unknown" offset="0x30" elementSize="0x4"/>
+      <tagblock name="Unknown" offset="0x3C" elementSize="0x4"/>
+      <tagblock name="Clusters" offset="0x48" elementSize="0x4"/>
     </tagblock>
-    <tagblock offset="0x20" elementSize="0x18">
-      <tagblock offset="0x0" elementSize="0xC"/>
-      <tagblock offset="0xC" elementSize="0x2"/>
-    </tagblock>
-  </tagblock>
-  <tagblock offset="0x64" elementSize="0x64">
-    <tagblock offset="0x10" elementSize="0x4"/>
-    <tagblock offset="0x1C" elementSize="0x4"/>
-    <tagblock offset="0x28" elementSize="0x4"/>
-    <tagblock offset="0x34" elementSize="0x1"/>
-    <tagblock offset="0x40" elementSize="0x8"/>
-    <tagblock offset="0x4C" elementSize="0x8"/>
-    <tagblock offset="0x58" elementSize="0x2"/>
-  </tagblock>
-  <tagblock offset="0x70" elementSize="0x24"/>
-  <tagblock offset="0x7C" elementSize="0xC"/>
-  <tagblock offset="0x88" elementSize="0x4"/>
-  <tagblock offset="0xD8" elementSize="0x24"/>
-  <tagblock offset="0xE4" elementSize="0xB4">
-    <tagblock offset="0x24" elementSize="0x1C">
-      <tagblock offset="0x4" elementSize="0x1"/>
-      <tagblock offset="0x10" elementSize="0x2"/>
-      <tagblock offset="0x4" elementSize="0x4"/>
-      <tagblock offset="0x10" elementSize="0x8"/>
-    </tagblock>
-    <tagblock offset="0x70" elementSize="0x4"/>
-  </tagblock>
-  <tagblock offset="0xF0" elementSize="0x30"/>
-  <tagblock offset="0xFC" elementSize="0x74">
-    <tagblock offset="0x24" elementSize="0x1C">
-      <tagblock offset="0x4" elementSize="0x1"/>
-      <tagblock offset="0x10" elementSize="0x2"/>
-      <tagblock offset="0x4" elementSize="0x4"/>
-      <tagblock offset="0x10" elementSize="0x8"/>
+    <tagblock name="BSPs" offset="0x20" elementSize="0x18">
+      <tagblock name="Unknown" offset="0x0" elementSize="0xC"/>
+      <tagblock name="Unknown" offset="0xC" elementSize="0x2"/>
     </tagblock>
   </tagblock>
-  <tagblock offset="0x108" elementSize="0x30"/>
-  <tagblock offset="0x114" elementSize="0xA8">
-    <tagblock offset="0x24" elementSize="0x1C">
-      <tagblock offset="0x4" elementSize="0x1"/>
-      <tagblock offset="0x10" elementSize="0x2"/>
-      <tagblock offset="0x4" elementSize="0x4"/>
-      <tagblock offset="0x10" elementSize="0x8"/>
+  <tagblock name="Scenario BSP Audibility" offset="0x64" elementSize="0x64">
+    <tagblock name="Encoded Door PAS" offset="0x10" elementSize="0x4"/>
+    <tagblock name="Cluster Door Portal Encoded PAS" offset="0x1C" elementSize="0x4"/>
+    <tagblock name="AI Deafening PAS" offset="0x28" elementSize="0x4"/>
+    <tagblock name="Cluster Distances" offset="0x34" elementSize="0x1"/>
+    <tagblock name="BSPs" offset="0x40" elementSize="0x8"/>
+    <tagblock name="BSP Cluster List" offset="0x4C" elementSize="0x8"/>
+    <tagblock name="Cluster Mapping" offset="0x58" elementSize="0x2"/>
+  </tagblock>
+  <tagblock name="Scenario Zoneset Groups" offset="0x70" elementSize="0x24"/>
+  <tagblock name="BSP Atlas" offset="0x7C" elementSize="0xC"/>
+  <tagblock name="Campaign Players" offset="0x88" elementSize="0x4"/>
+  <tagblock name="Object Names" offset="0xD8" elementSize="0x24"/>
+  <tagblock name="Scenery" offset="0xE4" elementSize="0xB4">
+    <tagblock name="Node Positioning" offset="0x24" elementSize="0x1C">
+      <tagblock name="Node Flags" offset="0x4" elementSize="0x1"/>
+      <tagblock name="Orientations" offset="0x10" elementSize="0x2"/>
+      <tagblock name="Node Flags [Readable]" offset="0x4" elementSize="0x4"/>
+      <tagblock name="Orientations [Readable]" offset="0x10" elementSize="0x8"/>
+    </tagblock>
+    <tagblock name="Pathfinding References" offset="0x70" elementSize="0x4"/>
+  </tagblock>
+  <tagblock name="Scenery Palette" offset="0xF0" elementSize="0x30"/>
+  <tagblock name="Bipeds" offset="0xFC" elementSize="0x74">
+    <tagblock name="Node Positioning" offset="0x24" elementSize="0x1C">
+      <tagblock name="Node Flags" offset="0x4" elementSize="0x1"/>
+      <tagblock name="Orientations" offset="0x10" elementSize="0x2"/>
+      <tagblock name="Node Flags [Readable]" offset="0x4" elementSize="0x4"/>
+      <tagblock name="Orientations [Readable]" offset="0x10" elementSize="0x8"/>
     </tagblock>
   </tagblock>
-  <tagblock offset="0x120" elementSize="0x30"/>
-  <tagblock offset="0x12C" elementSize="0x8C">
-    <tagblock offset="0x24" elementSize="0x1C">
-      <tagblock offset="0x4" elementSize="0x1"/>
-      <tagblock offset="0x10" elementSize="0x2"/>
-      <tagblock offset="0x4" elementSize="0x4"/>
-      <tagblock offset="0x10" elementSize="0x8"/>
+  <tagblock name="Biped Palette" offset="0x108" elementSize="0x30"/>
+  <tagblock name="Vehicles" offset="0x114" elementSize="0xA8">
+    <tagblock name="Node Positioning" offset="0x24" elementSize="0x1C">
+      <tagblock name="Node Flags" offset="0x4" elementSize="0x1"/>
+      <tagblock name="Orientations" offset="0x10" elementSize="0x2"/>
+      <tagblock name="Node Flags [Readable]" offset="0x4" elementSize="0x4"/>
+      <tagblock name="Orientations [Readable]" offset="0x10" elementSize="0x8"/>
     </tagblock>
   </tagblock>
-  <tagblock offset="0x138" elementSize="0x30"/>
-  <tagblock offset="0x144" elementSize="0xA8">
-    <tagblock offset="0x24" elementSize="0x1C">
-      <tagblock offset="0x4" elementSize="0x1"/>
-      <tagblock offset="0x10" elementSize="0x2"/>
-      <tagblock offset="0x4" elementSize="0x4"/>
-      <tagblock offset="0x10" elementSize="0x8"/>
+  <tagblock name="Vehicle Palette" offset="0x120" elementSize="0x30"/>
+  <tagblock name="Equipment" offset="0x12C" elementSize="0x8C">
+    <tagblock name="Node Positioning" offset="0x24" elementSize="0x1C">
+      <tagblock name="Node Flags" offset="0x4" elementSize="0x1"/>
+      <tagblock name="Orientations" offset="0x10" elementSize="0x2"/>
+      <tagblock name="Node Flags [Readable]" offset="0x4" elementSize="0x4"/>
+      <tagblock name="Orientations [Readable]" offset="0x10" elementSize="0x8"/>
     </tagblock>
   </tagblock>
-  <tagblock offset="0x150" elementSize="0x30"/>
-  <tagblock offset="0x15C" elementSize="0x2C"/>
-  <tagblock offset="0x168" elementSize="0x88">
-    <tagblock offset="0x24" elementSize="0x1C">
-      <tagblock offset="0x4" elementSize="0x1"/>
-      <tagblock offset="0x10" elementSize="0x2"/>
-      <tagblock offset="0x4" elementSize="0x4"/>
-      <tagblock offset="0x10" elementSize="0x8"/>
-    </tagblock>
-    <tagblock offset="0x78" elementSize="0x4"/>
-  </tagblock>
-  <tagblock offset="0x174" elementSize="0x30"/>
-  <tagblock offset="0x180" elementSize="0x78">
-    <tagblock offset="0x24" elementSize="0x1C">
-      <tagblock offset="0x4" elementSize="0x1"/>
-      <tagblock offset="0x10" elementSize="0x2"/>
-      <tagblock offset="0x4" elementSize="0x4"/>
-      <tagblock offset="0x10" elementSize="0x8"/>
+  <tagblock name="Equipment Palette" offset="0x138" elementSize="0x30"/>
+  <tagblock name="Weapons" offset="0x144" elementSize="0xA8">
+    <tagblock name="Node Positioning" offset="0x24" elementSize="0x1C">
+      <tagblock name="Node Flags" offset="0x4" elementSize="0x1"/>
+      <tagblock name="Orientations" offset="0x10" elementSize="0x2"/>
+      <tagblock name="Node Flags [Readable]" offset="0x4" elementSize="0x4"/>
+      <tagblock name="Orientations [Readable]" offset="0x10" elementSize="0x8"/>
     </tagblock>
   </tagblock>
-  <tagblock offset="0x18C" elementSize="0x30"/>
-  <tagblock offset="0x198" elementSize="0xB8">
-    <tagblock offset="0x24" elementSize="0x1C">
-      <tagblock offset="0x4" elementSize="0x1"/>
-      <tagblock offset="0x10" elementSize="0x2"/>
-      <tagblock offset="0x4" elementSize="0x4"/>
-      <tagblock offset="0x10" elementSize="0x8"/>
+  <tagblock name="Weapon Palette" offset="0x150" elementSize="0x30"/>
+  <tagblock name="Device Groups" offset="0x15C" elementSize="0x2C"/>
+  <tagblock name="Machines" offset="0x168" elementSize="0x88">
+    <tagblock name="Node Positioning" offset="0x24" elementSize="0x1C">
+      <tagblock name="Node Flags" offset="0x4" elementSize="0x1"/>
+      <tagblock name="Orientations" offset="0x10" elementSize="0x2"/>
+      <tagblock name="Node Flags [Readable]" offset="0x4" elementSize="0x4"/>
+      <tagblock name="Orientations [Readable]" offset="0x10" elementSize="0x8"/>
+    </tagblock>
+    <tagblock name="Pathfinding References" offset="0x78" elementSize="0x4"/>
+  </tagblock>
+  <tagblock name="Machine Palette" offset="0x174" elementSize="0x30"/>
+  <tagblock name="Terminals" offset="0x180" elementSize="0x78">
+    <tagblock name="Node Positioning" offset="0x24" elementSize="0x1C">
+      <tagblock name="Node Flags" offset="0x4" elementSize="0x1"/>
+      <tagblock name="Orientations" offset="0x10" elementSize="0x2"/>
+      <tagblock name="Node Flags [Readable]" offset="0x4" elementSize="0x4"/>
+      <tagblock name="Orientations [Readable]" offset="0x10" elementSize="0x8"/>
     </tagblock>
   </tagblock>
-  <tagblock offset="0x1A4" elementSize="0x30"/>
-  <tagblock offset="0x1B0" elementSize="0x7C">
-    <tagblock offset="0x24" elementSize="0x1C">
-      <tagblock offset="0x4" elementSize="0x1"/>
-      <tagblock offset="0x10" elementSize="0x2"/>
-      <tagblock offset="0x4" elementSize="0x4"/>
-      <tagblock offset="0x10" elementSize="0x8"/>
+  <tagblock name="Terminal Palette" offset="0x18C" elementSize="0x30"/>
+  <tagblock name="Alternate Reality Devices" offset="0x198" elementSize="0xB8">
+    <tagblock name="Node Positioning" offset="0x24" elementSize="0x1C">
+      <tagblock name="Node Flags" offset="0x4" elementSize="0x1"/>
+      <tagblock name="Orientations" offset="0x10" elementSize="0x2"/>
+      <tagblock name="Node Flags [Readable]" offset="0x4" elementSize="0x4"/>
+      <tagblock name="Orientations [Readable]" offset="0x10" elementSize="0x8"/>
     </tagblock>
   </tagblock>
-  <tagblock offset="0x1BC" elementSize="0x30"/>
-  <tagblock offset="0x1C8" elementSize="0x70">
-    <tagblock offset="0x24" elementSize="0x1C">
-      <tagblock offset="0x4" elementSize="0x1"/>
-      <tagblock offset="0x10" elementSize="0x2"/>
-      <tagblock offset="0x4" elementSize="0x4"/>
-      <tagblock offset="0x10" elementSize="0x8"/>
+  <tagblock name="Alternate Reality Device Palette" offset="0x1A4" elementSize="0x30"/>
+  <tagblock name="Controls" offset="0x1B0" elementSize="0x7C">
+    <tagblock name="Node Positioning" offset="0x24" elementSize="0x1C">
+      <tagblock name="Node Flags" offset="0x4" elementSize="0x1"/>
+      <tagblock name="Orientations" offset="0x10" elementSize="0x2"/>
+      <tagblock name="Node Flags [Readable]" offset="0x4" elementSize="0x4"/>
+      <tagblock name="Orientations [Readable]" offset="0x10" elementSize="0x8"/>
     </tagblock>
   </tagblock>
-  <tagblock offset="0x1D4" elementSize="0x30"/>
-  <tagblock offset="0x1E0" elementSize="0x84">
-    <tagblock offset="0x24" elementSize="0x1C">
-      <tagblock offset="0x4" elementSize="0x1"/>
-      <tagblock offset="0x10" elementSize="0x2"/>
-      <tagblock offset="0x4" elementSize="0x4"/>
-      <tagblock offset="0x10" elementSize="0x8"/>
-    </tagblock>
-    <tagblock offset="0x78" elementSize="0x4"/>
-  </tagblock>
-  <tagblock offset="0x1EC" elementSize="0x30"/>
-  <tagblock offset="0x1F8" elementSize="0x54">
-    <tagblock offset="0x24" elementSize="0x1C">
-      <tagblock offset="0x4" elementSize="0x1"/>
-      <tagblock offset="0x10" elementSize="0x2"/>
-      <tagblock offset="0x4" elementSize="0x4"/>
-      <tagblock offset="0x10" elementSize="0x8"/>
+  <tagblock name="Control Palette" offset="0x1BC" elementSize="0x30"/>
+  <tagblock name="Sound Scenery" offset="0x1C8" elementSize="0x70">
+    <tagblock name="Node Positioning" offset="0x24" elementSize="0x1C">
+      <tagblock name="Node Flags" offset="0x4" elementSize="0x1"/>
+      <tagblock name="Orientations" offset="0x10" elementSize="0x2"/>
+      <tagblock name="Node Flags [Readable]" offset="0x4" elementSize="0x4"/>
+      <tagblock name="Orientations [Readable]" offset="0x10" elementSize="0x8"/>
     </tagblock>
   </tagblock>
-  <tagblock offset="0x204" elementSize="0x30"/>
-  <tagblock offset="0x210" elementSize="0x8C">
-    <tagblock offset="0x24" elementSize="0x1C">
-      <tagblock offset="0x4" elementSize="0x1"/>
-      <tagblock offset="0x10" elementSize="0x2"/>
-      <tagblock offset="0x4" elementSize="0x4"/>
-      <tagblock offset="0x10" elementSize="0x8"/>
+  <tagblock name="Sound Scenery Palette" offset="0x1D4" elementSize="0x30"/>
+  <tagblock name="Giants" offset="0x1E0" elementSize="0x84">
+    <tagblock name="Node Positioning" offset="0x24" elementSize="0x1C">
+      <tagblock name="Node Flags" offset="0x4" elementSize="0x1"/>
+      <tagblock name="Orientations" offset="0x10" elementSize="0x2"/>
+      <tagblock name="Node Flags [Readable]" offset="0x4" elementSize="0x4"/>
+      <tagblock name="Orientations [Readable]" offset="0x10" elementSize="0x8"/>
+    </tagblock>
+    <tagblock name="Pathfinding References" offset="0x78" elementSize="0x4"/>
+  </tagblock>
+  <tagblock name="Giant Palette" offset="0x1EC" elementSize="0x30"/>
+  <tagblock name="Effect Scenery" offset="0x1F8" elementSize="0x54">
+    <tagblock name="Node Positioning" offset="0x24" elementSize="0x1C">
+      <tagblock name="Node Flags" offset="0x4" elementSize="0x1"/>
+      <tagblock name="Orientations" offset="0x10" elementSize="0x2"/>
+      <tagblock name="Node Flags [Readable]" offset="0x4" elementSize="0x4"/>
+      <tagblock name="Orientations [Readable]" offset="0x10" elementSize="0x8"/>
     </tagblock>
   </tagblock>
-  <tagblock offset="0x21C" elementSize="0x30"/>
-  <tagblock offset="0x228" elementSize="0x30"/>
-  <tagblock offset="0x234" elementSize="0x30"/>
-  <tagblock offset="0x240" elementSize="0x30"/>
-  <tagblock offset="0x24C" elementSize="0x30"/>
-  <tagblock offset="0x258" elementSize="0x30"/>
-  <tagblock offset="0x264" elementSize="0x30"/>
-  <tagblock offset="0x270" elementSize="0x30"/>
-  <tagblock offset="0x27C" elementSize="0xC"/>
-  <tagblock offset="0x288" elementSize="0x58"/>
-  <tagblock offset="0x294" elementSize="0x1C"/>
-  <tagblock offset="0x2A0" elementSize="0x7C">
-    <tagblock offset="0x44" elementSize="0x14"/>
-    <tagblock offset="0x50" elementSize="0x50"/>
-  </tagblock>
-  <tagblock offset="0x2B8" elementSize="0xC"/>
-  <tagblock offset="0x390" elementSize="0x24"/>
-  <tagblock offset="0x39C" elementSize="0x10"/>
-  <tagblock offset="0x3B4" elementSize="0x10"/>
-  <tagblock offset="0x3C0" elementSize="0x28"/>
-  <tagblock offset="0x3CC" elementSize="0x68">
-    <tagblock offset="0x30" elementSize="0x6C">
-      <tagblock offset="0x60" elementSize="0x38"/>
-    </tagblock>
-    <tagblock offset="0x3C" elementSize="0x90">
-      <tagblock offset="0x84" elementSize="0x38"/>
-    </tagblock>
-    <tagblock offset="0x50" elementSize="0x84">
-      <tagblock offset="0x14" elementSize="0x10"/>
-      <tagblock offset="0x20" elementSize="0x10"/>
-      <tagblock offset="0x2C" elementSize="0x10"/>
-      <tagblock offset="0x38" elementSize="0x10"/>
-    </tagblock>
-    <tagblock offset="0x5C" elementSize="0x84">
-      <tagblock offset="0x14" elementSize="0x10"/>
-      <tagblock offset="0x20" elementSize="0x10"/>
-      <tagblock offset="0x2C" elementSize="0x10"/>
-      <tagblock offset="0x38" elementSize="0x10"/>
+  <tagblock name="Effect Scenery Palette" offset="0x204" elementSize="0x30"/>
+  <tagblock name="Light Volumes" offset="0x210" elementSize="0x8C">
+    <tagblock name="Node Positioning" offset="0x24" elementSize="0x1C">
+      <tagblock name="Node Flags" offset="0x4" elementSize="0x1"/>
+      <tagblock name="Orientations" offset="0x10" elementSize="0x2"/>
+      <tagblock name="Node Flags [Readable]" offset="0x4" elementSize="0x4"/>
+      <tagblock name="Orientations [Readable]" offset="0x10" elementSize="0x8"/>
     </tagblock>
   </tagblock>
-  <tagblock offset="0x3D8" elementSize="0x3C">
-    <tagblock offset="0x24" elementSize="0x28"/>
-    <tagblock offset="0x30" elementSize="0xA8">
-      <tagblock offset="0x60" elementSize="0x8"/>
-      <tagblock offset="0x6C" elementSize="0x18"/>
+  <tagblock name="Light Volumes Palette" offset="0x21C" elementSize="0x30"/>
+  <tagblock name="Sandbox Vehicles" offset="0x228" elementSize="0x30"/>
+  <tagblock name="Sandbox Weapons" offset="0x234" elementSize="0x30"/>
+  <tagblock name="Sandbox Equipment" offset="0x240" elementSize="0x30"/>
+  <tagblock name="Sandbox Scenery" offset="0x24C" elementSize="0x30"/>
+  <tagblock name="Sandbox Teleporters" offset="0x258" elementSize="0x30"/>
+  <tagblock name="Sandbox Goal Objects" offset="0x264" elementSize="0x30"/>
+  <tagblock name="Sandbox Spawning" offset="0x270" elementSize="0x30"/>
+  <tagblock name="Soft Ceilings" offset="0x27C" elementSize="0xC"/>
+  <tagblock name="Player Starting Profile" offset="0x288" elementSize="0x58"/>
+  <tagblock name="Player Starting Locations" offset="0x294" elementSize="0x1C"/>
+  <tagblock name="Trigger Volumes" offset="0x2A0" elementSize="0x7C">
+    <tagblock name="Unknown" offset="0x44" elementSize="0x14"/>
+    <tagblock name="Unknown" offset="0x50" elementSize="0x50"/>
+  </tagblock>
+  <tagblock name="Zoneset Switch Trigger Volumes" offset="0x2B8" elementSize="0xC"/>
+  <tagblock name="Decals" offset="0x390" elementSize="0x24"/>
+  <tagblock name="Decal Palette" offset="0x39C" elementSize="0x10"/>
+  <tagblock name="Style Palette" offset="0x3B4" elementSize="0x10"/>
+  <tagblock name="Squad Groups" offset="0x3C0" elementSize="0x28"/>
+  <tagblock name="Squads" offset="0x3CC" elementSize="0x68">
+    <tagblock name="Group Locations" offset="0x30" elementSize="0x6C">
+      <tagblock name="Multi-State" offset="0x60" elementSize="0x38"/>
+    </tagblock>
+    <tagblock name="Single Locations" offset="0x3C" elementSize="0x90">
+      <tagblock name="Multi-State" offset="0x84" elementSize="0x38"/>
+    </tagblock>
+    <tagblock name="Cells" offset="0x50" elementSize="0x84">
+      <tagblock name="Character Type" offset="0x14" elementSize="0x10"/>
+      <tagblock name="Initial Weapon" offset="0x20" elementSize="0x10"/>
+      <tagblock name="Initial Secondary Weapon" offset="0x2C" elementSize="0x10"/>
+      <tagblock name="Initial Equipment" offset="0x38" elementSize="0x10"/>
+    </tagblock>
+    <tagblock name="Cells" offset="0x5C" elementSize="0x84">
+      <tagblock name="Character Type" offset="0x14" elementSize="0x10"/>
+      <tagblock name="Initial Weapon" offset="0x20" elementSize="0x10"/>
+      <tagblock name="Initial Secondary Weapon" offset="0x2C" elementSize="0x10"/>
+      <tagblock name="Initial Equipment" offset="0x38" elementSize="0x10"/>
     </tagblock>
   </tagblock>
-  <tagblock offset="0x3E4" elementSize="0x2C">
-    <tagblock offset="0x4" elementSize="0x4"/>
-    <tagblock offset="0x10" elementSize="0x14"/>
-    <tagblock offset="0x1C" elementSize="0x10">
-      <tagblock offset="0x4" elementSize="0x14"/>
+  <tagblock name="Zones" offset="0x3D8" elementSize="0x3C">
+    <tagblock name="Firing Positions" offset="0x24" elementSize="0x28"/>
+    <tagblock name="Areas" offset="0x30" elementSize="0xA8">
+      <tagblock name="Flight Hints" offset="0x60" elementSize="0x8"/>
+      <tagblock name="Unknown" offset="0x6C" elementSize="0x18"/>
     </tagblock>
   </tagblock>
-  <tagblock offset="0x3FC" elementSize="0x10"/>
-  <tagblock offset="0x414" elementSize="0x6C">
-    <tagblock offset="0x0" elementSize="0x24"/>
-    <tagblock offset="0xC" elementSize="0x48"/>
-    <tagblock offset="0x18" elementSize="0x8"/>
-    <tagblock offset="0x24" elementSize="0x8"/>
-    <tagblock offset="0x3C" elementSize="0xC">
-      <tagblock offset="0x0" elementSize="0xC"/>
-    </tagblock>
-    <tagblock offset="0x48" elementSize="0x7C">
-      <tagblock offset="0x44" elementSize="0x14"/>
-    </tagblock>
-    <tagblock offset="0x54" elementSize="0x18">
-      <tagblock offset="0xC" elementSize="0x28"/>
-    </tagblock>
-    <tagblock offset="0x60" elementSize="0x4"/>
-  </tagblock>
-  <tagblock offset="0x440" elementSize="0x34">
-    <tagblock offset="0x28" elementSize="0x24"/>
-  </tagblock>
-  <tagblock offset="0x44C" elementSize="0x28"/>
-  <tagblock offset="0x458" elementSize="0x10"/>
-  <tagblock offset="0x470" elementSize="0x84">
-    <tagblock offset="0x0" elementSize="0x38">
-      <tagblock offset="0x20" elementSize="0x3C"/>
+  <tagblock name="Unknown" offset="0x3E4" elementSize="0x2C">
+    <tagblock name="Unknown" offset="0x4" elementSize="0x4"/>
+    <tagblock name="Unknown" offset="0x10" elementSize="0x14"/>
+    <tagblock name="Unknown" offset="0x1C" elementSize="0x10">
+      <tagblock name="Unknown" offset="0x4" elementSize="0x14"/>
     </tagblock>
   </tagblock>
-  <tagblock offset="0x47C" elementSize="0x20"/>
-  <tagblock offset="0x488" elementSize="0x40"/>
-  <tagblock offset="0x494" elementSize="0x28"/>
-  <tagblock offset="0x4C0" elementSize="0x28">
-    <tagblock offset="0x4" elementSize="0x10"/>
-    <tagblock offset="0x10" elementSize="0x10"/>
-    <tagblock offset="0x1C" elementSize="0x16C">
-      <tagblock offset="0x10" elementSize="0x10"/>
-      <tagblock offset="0x2C" elementSize="0x10"/>
-      <tagblock offset="0x98" elementSize="0x10"/>
-      <tagblock offset="0xC4" elementSize="0x10"/>
-      <tagblock offset="0x140" elementSize="0x10"/>
+  <tagblock name="Character Palette" offset="0x3FC" elementSize="0x10"/>
+  <tagblock name="AI Pathfinding Data" offset="0x414" elementSize="0x6C">
+    <tagblock name="Unknown" offset="0x0" elementSize="0x24"/>
+    <tagblock name="Unknown" offset="0xC" elementSize="0x48"/>
+    <tagblock name="Unknown" offset="0x18" elementSize="0x8"/>
+    <tagblock name="Unknown" offset="0x24" elementSize="0x8"/>
+    <tagblock name="Unknown" offset="0x3C" elementSize="0xC">
+      <tagblock name="Unknown" offset="0x0" elementSize="0xC"/>
+    </tagblock>
+    <tagblock name="Unknown" offset="0x48" elementSize="0x7C">
+      <tagblock name="Unknown" offset="0x44" elementSize="0x14"/>
+    </tagblock>
+    <tagblock name="Unknown" offset="0x54" elementSize="0x18">
+      <tagblock name="Unknown" offset="0xC" elementSize="0x28"/>
+    </tagblock>
+    <tagblock name="Unknown" offset="0x60" elementSize="0x4"/>
+  </tagblock>
+  <tagblock name="Scripts" offset="0x440" elementSize="0x34">
+    <tagblock name="Parameters" offset="0x28" elementSize="0x24"/>
+  </tagblock>
+  <tagblock name="Globals" offset="0x44C" elementSize="0x28"/>
+  <tagblock name="Script References" offset="0x458" elementSize="0x10"/>
+  <tagblock name="Scripting Data" offset="0x470" elementSize="0x84">
+    <tagblock name="Point Sets" offset="0x0" elementSize="0x38">
+      <tagblock name="Points" offset="0x20" elementSize="0x3C"/>
     </tagblock>
   </tagblock>
-  <tagblock offset="0x4CC" elementSize="0xC"/>
-  <tagblock offset="0x4D8" elementSize="0x2"/>
-  <tagblock offset="0x4E4" elementSize="0x2"/>
-  <tagblock offset="0x4F0" elementSize="0x18"/>
-  <tagblock offset="0x514" elementSize="0x58"/>
-  <tagblock offset="0x538" elementSize="0x78"/>
-  <tagblock offset="0x544" elementSize="0x8"/>
-  <tagblock offset="0x580" elementSize="0x68">
-    <tagblock offset="0x10" elementSize="0x4"/>
-    <tagblock offset="0x1C" elementSize="0x4"/>
-    <tagblock offset="0x28" elementSize="0x4"/>
-    <tagblock offset="0x38" elementSize="0xC"/>
-    <tagblock offset="0x44" elementSize="0x4"/>
-    <tagblock offset="0x50" elementSize="0x4"/>
-    <tagblock offset="0x5C" elementSize="0x4"/>
-  </tagblock>
-  <tagblock offset="0x618" elementSize="0x6C">
-    <tagblock offset="0x48" elementSize="0x10"/>
-    <tagblock offset="0x54" elementSize="0x30"/>
-    <tagblock offset="0x60" elementSize="0x30"/>
-  </tagblock>
-  <tagblock offset="0x634" elementSize="0xB0">
-    <tagblock offset="0x24" elementSize="0x1C">
-      <tagblock offset="0x4" elementSize="0x1"/>
-      <tagblock offset="0x10" elementSize="0x2"/>
-      <tagblock offset="0x4" elementSize="0x4"/>
-      <tagblock offset="0x10" elementSize="0x8"/>
+  <tagblock name="Cutscene Flags" offset="0x47C" elementSize="0x20"/>
+  <tagblock name="Cutscene Camera Points" offset="0x488" elementSize="0x40"/>
+  <tagblock name="Cutscene Titles" offset="0x494" elementSize="0x28"/>
+  <tagblock name="Scenario Resources" offset="0x4C0" elementSize="0x28">
+    <tagblock name="Script Source" offset="0x4" elementSize="0x10"/>
+    <tagblock name="AI Resources" offset="0x10" elementSize="0x10"/>
+    <tagblock name="References" offset="0x1C" elementSize="0x16C">
+      <tagblock name="Other Scenery" offset="0x10" elementSize="0x10"/>
+      <tagblock name="Other Bipeds" offset="0x2C" elementSize="0x10"/>
+      <tagblock name="Other Devices" offset="0x98" elementSize="0x10"/>
+      <tagblock name="Other Decals" offset="0xC4" elementSize="0x10"/>
+      <tagblock name="Other Decorators" offset="0x140" elementSize="0x10"/>
     </tagblock>
-    <tagblock offset="0x70" elementSize="0x4"/>
   </tagblock>
-  <tagblock offset="0x640" elementSize="0x30"/>
-  <tagblock offset="0x64C" elementSize="0x10"/>
-  <tagblock offset="0x658" elementSize="0x48">
-    <tagblock offset="0x10" elementSize="0x24"/>
-    <tagblock offset="0x1C" elementSize="0x10"/>
+  <tagblock name="Unit Seats Mapping" offset="0x4CC" elementSize="0xC"/>
+  <tagblock name="Scenario Kill Triggers" offset="0x4D8" elementSize="0x2"/>
+  <tagblock name="Scenario Safe Triggers" offset="0x4E4" elementSize="0x2"/>
+  <tagblock name="Script Expressions" offset="0x4F0" elementSize="0x18"/>
+  <tagblock name="Background Sound Environment Palette" offset="0x514" elementSize="0x58"/>
+  <tagblock name="Unknown" offset="0x538" elementSize="0x78"/>
+  <tagblock name="Fog" offset="0x544" elementSize="0x8"/>
+  <tagblock name="Scenario Cluster Data" offset="0x580" elementSize="0x68">
+    <tagblock name="Background Sound Environments" offset="0x10" elementSize="0x4"/>
+    <tagblock name="Unknown" offset="0x1C" elementSize="0x4"/>
+    <tagblock name="Unknown" offset="0x28" elementSize="0x4"/>
+    <tagblock name="Cluster Centroids" offset="0x38" elementSize="0xC"/>
+    <tagblock name="Unknown" offset="0x44" elementSize="0x4"/>
+    <tagblock name="Fog" offset="0x50" elementSize="0x4"/>
+    <tagblock name="Camera Effects" offset="0x5C" elementSize="0x4"/>
   </tagblock>
-  <tagblock offset="0x680" elementSize="0x30"/>
-  <tagblock offset="0x68C" elementSize="0x104"/>
-  <tagblock offset="0x6B0" elementSize="0x10"/>
-  <tagblock offset="0x6CC" elementSize="0x24"/>
-  <tagblock offset="0x6F0" elementSize="0x4"/>
-  <tagblock offset="0x75C" elementSize="0x10"/>
-  <tagblock offset="0x768" elementSize="0x24">
-    <tagblock offset="0x18" elementSize="0xE8">
-      <tagblock offset="0xB0" elementSize="0x124"/>
-      <tagblock offset="0xD0" elementSize="0x10"/>
-      <tagblock offset="0xDC" elementSize="0xC">
-        <tagblock offset="0x0" elementSize="0x10"/>
+  <tagblock name="Spawn Data" offset="0x618" elementSize="0x6C">
+    <tagblock name="Dynamic Spawn Overloads" offset="0x48" elementSize="0x10"/>
+    <tagblock name="Static Respawn Zones" offset="0x54" elementSize="0x30"/>
+    <tagblock name="Static Initial Spawn Zones" offset="0x60" elementSize="0x30"/>
+  </tagblock>
+  <tagblock name="Crates" offset="0x634" elementSize="0xB0">
+    <tagblock name="Node Positioning" offset="0x24" elementSize="0x1C">
+      <tagblock name="Node Flags" offset="0x4" elementSize="0x1"/>
+      <tagblock name="Orientations" offset="0x10" elementSize="0x2"/>
+      <tagblock name="Node Flags [Readable]" offset="0x4" elementSize="0x4"/>
+      <tagblock name="Orientations [Readable]" offset="0x10" elementSize="0x8"/>
+    </tagblock>
+    <tagblock name="Unknown" offset="0x70" elementSize="0x4"/>
+  </tagblock>
+  <tagblock name="Crate Palette" offset="0x640" elementSize="0x30"/>
+  <tagblock name="Flock Palette" offset="0x64C" elementSize="0x10"/>
+  <tagblock name="Flocks" offset="0x658" elementSize="0x48">
+    <tagblock name="Sources" offset="0x10" elementSize="0x24"/>
+    <tagblock name="Sinks" offset="0x1C" elementSize="0x10"/>
+  </tagblock>
+  <tagblock name="Creature Palette" offset="0x680" elementSize="0x30"/>
+  <tagblock name="Editor Folders" offset="0x68C" elementSize="0x104"/>
+  <tagblock name="Mission Dialogue" offset="0x6B0" elementSize="0x10"/>
+  <tagblock name="Interpolators" offset="0x6CC" elementSize="0x24"/>
+  <tagblock name="Simulation Definition Table" offset="0x6F0" elementSize="0x4"/>
+  <tagblock name="Unknown Objects" offset="0x75C" elementSize="0x10"/>
+  <tagblock name="AI Objectives" offset="0x768" elementSize="0x24">
+    <tagblock name="Roles" offset="0x18" elementSize="0xE8">
+      <tagblock name="Conditions" offset="0xB0" elementSize="0x124"/>
+      <tagblock name="Unknown" offset="0xD0" elementSize="0x10"/>
+      <tagblock name="Point Geometry" offset="0xDC" elementSize="0xC">
+        <tagblock name="Points" offset="0x0" elementSize="0x10"/>
       </tagblock>
     </tagblock>
   </tagblock>
-  <tagblock offset="0x774" elementSize="0xC8">
-    <tagblock offset="0x8" elementSize="0x2"/>
-    <tagblock offset="0x14" elementSize="0x2"/>
-    <tagblock offset="0x20" elementSize="0x2"/>
-    <tagblock offset="0x2C" elementSize="0x2"/>
-    <tagblock offset="0x38" elementSize="0x2"/>
-    <tagblock offset="0x44" elementSize="0x2"/>
-    <tagblock offset="0x50" elementSize="0x2"/>
-    <tagblock offset="0x5C" elementSize="0x2"/>
-    <tagblock offset="0x68" elementSize="0x2"/>
-    <tagblock offset="0x74" elementSize="0x2"/>
-    <tagblock offset="0x80" elementSize="0x2"/>
-    <tagblock offset="0x8C" elementSize="0x2"/>
-    <tagblock offset="0x98" elementSize="0x2"/>
-    <tagblock offset="0xA4" elementSize="0x2"/>
-    <tagblock offset="0xB0" elementSize="0x2"/>
+  <tagblock name="Designer Zonesets" offset="0x774" elementSize="0xC8">
+    <tagblock name="Bipeds" offset="0x8" elementSize="0x2"/>
+    <tagblock name="Vehicles" offset="0x14" elementSize="0x2"/>
+    <tagblock name="Weapons" offset="0x20" elementSize="0x2"/>
+    <tagblock name="Equipment" offset="0x2C" elementSize="0x2"/>
+    <tagblock name="Scenery" offset="0x38" elementSize="0x2"/>
+    <tagblock name="Machines" offset="0x44" elementSize="0x2"/>
+    <tagblock name="Terminals" offset="0x50" elementSize="0x2"/>
+    <tagblock name="Unknown" offset="0x5C" elementSize="0x2"/>
+    <tagblock name="Unknown" offset="0x68" elementSize="0x2"/>
+    <tagblock name="Unknown" offset="0x74" elementSize="0x2"/>
+    <tagblock name="Crates" offset="0x80" elementSize="0x2"/>
+    <tagblock name="Creatures" offset="0x8C" elementSize="0x2"/>
+    <tagblock name="Giants" offset="0x98" elementSize="0x2"/>
+    <tagblock name="Unknown" offset="0xA4" elementSize="0x2"/>
+    <tagblock name="Characters" offset="0xB0" elementSize="0x2"/>
   </tagblock>
-  <tagblock offset="0x780" elementSize="0x4"/>
-  <tagblock offset="0x798" elementSize="0x10"/>
-  <tagblock offset="0x7A4" elementSize="0x14"/>
-  <tagblock offset="0x7BC" elementSize="0x1C">
-    <tagblock offset="0x0" elementSize="0x8"/>
-    <tagblock offset="0x10" elementSize="0x8"/>
+  <tagblock name="Unknown" offset="0x780" elementSize="0x4"/>
+  <tagblock name="Cinematics" offset="0x798" elementSize="0x10"/>
+  <tagblock name="Cinematic Lighting" offset="0x7A4" elementSize="0x14"/>
+  <tagblock name="Scenario Metagame" offset="0x7BC" elementSize="0x1C">
+    <tagblock name="Time Multipliers" offset="0x0" elementSize="0x8"/>
+    <tagblock name="Survival" offset="0x10" elementSize="0x8"/>
   </tagblock>
-  <tagblock offset="0x7C8" elementSize="0x18"/>
-  <tagblock offset="0x7D4" elementSize="0x10"/>
-  <tagblock offset="0x7EC" elementSize="0x14"/>
+  <tagblock name="Unknown" offset="0x7C8" elementSize="0x18"/>
+  <tagblock name="Unknown" offset="0x7D4" elementSize="0x10"/>
+  <tagblock name="Unknown" offset="0x7EC" elementSize="0x14"/>
 </plugin>

@@ -18,7 +18,7 @@
 
   <xsl:template match="tagblock">
     <xsl:copy>
-      <xsl:apply-templates select="tagblock|@elementSize|@offset"/>
+      <xsl:apply-templates select="tagblock|@name|@offset|@elementSize"/>
     </xsl:copy>
   </xsl:template>
 </xsl:stylesheet>
