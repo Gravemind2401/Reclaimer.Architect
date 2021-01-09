@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
+using Reclaimer.Resources;
 
 namespace Reclaimer.Models.Ai
 {
@@ -35,6 +36,13 @@ namespace Reclaimer.Models.Ai
 
     public class AiEncounter : NamedBlock
     {
+        private int zoneIndex;
+        public int ZoneIndex
+        {
+            get { return zoneIndex; }
+            set { SetProperty(ref zoneIndex, value); }
+        }
+
         public ObservableCollection<AiSquad> Squads { get; }
 
         public AiEncounter()

@@ -248,6 +248,8 @@ namespace Reclaimer.Models
             var section = Sections["squads"];
             var tagBlocks = section.Node.SelectNodes("./tagblock[@id]").OfType<XmlNode>().ToDictionary(n => n.Attributes["id"].Value);
 
+            var encounters = ReadEncounters(reader, tagBlocks, RootAddress);
+
             var zoneNode = tagBlocks["zones"];
             var zoneBlock = new BlockReference(zoneNode, reader, RootAddress);
 
@@ -263,7 +265,7 @@ namespace Reclaimer.Models
 
                 ReadFiringPositions(reader, tagBlocks, zone, baseAddress);
                 //ReadAreas
-                ReadEncounters(reader, tagBlocks, zone, RootAddress);
+                zone.Encounters.AddRange(encounters.Where(e => e.ZoneIndex == i));
 
                 SquadHierarchy.Zones.Add(zone);
             }
@@ -288,12 +290,15 @@ namespace Reclaimer.Models
             }
         }
 
-        private void ReadEncounters(EndianReader reader, Dictionary<string, XmlNode> blockLookup, AiZone owner, long rootAddress)
+        private List<AiEncounter> ReadEncounters(EndianReader reader, Dictionary<string, XmlNode> blockLookup, long rootAddress)
         {
+            var results = new List<AiEncounter>();
+
             var blockNode = blockLookup["encounters"];
             var blockRef = new BlockReference(blockNode, reader, rootAddress);
 
             var name = OffsetById(blockNode, FieldId.Name);
+            var parentIndex = OffsetById(blockNode, FieldId.ParentIndex);
 
             for (int i = 0; i < blockRef.TagBlock.Count; i++)
             {
@@ -303,10 +308,15 @@ namespace Reclaimer.Models
                 reader.Seek(baseAddress + name, SeekOrigin.Begin);
                 enc.Name = reader.ReadNullTerminatedString(32);
 
+                reader.Seek(baseAddress + parentIndex, SeekOrigin.Begin);
+                enc.ZoneIndex = reader.ReadInt16();
+
                 ReadSquads(reader, blockLookup, enc, baseAddress);
 
-                owner.Encounters.Add(enc);
+                results.Add(enc);
             }
+
+            return results;
         }
 
         private void ReadSquads(EndianReader reader, Dictionary<string, XmlNode> blockLookup, AiEncounter owner, long rootAddress)
@@ -522,7 +532,7 @@ namespace Reclaimer.Models
             SelectedItemIndex = -1;
             Items.Clear();
 
-            if (selectedNode == null || SelectedNodeType == NodeType.None)
+            if (SelectedNodeType == NodeType.None)
                 return;
 
             var paletteKey = PaletteType.FromNodeType(SelectedNodeType);

@@ -97,6 +97,15 @@ namespace Reclaimer.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to parentindex.
+        /// </summary>
+        internal static string ParentIndex {
+            get {
+                return ResourceManager.GetString("ParentIndex", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to position.
         /// </summary>
         internal static string Position {

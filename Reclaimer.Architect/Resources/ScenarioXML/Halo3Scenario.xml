@@ -2954,7 +2954,7 @@
         <option name="Unused15" value="0xF" />
       </enum16>
       <blockIndex16 name="Parent Squad Group" targetId="scenario_squad_group" offset="0x26" visible="true" />
-      <blockIndex16 name="Parent Zone" targetId="scenario_ai_zone" offset="0x28" visible="true" />
+      <blockIndex16 name="Parent Zone" targetId="scenario_ai_zone" offset="0x28" visible="true" id="parentindex" />
       <int16 name="Trigger Index" offset="0x2A" visible="true" />
       <int16 name="Objective Index" offset="0x2C" visible="true" />
       <int16 name="Objective Role Index" offset="0x2E" visible="true" />
