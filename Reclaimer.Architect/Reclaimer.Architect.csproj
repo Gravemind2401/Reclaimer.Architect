@@ -170,7 +170,7 @@
     <Compile Include="Geometry\BspManager.cs" />
     <Compile Include="Geometry\SceneManager.cs" />
     <Compile Include="Models\Ai\AiFiringPosition.cs" />
-    <Compile Include="Models\Ai\NamedBlock.cs" />
+    <Compile Include="Models\Ai\AiNamedBlock.cs" />
     <Compile Include="Models\Ai\AiStartingLocation.cs" />
     <Compile Include="Models\IBspGeometryInstanceBlock.cs" />
     <Compile Include="Models\IMetaUpdateReceiver.cs" />

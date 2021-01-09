@@ -129,8 +129,6 @@ namespace Reclaimer.Models
             Hierarchy = new ObservableCollection<SceneNodeModel>();
             Items = new ObservableCollection<ListBoxItem>();
 
-            SquadHierarchy = new AiSquadHierarchy();
-
             Bsps = new ObservableCollection<TagReference>();
             Skies = new ObservableCollection<TagReference>();
             ObjectNames = new List<string>();
@@ -141,6 +139,8 @@ namespace Reclaimer.Models
             using (var reader = CreateReader())
             {
                 LoadSections(reader);
+
+                SquadHierarchy = new AiSquadHierarchy(this);
                 ReadSquadHierarchy(reader);
 
                 //populate hierarchy tree
@@ -245,25 +245,22 @@ namespace Reclaimer.Models
 
         private void ReadSquadHierarchy(EndianReader reader)
         {
-            var section = Sections["squads"];
-            var tagBlocks = section.Node.SelectNodes("./tagblock[@id]").OfType<XmlNode>().ToDictionary(n => n.Attributes["id"].Value);
+            var encounters = ReadEncounters(reader, RootAddress);
 
-            var encounters = ReadEncounters(reader, tagBlocks, RootAddress);
-
-            var zoneNode = tagBlocks["zones"];
+            var zoneNode = SquadHierarchy.AiNodes["zones"];
             var zoneBlock = new BlockReference(zoneNode, reader, RootAddress);
 
             var nameOffset = OffsetById(zoneNode, FieldId.Name);
 
             for (int i = 0; i < zoneBlock.TagBlock.Count; i++)
             {
-                var zone = new AiZone();
+                var zone = new AiZone(zoneBlock, i);
                 var baseAddress = zoneBlock.TagBlock.Pointer.Address + zoneBlock.BlockSize * i;
 
                 reader.Seek(baseAddress + nameOffset, SeekOrigin.Begin);
                 zone.Name = reader.ReadNullTerminatedString(32);
 
-                ReadFiringPositions(reader, tagBlocks, zone, baseAddress);
+                ReadFiringPositions(reader, zone, baseAddress);
                 //ReadAreas
                 zone.Encounters.AddRange(encounters.Where(e => e.ZoneIndex == i));
 
@@ -271,9 +268,9 @@ namespace Reclaimer.Models
             }
         }
 
-        private void ReadFiringPositions(EndianReader reader, Dictionary<string, XmlNode> blockLookup, AiZone owner, long rootAddress)
+        private void ReadFiringPositions(EndianReader reader, AiZone owner, long rootAddress)
         {
-            var blockNode = blockLookup["firingpositions"];
+            var blockNode = SquadHierarchy.AiNodes["firingpositions"];
             var blockRef = new BlockReference(blockNode, reader, rootAddress);
 
             var position = OffsetById(blockNode, FieldId.Position);
@@ -290,11 +287,11 @@ namespace Reclaimer.Models
             }
         }
 
-        private List<AiEncounter> ReadEncounters(EndianReader reader, Dictionary<string, XmlNode> blockLookup, long rootAddress)
+        private List<AiEncounter> ReadEncounters(EndianReader reader, long rootAddress)
         {
             var results = new List<AiEncounter>();
 
-            var blockNode = blockLookup["encounters"];
+            var blockNode = SquadHierarchy.AiNodes["encounters"];
             var blockRef = new BlockReference(blockNode, reader, rootAddress);
 
             var name = OffsetById(blockNode, FieldId.Name);
@@ -302,7 +299,7 @@ namespace Reclaimer.Models
 
             for (int i = 0; i < blockRef.TagBlock.Count; i++)
             {
-                var enc = new AiEncounter();
+                var enc = new AiEncounter(blockRef, i);
                 var baseAddress = blockRef.TagBlock.Pointer.Address + blockRef.BlockSize * i;
 
                 reader.Seek(baseAddress + name, SeekOrigin.Begin);
@@ -311,7 +308,7 @@ namespace Reclaimer.Models
                 reader.Seek(baseAddress + parentIndex, SeekOrigin.Begin);
                 enc.ZoneIndex = reader.ReadInt16();
 
-                ReadSquads(reader, blockLookup, enc, baseAddress);
+                ReadSquads(reader, enc, baseAddress);
 
                 results.Add(enc);
             }
@@ -319,25 +316,25 @@ namespace Reclaimer.Models
             return results;
         }
 
-        private void ReadSquads(EndianReader reader, Dictionary<string, XmlNode> blockLookup, AiEncounter owner, long rootAddress)
+        private void ReadSquads(EndianReader reader, AiEncounter owner, long rootAddress)
         {
-            var blockNode = blockLookup["squads"];
+            var blockNode = SquadHierarchy.AiNodes["squads"];
             var blockRef = new BlockReference(blockNode, reader, rootAddress);
 
             for (int i = 0; i < blockRef.TagBlock.Count; i++)
             {
-                var squad = new AiSquad { Name = $"Squad {i:D2}" };
+                var squad = new AiSquad(blockRef, i) { Name = $"Squad {i:D2}" };
                 var baseAddress = blockRef.TagBlock.Pointer.Address + blockRef.BlockSize * i;
 
-                ReadStartingLocations(reader, blockLookup, squad, baseAddress);
+                ReadStartingLocations(reader, squad, baseAddress);
 
                 owner.Squads.Add(squad);
             }
         }
 
-        private void ReadStartingLocations(EndianReader reader, Dictionary<string, XmlNode> blockLookup, AiSquad owner, long rootAddress)
+        private void ReadStartingLocations(EndianReader reader, AiSquad owner, long rootAddress)
         {
-            var blockNode = blockLookup["startinglocations"];
+            var blockNode = SquadHierarchy.AiNodes["startinglocations"];
             var blockRef = new BlockReference(blockNode, reader, rootAddress);
 
             var name = OffsetById(blockNode, FieldId.Name);
@@ -518,7 +515,7 @@ namespace Reclaimer.Models
             if (placeholder.NodeType == NodeType.AiZoneItem)
                 return SquadHierarchy.Zones.Select(z => new SceneNodeModel(z.Name, NodeType.AiZoneItem) { Tag = z, IconType = 1 });
             else if (placeholder.NodeType == NodeType.AiEncounterItem)
-                return (parent.Tag as AiZone).Encounters.Select(e => new SceneNodeModel(e.Name, NodeType.AiZoneItem) { Tag = e, IconType = 1 });
+                return (parent.Tag as AiZone).Encounters.Select(e => new SceneNodeModel(e.Name, NodeType.AiEncounterItem) { Tag = e, IconType = 1 });
             else if (placeholder.NodeType == NodeType.AiSquadItem)
                 return (parent.Tag as AiEncounter).Squads.Select(s => new SceneNodeModel(s.Name, NodeType.AiSquadItem) { Tag = s, IconType = 1 });
             else instances.Add(placeholder);
@@ -557,6 +554,21 @@ namespace Reclaimer.Models
             {
                 foreach (var vol in TriggerVolumes)
                     Items.Add(new ListBoxItem { Content = vol.GetDisplayName(), Tag = vol });
+            }
+            else if (SelectedNodeType == NodeType.AiZones)
+            {
+                foreach (var zone in SquadHierarchy.Zones)
+                    Items.Add(new ListBoxItem { Content = zone.Name, Tag = zone });
+            }
+            else if (SelectedNodeType == NodeType.AiEncounters)
+            {
+                foreach (var enc in (SelectedNode.Parent.Tag as AiZone).Encounters)
+                    Items.Add(new ListBoxItem { Content = enc.Name, Tag = enc });
+            }
+            else if (SelectedNodeType == NodeType.AiSquads)
+            {
+                foreach (var squad in (SelectedNode.Parent.Tag as AiEncounter).Squads)
+                    Items.Add(new ListBoxItem { Content = squad.Name, Tag = squad });
             }
         }
 

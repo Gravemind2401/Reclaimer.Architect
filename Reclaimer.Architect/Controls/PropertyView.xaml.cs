@@ -1,6 +1,7 @@
 ﻿using Adjutant.Geometry;
 using Adjutant.Spatial;
 using Reclaimer.Models;
+using Reclaimer.Models.Ai;
 using Reclaimer.Plugins.MetaViewer;
 using Reclaimer.Plugins.MetaViewer.Halo3;
 using System;
@@ -44,11 +45,11 @@ namespace Reclaimer.Controls
         #endregion
 
         private readonly Dictionary<string, MetaValueBase> valuesById;
+        private readonly List<Tuple<XmlNode, int>> altNodes;
 
         private ScenarioModel scenario;
         private MetaContext context; //dont dispose this because it will dispose our MetadataStream
         private XmlNode rootNode;
-        private XmlNode altNode;
         private long baseAddress;
 
         public TabModel TabModel { get; }
@@ -59,6 +60,7 @@ namespace Reclaimer.Controls
         {
             InitializeComponent();
             valuesById = new Dictionary<string, MetaValueBase>();
+            altNodes = new List<Tuple<XmlNode, int>>();
             Metadata = new ObservableCollection<MetaValueBase>();
             TabModel = new TabModel(this, Studio.Controls.TabItemType.Tool) { Header = "Properties", ToolTip = "Property View" };
             DataContext = this;
@@ -107,16 +109,18 @@ namespace Reclaimer.Controls
         {
             context = new MetaContext(scenario.Xml, scenario.ScenarioTag.CacheFile, scenario.ScenarioTag, scenario.MetadataStream);
             Visibility = Visibility.Hidden;
-            rootNode = altNode = null;
+            rootNode = null;
+            altNodes.Clear();
 
             var paletteKey = PaletteType.FromNodeType(nodeType);
             if (paletteKey != null && itemIndex >= 0)
             {
                 var palette = scenario.Palettes[paletteKey];
                 rootNode = palette.PlacementsNode;
-                altNode = palette.PaletteNode;
                 baseAddress = palette.PlacementBlockRef.TagBlock.Pointer.Address
                     + itemIndex * palette.PlacementBlockRef.BlockSize;
+
+                altNodes.Add(Tuple.Create(palette.PaletteNode, 0));
 
                 CurrentItem = palette.Placements[itemIndex];
                 LoadData();
@@ -163,6 +167,51 @@ namespace Reclaimer.Controls
                     CurrentItem = scenario.TriggerVolumes[itemIndex];
                     LoadData();
                 }
+                else if ((nodeType == NodeType.AiZoneItem && scenario.SelectedNode.Tag is AiZone) || (nodeType == NodeType.AiZones && itemIndex >= 0))
+                {
+                    var zone = nodeType == NodeType.AiZones
+                        ? scenario.SquadHierarchy.Zones[itemIndex]
+                        : scenario.SelectedNode.Tag as AiZone;
+
+                    rootNode = scenario.SquadHierarchy.AiNodes["zones"];
+                    baseAddress = zone.BlockReference.TagBlock.Pointer.Address
+                        + zone.BlockIndex * zone.BlockReference.BlockSize;
+
+                    CurrentItem = zone;
+                    LoadData();
+                }
+                else if ((nodeType == NodeType.AiEncounterItem && scenario.SelectedNode.Tag is AiEncounter) || (nodeType == NodeType.AiEncounters && itemIndex >= 0))
+                {
+                    var enc = nodeType == NodeType.AiEncounters
+                        ? (scenario.SelectedNode.Parent.Tag as AiZone).Encounters[itemIndex]
+                        : scenario.SelectedNode.Tag as AiEncounter;
+
+                    rootNode = scenario.SquadHierarchy.AiNodes["encounters"];
+                    baseAddress = enc.BlockReference.TagBlock.Pointer.Address
+                        + enc.BlockIndex * enc.BlockReference.BlockSize;
+
+                    altNodes.Add(Tuple.Create(scenario.SquadHierarchy.AiNodes["squadgroups"], 0));
+                    altNodes.Add(Tuple.Create(scenario.SquadHierarchy.AiNodes["zones"], 0));
+
+                    CurrentItem = enc;
+                    LoadData();
+                }
+                else if ((nodeType == NodeType.AiSquadItem && scenario.SelectedNode.Tag is AiSquad) || (nodeType == NodeType.AiSquads && itemIndex >= 0))
+                {
+                    var squad = nodeType == NodeType.AiSquads
+                        ? (scenario.SelectedNode.Parent.Tag as AiEncounter).Squads[itemIndex]
+                        : scenario.SelectedNode.Tag as AiSquad;
+
+                    rootNode = scenario.SquadHierarchy.AiNodes["squads"];
+                    baseAddress = squad.BlockReference.TagBlock.Pointer.Address
+                        + squad.BlockIndex * squad.BlockReference.BlockSize;
+
+                    foreach (var palette in scenario.Palettes.Values)
+                        altNodes.Add(Tuple.Create(palette.PaletteNode, 0));
+
+                    CurrentItem = squad;
+                    LoadData();
+                }
                 else
                 {
                     CurrentItem = null;
@@ -194,10 +243,12 @@ namespace Reclaimer.Controls
                 catch { }
             }
 
-            if (altNode == null)
+            if (altNodes.Count == 0)
                 return;
 
-            MetaValueBase.GetMetaValue(altNode, context, 0);
+            foreach (var t in altNodes)
+                MetaValueBase.GetMetaValue(t.Item1, context, t.Item2);
+
             context.UpdateBlockIndices();
         }
 

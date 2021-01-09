@@ -9,13 +9,22 @@ using System.Threading.Tasks;
 
 namespace Reclaimer.Models.Ai
 {
-    public abstract class NamedBlock : BindableBase, IMetaUpdateReceiver
+    public abstract class AiNamedBlock : BindableBase, IMetaUpdateReceiver
     {
+        internal BlockReference BlockReference { get; }
+        internal int BlockIndex { get; }
+
         private string name;
         public string Name
         {
             get { return name; }
             set { SetProperty(ref name, value); }
+        }
+
+        public AiNamedBlock(BlockReference blockRef, int index)
+        {
+            BlockReference = blockRef;
+            BlockIndex = index;
         }
 
         public virtual void UpdateFromMetaValue(MetaValueBase meta, string fieldId)
