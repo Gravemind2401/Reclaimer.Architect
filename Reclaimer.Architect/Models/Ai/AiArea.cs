@@ -1,4 +1,5 @@
 ﻿using Reclaimer.Plugins.MetaViewer;
+using Reclaimer.Resources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,13 +8,20 @@ using System.Threading.Tasks;
 
 namespace Reclaimer.Models.Ai
 {
-    public class AiFiringPosition : ScenarioObject
+    public class AiArea : ScenarioObject
     {
         internal AiZone Zone { get; }
         internal BlockReference BlockReference { get; }
         internal int BlockIndex { get; }
 
-        public AiFiringPosition(ScenarioModel parent, AiZone zone, BlockReference blockRef, int index)
+        private string name;
+        public string Name
+        {
+            get { return name; }
+            set { SetProperty(ref name, value, FieldId.Name); }
+        }
+
+        public AiArea(ScenarioModel parent, AiZone zone, BlockReference blockRef, int index)
             : base(parent)
         {
             Zone = zone;
@@ -23,7 +31,7 @@ namespace Reclaimer.Models.Ai
 
         public override string GetDisplayName()
         {
-            return $"firing position {Zone.FiringPositions.IndexOf(this)}";
+            return Name;
         }
 
         public override void UpdateFromMetaValue(MetaValueBase meta, string fieldId)

@@ -2834,14 +2834,14 @@
         <bit name="Bit 15" index="15" />
       </flags16>
       <int16 name="Unknown" offset="0x12" visible="false" />
-      <int16 name="Area Index" offset="0x14" visible="true" />
+      <blockIndex16 name="Area Index" targetId="scenario_ai_area" offset="0x14" visible="true" />
       <int16 name="Cluster Index" offset="0x16" visible="true" />
       <int32 name="Unknown" offset="0x18" visible="false" />
       <degree name="Normal y" offset="0x1C" visible="true" />
       <degree name="Normal p" offset="0x20" visible="true" />
       <undefined name="Unknown" offset="0x24" visible="false" />
     </tagblock>
-    <tagblock id="areas" offset="0x34" visible="true" elementSize="0x6C">
+    <tagblock id="areas" srcId="scenario_ai_area" offset="0x34" visible="true" elementSize="0x6C">
       <ascii name="Name" offset="0x0" visible="true" length="0x20" id="name" />
       <flags32 name="Area Flags" offset="0x20" visible="true">
         <bit name="Vehicle Area" index="0" />

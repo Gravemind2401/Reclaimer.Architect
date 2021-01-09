@@ -45,7 +45,7 @@ namespace Reclaimer.Controls
         #endregion
 
         private readonly Dictionary<string, MetaValueBase> valuesById;
-        private readonly List<Tuple<XmlNode, int>> altNodes;
+        private readonly List<Tuple<XmlNode, long>> altNodes;
 
         private ScenarioModel scenario;
         private MetaContext context; //dont dispose this because it will dispose our MetadataStream
@@ -60,7 +60,7 @@ namespace Reclaimer.Controls
         {
             InitializeComponent();
             valuesById = new Dictionary<string, MetaValueBase>();
-            altNodes = new List<Tuple<XmlNode, int>>();
+            altNodes = new List<Tuple<XmlNode, long>>();
             Metadata = new ObservableCollection<MetaValueBase>();
             TabModel = new TabModel(this, Studio.Controls.TabItemType.Tool) { Header = "Properties", ToolTip = "Property View" };
             DataContext = this;
@@ -120,7 +120,7 @@ namespace Reclaimer.Controls
                 baseAddress = palette.PlacementBlockRef.TagBlock.Pointer.Address
                     + itemIndex * palette.PlacementBlockRef.BlockSize;
 
-                altNodes.Add(Tuple.Create(palette.PaletteNode, 0));
+                altNodes.Add(Tuple.Create(palette.PaletteNode, scenario.RootAddress));
 
                 CurrentItem = palette.Placements[itemIndex];
                 LoadData();
@@ -167,6 +167,19 @@ namespace Reclaimer.Controls
                     CurrentItem = scenario.TriggerVolumes[itemIndex];
                     LoadData();
                 }
+                else if (nodeType == NodeType.AiSquadGroups && itemIndex >= 0)
+                {
+                    var group = scenario.SquadHierarchy.SquadGroups[itemIndex];
+
+                    rootNode = scenario.SquadHierarchy.AiNodes["squadgroups"];
+                    baseAddress = group.BlockReference.TagBlock.Pointer.Address
+                        + group.BlockIndex * group.BlockReference.BlockSize;
+
+                    altNodes.Add(Tuple.Create(scenario.SquadHierarchy.AiNodes["squadgroups"], scenario.RootAddress));
+
+                    CurrentItem = group;
+                    LoadData();
+                }
                 else if ((nodeType == NodeType.AiZoneItem && scenario.SelectedNode.Tag is AiZone) || (nodeType == NodeType.AiZones && itemIndex >= 0))
                 {
                     var zone = nodeType == NodeType.AiZones
@@ -180,6 +193,31 @@ namespace Reclaimer.Controls
                     CurrentItem = zone;
                     LoadData();
                 }
+                else if (nodeType == NodeType.AiFiringPositions && itemIndex >= 0)
+                {
+                    var fpos = (scenario.SelectedNode.Parent.Tag as AiZone).FiringPositions[itemIndex];
+
+                    rootNode = scenario.SquadHierarchy.AiNodes["firingpositions"];
+                    baseAddress = fpos.BlockReference.TagBlock.Pointer.Address
+                        + fpos.BlockIndex * fpos.BlockReference.BlockSize;
+
+                    var zoneAddress = fpos.Zone.BlockReference.TagBlock.Pointer.Address;
+                    altNodes.Add(Tuple.Create(scenario.SquadHierarchy.AiNodes["areas"], zoneAddress));
+
+                    CurrentItem = fpos;
+                    LoadData();
+                }
+                else if (nodeType == NodeType.AiZoneAreas && itemIndex >= 0)
+                {
+                    var area = (scenario.SelectedNode.Parent.Tag as AiZone).Areas[itemIndex];
+
+                    rootNode = scenario.SquadHierarchy.AiNodes["areas"];
+                    baseAddress = area.BlockReference.TagBlock.Pointer.Address
+                        + area.BlockIndex * area.BlockReference.BlockSize;
+
+                    CurrentItem = area;
+                    LoadData();
+                }
                 else if ((nodeType == NodeType.AiEncounterItem && scenario.SelectedNode.Tag is AiEncounter) || (nodeType == NodeType.AiEncounters && itemIndex >= 0))
                 {
                     var enc = nodeType == NodeType.AiEncounters
@@ -190,8 +228,8 @@ namespace Reclaimer.Controls
                     baseAddress = enc.BlockReference.TagBlock.Pointer.Address
                         + enc.BlockIndex * enc.BlockReference.BlockSize;
 
-                    altNodes.Add(Tuple.Create(scenario.SquadHierarchy.AiNodes["squadgroups"], 0));
-                    altNodes.Add(Tuple.Create(scenario.SquadHierarchy.AiNodes["zones"], 0));
+                    altNodes.Add(Tuple.Create(scenario.SquadHierarchy.AiNodes["squadgroups"], scenario.RootAddress));
+                    altNodes.Add(Tuple.Create(scenario.SquadHierarchy.AiNodes["zones"], scenario.RootAddress));
 
                     CurrentItem = enc;
                     LoadData();
@@ -207,9 +245,23 @@ namespace Reclaimer.Controls
                         + squad.BlockIndex * squad.BlockReference.BlockSize;
 
                     foreach (var palette in scenario.Palettes.Values)
-                        altNodes.Add(Tuple.Create(palette.PaletteNode, 0));
+                        altNodes.Add(Tuple.Create(palette.PaletteNode, scenario.RootAddress));
 
                     CurrentItem = squad;
+                    LoadData();
+                }
+                else if (nodeType == NodeType.AiStartingLocations && itemIndex >= 0)
+                {
+                    var fpos = (scenario.SelectedNode.Parent.Tag as AiSquad).StartingLocations[itemIndex];
+
+                    rootNode = scenario.SquadHierarchy.AiNodes["startinglocations"];
+                    baseAddress = fpos.BlockReference.TagBlock.Pointer.Address
+                        + fpos.BlockIndex * fpos.BlockReference.BlockSize;
+
+                    foreach (var palette in scenario.Palettes.Values)
+                        altNodes.Add(Tuple.Create(palette.PaletteNode, scenario.RootAddress));
+
+                    CurrentItem = fpos;
                     LoadData();
                 }
                 else
@@ -228,6 +280,11 @@ namespace Reclaimer.Controls
                 meta.PropertyChanged -= Meta_PropertyChanged;
             Metadata.Clear();
             valuesById.Clear();
+
+            //load altnodes beforehand so any root nodes will overwrite altnodes if they are duplicates
+            foreach (var t in altNodes)
+                MetaValueBase.GetMetaValue(t.Item1, context, t.Item2);
+
             foreach (XmlNode n in rootNode.ChildNodes)
             {
                 try
@@ -242,12 +299,6 @@ namespace Reclaimer.Controls
                 }
                 catch { }
             }
-
-            if (altNodes.Count == 0)
-                return;
-
-            foreach (var t in altNodes)
-                MetaValueBase.GetMetaValue(t.Item1, context, t.Item2);
 
             context.UpdateBlockIndices();
         }

@@ -45,7 +45,10 @@ namespace Reclaimer.Controls
 
         public void ShowCurrentSelection()
         {
-            list.ScrollIntoView(list.SelectedItem);
+            //dont use indexing in case the list is empty
+            if (scenario.SelectedItemIndex < 0)
+                list.ScrollIntoView(scenario.Items.FirstOrDefault());
+            else list.ScrollIntoView(scenario.Items.Skip(scenario.SelectedItemIndex).FirstOrDefault());
         }
 
         private void tv_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)

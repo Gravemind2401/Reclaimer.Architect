@@ -10,6 +10,10 @@ namespace Reclaimer.Models.Ai
 {
     public class AiStartingLocation : ScenarioObject
     {
+        internal AiSquad Squad { get; }
+        internal BlockReference BlockReference { get; }
+        internal int BlockIndex { get; }
+
         private string name;
         public string Name
         {
@@ -17,9 +21,12 @@ namespace Reclaimer.Models.Ai
             set { SetProperty(ref name, value, FieldId.Name); }
         }
 
-        public AiStartingLocation(ScenarioModel parent)
+        public AiStartingLocation(ScenarioModel parent, AiSquad squad, BlockReference blockRef, int index)
             : base(parent)
         {
+            Squad = squad;
+            BlockReference = blockRef;
+            BlockIndex = index;
         }
 
         public override string GetDisplayName()

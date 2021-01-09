@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Reclaimer.Models.Ai
 {
-    public abstract class AiNamedBlock : BindableBase, IMetaUpdateReceiver
+    public class AiNamedBlock : BindableBase, IMetaUpdateReceiver
     {
         internal BlockReference BlockReference { get; }
         internal int BlockIndex { get; }

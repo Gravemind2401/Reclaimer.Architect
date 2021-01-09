@@ -29,14 +29,14 @@ namespace Reclaimer.Models.Ai
     public class AiZone : AiNamedBlock
     {
         public ObservableCollection<AiFiringPosition> FiringPositions { get; }
-        public ObservableCollection<AiNamedBlock> Areas { get; }
+        public ObservableCollection<AiArea> Areas { get; }
         public ObservableCollection<AiEncounter> Encounters { get; }
 
         public AiZone(BlockReference blockRef, int index)
             : base(blockRef, index)
         {
             FiringPositions = new ObservableCollection<AiFiringPosition>();
-            Areas = new ObservableCollection<AiNamedBlock>();
+            Areas = new ObservableCollection<AiArea>();
             Encounters = new ObservableCollection<AiEncounter>();
         }
     }
