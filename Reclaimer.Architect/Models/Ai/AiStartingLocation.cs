@@ -1,4 +1,7 @@
-﻿using Reclaimer.Plugins.MetaViewer;
+﻿using Adjutant.Blam.Common;
+using Adjutant.Spatial;
+using Reclaimer.Plugins.MetaViewer;
+using Reclaimer.Plugins.MetaViewer.Halo3;
 using Reclaimer.Resources;
 using System;
 using System.Collections.Generic;
@@ -14,11 +17,18 @@ namespace Reclaimer.Models.Ai
         internal BlockReference BlockReference { get; }
         internal int BlockIndex { get; }
 
-        private string name;
-        public string Name
+        private StringId name;
+        public StringId Name
         {
             get { return name; }
             set { SetProperty(ref name, value, FieldId.Name); }
+        }
+
+        private RealVector3D rotation;
+        public RealVector3D Rotation
+        {
+            get { return rotation; }
+            set { SetProperty(ref rotation, value, FieldId.Rotation); }
         }
 
         public AiStartingLocation(ScenarioModel parent, AiSquad squad, BlockReference blockRef, int index)
@@ -29,19 +39,33 @@ namespace Reclaimer.Models.Ai
             BlockIndex = index;
         }
 
+        protected override long GetFieldAddress(string fieldId)
+        {
+            var fieldOffset = Parent.SquadHierarchy.AiNodes[AiSection.StartLocations].SelectSingleNode($"*[@id='{fieldId}']").GetIntAttribute("offset") ?? 0;
+            return BlockReference.TagBlock.Pointer.Address + BlockReference.BlockSize * BlockIndex + fieldOffset;
+        }
+
         public override string GetDisplayName()
         {
-            return Name;
+            return Name.Value;
         }
 
         public override void UpdateFromMetaValue(MetaValueBase meta, string fieldId)
         {
-            throw new NotImplementedException();
-        }
-
-        protected override long GetFieldAddress(string fieldId)
-        {
-            throw new NotImplementedException();
+            switch (fieldId)
+            {
+                case FieldId.Name:
+                    //var str = meta as StringValue;
+                    //Name = str.Value;
+                    break;
+                case FieldId.Position:
+                    var multi = meta as MultiValue;
+                    var vector = new RealVector3D(multi.Value1, multi.Value2, multi.Value3);
+                    if (fieldId == FieldId.Position)
+                        Position = vector;
+                    else Rotation = vector;
+                    break;
+            }
         }
     }
 }

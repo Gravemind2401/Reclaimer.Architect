@@ -1,4 +1,6 @@
-﻿using Reclaimer.Plugins.MetaViewer;
+﻿using Adjutant.Spatial;
+using Reclaimer.Plugins.MetaViewer;
+using Reclaimer.Plugins.MetaViewer.Halo3;
 using Reclaimer.Resources;
 using System;
 using System.Collections.Generic;
@@ -29,6 +31,12 @@ namespace Reclaimer.Models.Ai
             BlockIndex = index;
         }
 
+        protected override long GetFieldAddress(string fieldId)
+        {
+            var fieldOffset = Parent.SquadHierarchy.AiNodes[AiSection.Areas].SelectSingleNode($"*[@id='{fieldId}']").GetIntAttribute("offset") ?? 0;
+            return BlockReference.TagBlock.Pointer.Address + BlockReference.BlockSize * BlockIndex + fieldOffset;
+        }
+
         public override string GetDisplayName()
         {
             return Name;
@@ -36,12 +44,17 @@ namespace Reclaimer.Models.Ai
 
         public override void UpdateFromMetaValue(MetaValueBase meta, string fieldId)
         {
-            throw new NotImplementedException();
-        }
-
-        protected override long GetFieldAddress(string fieldId)
-        {
-            throw new NotImplementedException();
+            switch (fieldId)
+            {
+                case FieldId.Name:
+                    var str = meta as StringValue;
+                    Name = str.Value;
+                    break;
+                case FieldId.Position:
+                    var multi = meta as MultiValue;
+                    Position = new RealVector3D(multi.Value1, multi.Value2, multi.Value3);
+                    break;
+            }
         }
     }
 }
