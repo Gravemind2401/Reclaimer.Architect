@@ -26,10 +26,10 @@
       <placeholder header="#zone" type="AiZoneItem">
         <node header="Firing Positions" type="AiFiringPositions" />
         <node header="Areas" type="AiZoneAreas" />
-        <node header="Encounters" type="AiEncounters">
-          <placeholder header="#encounter" type="AiEncounterItem">
-            <node header="Squads" type="AiSquads">
-              <placeholder header="#squad" type="AiSquadItem">
+        <node header="Squads" type="AiSquads">
+          <placeholder header="#squad" type="AiSquadItem">
+            <node header="Encounters" type="AiEncounters">
+              <placeholder header="#encounter" type="AiEncounterItem">
                 <node header="Starting Locations" type="AiStartingLocations" />
               </placeholder>
             </node>

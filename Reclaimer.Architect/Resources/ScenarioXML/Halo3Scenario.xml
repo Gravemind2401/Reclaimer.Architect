@@ -2770,7 +2770,7 @@
       <blockIndex16 name="Parent Group" targetId="scenario_squad_group" offset="0x20" visible="true" />
       <int16 name="Objective Index" offset="0x22" visible="true" />
       <int16 name="Unknown" offset="0x24" visible="true" />
-      <int16 name="Unknown" offset="0x26" visible="true" />
+      <int16 name="Editor Folder Index" offset="0x26" visible="true" />
     </tagblock>
     <tagblock id="zones" srcId="scenario_ai_zone" offset="0x398" elementSize="0x40">
       <ascii name="Name" offset="0x0" visible="true" length="0x20" id="name" />
@@ -2811,7 +2811,7 @@
       <int16 name="Manual BSP Index" offset="0x24" visible="true" />
       <int16 name="Unknown" offset="0x26" visible="false" />
     </tagblock>
-    <tagblock id="firingpositions" offset="0x28" visible="true" elementSize="0x28">
+    <tagblock id="firingpositions" offset="0x28" elementSize="0x28">
       <point3 name="Position" offset="0x0" visible="true" id="position" />
       <int16 name="Reference Frame" offset="0xC" visible="true" />
       <int16 name="BSP Index" offset="0xE" visible="true" />
@@ -2841,7 +2841,7 @@
       <degree name="Normal p" offset="0x20" visible="true" />
       <undefined name="Unknown" offset="0x24" visible="false" />
     </tagblock>
-    <tagblock id="areas" srcId="scenario_ai_area" offset="0x34" visible="true" elementSize="0x6C">
+    <tagblock id="areas" srcId="scenario_ai_area" offset="0x34" elementSize="0x6C">
       <ascii name="Name" offset="0x0" visible="true" length="0x20" id="name" />
       <flags32 name="Area Flags" offset="0x20" visible="true">
         <bit name="Vehicle Area" index="0" />
@@ -2899,7 +2899,7 @@
         <undefined name="Unknown" offset="0x4" visible="false" />
       </tagblock>
     </tagblock>
-    <tagblock id="encounters" offset="0x38C" elementSize="0x40">
+    <tagblock id="squads" offset="0x38C" elementSize="0x40">
       <ascii name="Name" offset="0x0" visible="true" length="0x20" id="name" />
       <flags32 name="Flags" offset="0x20" visible="true">
         <bit name="Bit 0" index="0" />
@@ -2961,7 +2961,7 @@
       <int16 name="Editor Folder Index" offset="0x3C" visible="true" />
       <int16 name="Unknown" offset="0x3E" visible="false" />
     </tagblock>
-    <tagblock id="squads" offset="0x30" elementSize="0x60">
+    <tagblock id="encounters" offset="0x30" elementSize="0x60">
       <int16 name="Unknown" offset="0x0" visible="false" />
       <int16 name="Unknown" offset="0x2" visible="false" />
       <int16 name="Count" offset="0x4" visible="true" />

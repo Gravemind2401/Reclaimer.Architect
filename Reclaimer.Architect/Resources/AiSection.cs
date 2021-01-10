@@ -12,8 +12,8 @@ namespace Reclaimer.Resources
         public const string Zones = "zones";
         public const string FiringPositions = "firingpositions";
         public const string Areas = "areas";
-        public const string Encounters = "encounters";
         public const string Squads = "squads";
+        public const string Encounters = "encounters";
         public const string StartLocations = "startinglocations";
     }
 }

@@ -39,10 +39,10 @@ namespace Reclaimer.Models
         AiZoneItem,
         AiFiringPositions,
         AiZoneAreas,
-        AiEncounters, //squads
-        AiEncounterItem,
-        AiSquads, //base squads
+        AiSquads,
         AiSquadItem,
+        AiEncounters, //base squads
+        AiEncounterItem,
         AiStartingLocations,
 
 

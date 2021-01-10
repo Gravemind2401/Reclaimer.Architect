@@ -147,13 +147,13 @@ namespace Reclaimer.Controls
             sceneManager.StartPositionGroup.IsRendering = node.NodeType == NodeType.StartPositions;
             sceneManager.TriggerVolumeGroup.IsRendering = node.NodeType == NodeType.TriggerVolumes;
 
-            foreach (var pair in sceneManager.ZoneFiringPositionGroups)
+            foreach (var pair in sceneManager.AiFiringPositionGroups)
                 pair.Value.IsRendering = node.NodeType == NodeType.AiFiringPositions && pair.Key == node.Tag;
 
-            foreach (var pair in sceneManager.ZoneAreaGroups)
+            foreach (var pair in sceneManager.AiAreaGroups)
                 pair.Value.IsRendering = node.NodeType == NodeType.AiZoneAreas && pair.Key == node.Tag;
 
-            foreach (var pair in sceneManager.SquadStartLocationGroups)
+            foreach (var pair in sceneManager.AiStartLocationGroups)
                 pair.Value.IsRendering = node.NodeType == NodeType.AiStartingLocations && pair.Key == node.Tag;
 
             //if not a palette this will disable hit testing on all palettes
@@ -197,17 +197,17 @@ namespace Reclaimer.Controls
             else if (node.NodeType == NodeType.AiFiringPositions)
             {
                 var zone = scenario.SelectedNode.Tag as AiZone;
-                renderer.SetSelectedElement(sceneManager.ZoneFiringPositions[zone][itemIndex]);
+                renderer.SetSelectedElement(sceneManager.AiFiringPositions[zone][itemIndex]);
             }
             else if (node.NodeType == NodeType.AiZoneAreas)
             {
                 var zone = scenario.SelectedNode.Tag as AiZone;
-                renderer.SetSelectedElement(sceneManager.ZoneAreas[zone][itemIndex]);
+                renderer.SetSelectedElement(sceneManager.AiAreas[zone][itemIndex]);
             }
             else if (node.NodeType == NodeType.AiStartingLocations)
             {
-                var squad = scenario.SelectedNode.Tag as AiSquad;
-                renderer.SetSelectedElement(sceneManager.SquadStartLocations[squad][itemIndex]);
+                var squad = scenario.SelectedNode.Tag as AiEncounter;
+                renderer.SetSelectedElement(sceneManager.AiStartLocations[squad][itemIndex]);
             }
         }
 
@@ -235,19 +235,19 @@ namespace Reclaimer.Controls
             else if (node.NodeType == NodeType.AiFiringPositions)
             {
                 var zone = scenario.SelectedNode.Tag as AiZone;
-                var obj = sceneManager.ZoneFiringPositions[zone][index];
+                var obj = sceneManager.AiFiringPositions[zone][index];
                 renderer.ZoomToBounds(obj.GetTotalBounds(), 500);
             }
             else if (node.NodeType == NodeType.AiZoneAreas)
             {
                 var zone = scenario.SelectedNode.Tag as AiZone;
-                var obj = sceneManager.ZoneAreas[zone][index];
+                var obj = sceneManager.AiAreas[zone][index];
                 renderer.ZoomToBounds(obj.GetTotalBounds(), 500);
             }
             else if (node.NodeType == NodeType.AiStartingLocations)
             {
-                var squad = scenario.SelectedNode.Tag as AiSquad;
-                var obj = sceneManager.SquadStartLocations[squad][index];
+                var squad = scenario.SelectedNode.Tag as AiEncounter;
+                var obj = sceneManager.AiStartLocations[squad][index];
                 renderer.ZoomToBounds(obj.GetTotalBounds(), 500);
             }
         }
@@ -287,7 +287,7 @@ namespace Reclaimer.Controls
             }
             else if (scenario.SelectedNodeType == NodeType.AiStartingLocations)
             {
-                var squad = scenario.SelectedNode.Tag as AiSquad;
+                var squad = scenario.SelectedNode.Tag as AiEncounter;
                 scenario.SelectedItemIndex = squad.StartingLocations.IndexOf(element.DataContext as AiStartingLocation);
             }
             else
@@ -344,9 +344,9 @@ namespace Reclaimer.Controls
                     modelGroup.Children.Add(sceneManager.StartPositionGroup);
                     modelGroup.Children.Add(sceneManager.TriggerVolumeGroup);
 
-                    foreach (var group in sceneManager.ZoneAreaGroups.Values
-                        .Concat(sceneManager.ZoneFiringPositionGroups.Values)
-                        .Concat(sceneManager.SquadStartLocationGroups.Values))
+                    foreach (var group in sceneManager.AiAreaGroups.Values
+                        .Concat(sceneManager.AiFiringPositionGroups.Values)
+                        .Concat(sceneManager.AiStartLocationGroups.Values))
                     {
                         group.IsRendering = false;
                         modelGroup.Children.Add(group);

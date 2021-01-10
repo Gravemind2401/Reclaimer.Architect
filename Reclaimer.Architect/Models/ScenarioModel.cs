@@ -266,7 +266,7 @@ namespace Reclaimer.Models
 
         private void ReadZones(EndianReader reader)
         {
-            var encounters = ReadEncounters(reader, RootAddress);
+            var squads = ReadSquads(reader, RootAddress);
 
             var blockNode = SquadHierarchy.AiNodes[AiSection.Zones];
             var blockRef = new BlockReference(blockNode, reader, RootAddress);
@@ -283,7 +283,7 @@ namespace Reclaimer.Models
 
                 ReadFiringPositions(reader, zone, baseAddress);
                 ReadAreas(reader, zone, baseAddress);
-                zone.Encounters.AddRange(encounters.Where(e => e.ZoneIndex == i));
+                zone.Squads.AddRange(squads.Where(e => e.ZoneIndex == i));
 
                 SquadHierarchy.Zones.Add(zone);
             }
@@ -331,11 +331,11 @@ namespace Reclaimer.Models
             }
         }
 
-        private List<AiEncounter> ReadEncounters(EndianReader reader, long rootAddress)
+        private List<AiSquad> ReadSquads(EndianReader reader, long rootAddress)
         {
-            var results = new List<AiEncounter>();
+            var results = new List<AiSquad>();
 
-            var blockNode = SquadHierarchy.AiNodes[AiSection.Encounters];
+            var blockNode = SquadHierarchy.AiNodes[AiSection.Squads];
             var blockRef = new BlockReference(blockNode, reader, rootAddress);
 
             var name = OffsetById(blockNode, FieldId.Name);
@@ -343,40 +343,40 @@ namespace Reclaimer.Models
 
             for (int i = 0; i < blockRef.TagBlock.Count; i++)
             {
-                var enc = new AiEncounter(blockRef, i);
+                var squad = new AiSquad(blockRef, i);
                 var baseAddress = blockRef.TagBlock.Pointer.Address + blockRef.BlockSize * i;
 
                 reader.Seek(baseAddress + name, SeekOrigin.Begin);
-                enc.Name = reader.ReadNullTerminatedString(32);
+                squad.Name = reader.ReadNullTerminatedString(32);
 
                 reader.Seek(baseAddress + parentIndex, SeekOrigin.Begin);
-                enc.ZoneIndex = reader.ReadInt16();
+                squad.ZoneIndex = reader.ReadInt16();
 
-                ReadSquads(reader, enc, baseAddress);
+                ReadEncounters(reader, squad, baseAddress);
 
-                results.Add(enc);
+                results.Add(squad);
             }
 
             return results;
         }
 
-        private void ReadSquads(EndianReader reader, AiEncounter owner, long rootAddress)
+        private void ReadEncounters(EndianReader reader, AiSquad owner, long rootAddress)
         {
-            var blockNode = SquadHierarchy.AiNodes[AiSection.Squads];
+            var blockNode = SquadHierarchy.AiNodes[AiSection.Encounters];
             var blockRef = new BlockReference(blockNode, reader, rootAddress);
 
             for (int i = 0; i < blockRef.TagBlock.Count; i++)
             {
-                var squad = new AiSquad(blockRef, i) { Name = $"Squad {i:D2}" };
+                var enc = new AiEncounter(blockRef, i) { Name = $"Encounter {i}" };
                 var baseAddress = blockRef.TagBlock.Pointer.Address + blockRef.BlockSize * i;
 
-                ReadStartingLocations(reader, squad, baseAddress);
+                ReadStartingLocations(reader, enc, baseAddress);
 
-                owner.Squads.Add(squad);
+                owner.Encounters.Add(enc);
             }
         }
 
-        private void ReadStartingLocations(EndianReader reader, AiSquad owner, long rootAddress)
+        private void ReadStartingLocations(EndianReader reader, AiEncounter owner, long rootAddress)
         {
             var blockNode = SquadHierarchy.AiNodes[AiSection.StartLocations];
             var blockRef = new BlockReference(blockNode, reader, rootAddress);
@@ -558,10 +558,10 @@ namespace Reclaimer.Models
 
             if (placeholder.NodeType == NodeType.AiZoneItem)
                 return SquadHierarchy.Zones.Select(z => new SceneNodeModel(z.Name, NodeType.AiZoneItem) { Tag = z, IconType = 1 });
-            else if (placeholder.NodeType == NodeType.AiEncounterItem)
-                return (parent.Tag as AiZone).Encounters.Select(e => new SceneNodeModel(e.Name, NodeType.AiEncounterItem) { Tag = e, IconType = 1 });
             else if (placeholder.NodeType == NodeType.AiSquadItem)
-                return (parent.Tag as AiEncounter).Squads.Select(s => new SceneNodeModel(s.Name, NodeType.AiSquadItem) { Tag = s, IconType = 1 });
+                return (parent.Tag as AiZone).Squads.Select(e => new SceneNodeModel(e.Name, NodeType.AiSquadItem) { Tag = e, IconType = 1 });
+            else if (placeholder.NodeType == NodeType.AiEncounterItem)
+                return (parent.Tag as AiSquad).Encounters.Select(s => new SceneNodeModel(s.Name, NodeType.AiEncounterItem) { Tag = s, IconType = 1 });
             else instances.Add(placeholder);
 
             return instances;
@@ -616,19 +616,19 @@ namespace Reclaimer.Models
                 foreach (var fpos in (SelectedNode.Parent.Tag as AiZone).FiringPositions)
                     Items.Add(new ListBoxItem { Content = fpos.GetDisplayName(), Tag = fpos });
             }
-            else if (SelectedNodeType == NodeType.AiEncounters)
-            {
-                foreach (var enc in (SelectedNode.Parent.Tag as AiZone).Encounters)
-                    Items.Add(new ListBoxItem { Content = enc.Name, Tag = enc });
-            }
             else if (SelectedNodeType == NodeType.AiSquads)
             {
-                foreach (var squad in (SelectedNode.Parent.Tag as AiEncounter).Squads)
+                foreach (var squad in (SelectedNode.Parent.Tag as AiZone).Squads)
                     Items.Add(new ListBoxItem { Content = squad.Name, Tag = squad });
+            }
+            else if (SelectedNodeType == NodeType.AiEncounters)
+            {
+                foreach (var enc in (SelectedNode.Parent.Tag as AiSquad).Encounters)
+                    Items.Add(new ListBoxItem { Content = enc.Name, Tag = enc });
             }
             else if (SelectedNodeType == NodeType.AiStartingLocations)
             {
-                foreach (var loc in (SelectedNode.Parent.Tag as AiSquad).StartingLocations)
+                foreach (var loc in (SelectedNode.Parent.Tag as AiEncounter).StartingLocations)
                     Items.Add(new ListBoxItem { Content = loc.GetDisplayName(), Tag = loc });
             }
 

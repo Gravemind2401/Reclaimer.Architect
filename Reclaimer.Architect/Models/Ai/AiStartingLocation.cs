@@ -13,7 +13,7 @@ namespace Reclaimer.Models.Ai
 {
     public class AiStartingLocation : ScenarioObject
     {
-        internal AiSquad Squad { get; }
+        internal AiEncounter Squad { get; }
         internal BlockReference BlockReference { get; }
         internal int BlockIndex { get; }
 
@@ -31,7 +31,7 @@ namespace Reclaimer.Models.Ai
             set { SetProperty(ref rotation, value, FieldId.Rotation); }
         }
 
-        public AiStartingLocation(ScenarioModel parent, AiSquad squad, BlockReference blockRef, int index)
+        public AiStartingLocation(ScenarioModel parent, AiEncounter squad, BlockReference blockRef, int index)
             : base(parent)
         {
             Squad = squad;

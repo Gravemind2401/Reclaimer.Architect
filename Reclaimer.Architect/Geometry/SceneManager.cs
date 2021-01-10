@@ -39,12 +39,12 @@ namespace Reclaimer.Geometry
         public ObservableCollection<StartPosition3D> StartPositions { get; private set; }
         public ObservableCollection<BoxManipulator3D> TriggerVolumes { get; private set; }
 
-        public Dictionary<AiZone, Helix.GroupElement3D> ZoneAreaGroups { get; private set; }
-        public Dictionary<AiZone, ObservableCollection<PositionMarker3D>> ZoneAreas { get; private set; }
-        public Dictionary<AiZone, Helix.GroupElement3D> ZoneFiringPositionGroups { get; private set; }
-        public Dictionary<AiZone, ObservableCollection<PositionMarker3D>> ZoneFiringPositions { get; private set; }
-        public Dictionary<AiSquad, Helix.GroupElement3D> SquadStartLocationGroups { get; private set; }
-        public Dictionary<AiSquad, ObservableCollection<PositionRotationMarker3D>> SquadStartLocations { get; private set; }
+        public Dictionary<AiZone, Helix.GroupElement3D> AiAreaGroups { get; private set; }
+        public Dictionary<AiZone, ObservableCollection<PositionMarker3D>> AiAreas { get; private set; }
+        public Dictionary<AiZone, Helix.GroupElement3D> AiFiringPositionGroups { get; private set; }
+        public Dictionary<AiZone, ObservableCollection<PositionMarker3D>> AiFiringPositions { get; private set; }
+        public Dictionary<AiEncounter, Helix.GroupElement3D> AiStartLocationGroups { get; private set; }
+        public Dictionary<AiEncounter, ObservableCollection<PositionRotationMarker3D>> AiStartLocations { get; private set; }
 
         public IEnumerable<Task> ReadScenario(ScenarioModel scenario)
         {
@@ -55,12 +55,12 @@ namespace Reclaimer.Geometry
             StartPositions = new ObservableCollection<StartPosition3D>();
             TriggerVolumes = new ObservableCollection<BoxManipulator3D>();
 
-            ZoneAreaGroups = new Dictionary<AiZone, Helix.GroupElement3D>();
-            ZoneAreas = new Dictionary<AiZone, ObservableCollection<PositionMarker3D>>();
-            ZoneFiringPositionGroups = new Dictionary<AiZone, Helix.GroupElement3D>();
-            ZoneFiringPositions = new Dictionary<AiZone, ObservableCollection<PositionMarker3D>>();
-            SquadStartLocationGroups = new Dictionary<AiSquad, Helix.GroupElement3D>();
-            SquadStartLocations = new Dictionary<AiSquad, ObservableCollection<PositionRotationMarker3D>>();
+            AiAreaGroups = new Dictionary<AiZone, Helix.GroupElement3D>();
+            AiAreas = new Dictionary<AiZone, ObservableCollection<PositionMarker3D>>();
+            AiFiringPositionGroups = new Dictionary<AiZone, Helix.GroupElement3D>();
+            AiFiringPositions = new Dictionary<AiZone, ObservableCollection<PositionMarker3D>>();
+            AiStartLocationGroups = new Dictionary<AiEncounter, Helix.GroupElement3D>();
+            AiStartLocations = new Dictionary<AiEncounter, ObservableCollection<PositionRotationMarker3D>>();
 
             yield return Task.Run(() =>
             {
@@ -150,8 +150,8 @@ namespace Reclaimer.Geometry
                     areaGroup.Children.Add(areaMarker);
                 }
 
-                ZoneAreaGroups.Add(zone, areaGroup);
-                ZoneAreas.Add(zone, areaMarkers);
+                AiAreaGroups.Add(zone, areaGroup);
+                AiAreas.Add(zone, areaMarkers);
 
                 var fposGroup = new Helix.GroupModel3D();
                 var fposMarkers = new ObservableCollection<PositionMarker3D>();
@@ -164,17 +164,17 @@ namespace Reclaimer.Geometry
                     fposGroup.Children.Add(fposMarker);
                 }
 
-                ZoneFiringPositionGroups.Add(zone, fposGroup);
-                ZoneFiringPositions.Add(zone, fposMarkers);
+                AiFiringPositionGroups.Add(zone, fposGroup);
+                AiFiringPositions.Add(zone, fposMarkers);
 
-                foreach (var enc in zone.Encounters)
+                foreach (var squad in zone.Squads)
                 {
-                    foreach (var squad in enc.Squads)
+                    foreach (var enc in squad.Encounters)
                     {
                         var locGroup = new Helix.GroupModel3D();
                         var locMarkers = new ObservableCollection<PositionRotationMarker3D>();
 
-                        foreach (var loc in squad.StartingLocations)
+                        foreach (var loc in enc.StartingLocations)
                         {
                             var locMarker = new PositionRotationMarker3D();
                             BindSquadStartLocation(loc, locMarker);
@@ -182,8 +182,8 @@ namespace Reclaimer.Geometry
                             locGroup.Children.Add(locMarker);
                         }
 
-                        SquadStartLocationGroups.Add(squad, locGroup);
-                        SquadStartLocations.Add(squad, locMarkers);
+                        AiStartLocationGroups.Add(enc, locGroup);
+                        AiStartLocations.Add(enc, locMarkers);
                     }
                 }
             }

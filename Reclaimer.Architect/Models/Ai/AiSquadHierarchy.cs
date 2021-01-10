@@ -30,18 +30,18 @@ namespace Reclaimer.Models.Ai
     {
         public ObservableCollection<AiFiringPosition> FiringPositions { get; }
         public ObservableCollection<AiArea> Areas { get; }
-        public ObservableCollection<AiEncounter> Encounters { get; }
+        public ObservableCollection<AiSquad> Squads { get; }
 
         public AiZone(BlockReference blockRef, int index)
             : base(blockRef, index)
         {
             FiringPositions = new ObservableCollection<AiFiringPosition>();
             Areas = new ObservableCollection<AiArea>();
-            Encounters = new ObservableCollection<AiEncounter>();
+            Squads = new ObservableCollection<AiSquad>();
         }
     }
 
-    public class AiEncounter : AiNamedBlock
+    public class AiSquad : AiNamedBlock
     {
         private int zoneIndex;
         public int ZoneIndex
@@ -50,20 +50,20 @@ namespace Reclaimer.Models.Ai
             set { SetProperty(ref zoneIndex, value); }
         }
 
-        public ObservableCollection<AiSquad> Squads { get; }
+        public ObservableCollection<AiEncounter> Encounters { get; }
 
-        public AiEncounter(BlockReference blockRef, int index)
+        public AiSquad(BlockReference blockRef, int index)
             : base(blockRef, index)
         {
-            Squads = new ObservableCollection<AiSquad>();
+            Encounters = new ObservableCollection<AiEncounter>();
         }
     }
 
-    public class AiSquad : AiNamedBlock
+    public class AiEncounter : AiNamedBlock
     {
         public ObservableCollection<AiStartingLocation> StartingLocations { get; }
 
-        public AiSquad(BlockReference blockRef, int index)
+        public AiEncounter(BlockReference blockRef, int index)
             : base(blockRef, index)
         {
             StartingLocations = new ObservableCollection<AiStartingLocation>();
