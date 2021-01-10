@@ -158,6 +158,8 @@
       <DependentUpon>Spinner.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\LightFixture3D.cs" />
+    <Compile Include="Controls\PositionMarker3D.cs" />
+    <Compile Include="Controls\PositionRotationMarker3D.cs" />
     <Compile Include="Controls\StartPosition3D.cs" />
     <Compile Include="Controls\TransformManipulatorEx3D.cs" />
     <Compile Include="Controls\PropertyView.xaml.cs">
@@ -200,6 +202,7 @@
     <Compile Include="Resources\AiSection.cs" />
     <Compile Include="Resources\FieldId.cs" />
     <Compile Include="Resources\Section.cs" />
+    <Compile Include="Utilities\TranslationTransformConverter.cs" />
     <Compile Include="Utilities\InMemoryMetadata.cs" />
     <Compile Include="Utilities\IsPaletteNodeConverter.cs" />
     <Compile Include="Utilities\SharpDXVectorConverter.cs" />

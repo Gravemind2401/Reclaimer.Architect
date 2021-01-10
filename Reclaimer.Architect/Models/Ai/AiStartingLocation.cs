@@ -55,8 +55,8 @@ namespace Reclaimer.Models.Ai
             switch (fieldId)
             {
                 case FieldId.Name:
-                    //var str = meta as StringValue;
-                    //Name = str.Value;
+                    var str = meta as StringValue;
+                    Name = str.StringIdValue;
                     break;
                 case FieldId.Position:
                     var multi = meta as MultiValue;

@@ -98,13 +98,14 @@ namespace Reclaimer.Controls
             }
         }
 
-        public void ShowProperties(NodeType nodeType, int itemIndex)
+        public void ShowProperties(SceneNodeModel node, int itemIndex)
         {
             context = new MetaContext(scenario.Xml, scenario.ScenarioTag.CacheFile, scenario.ScenarioTag, scenario.MetadataStream);
             Visibility = Visibility.Hidden;
             rootNode = null;
             altNodes.Clear();
 
+            var nodeType = node.NodeType;
             var paletteKey = PaletteType.FromNodeType(nodeType);
             if (paletteKey != null && itemIndex >= 0)
             {
@@ -275,6 +276,7 @@ namespace Reclaimer.Controls
             valuesById.Clear();
 
             //load altnodes beforehand so any root nodes will overwrite altnodes if they are duplicates
+            //this brings in additional xml nodes to use their block names
             foreach (var t in altNodes)
                 MetaValueBase.GetMetaValue(t.Item1, context, t.Item2);
 

@@ -656,16 +656,16 @@ namespace Reclaimer.Models
 
         private void OnSelectedNodeChanged()
         {
-            PropertyView?.ShowProperties(SelectedNodeType, -1);
-            RenderView?.SelectPalette(SelectedNodeType);
+            PropertyView?.ShowProperties(SelectedNode, -1);
+            RenderView?.SelectPalette(SelectedNode);
             DisplayItems();
         }
 
         private void OnSelectedItemChanged()
         {
             HierarchyView.ShowCurrentSelection();
-            PropertyView?.ShowProperties(SelectedNodeType, SelectedItemIndex);
-            RenderView?.SelectObject(SelectedNodeType, SelectedItemIndex);
+            PropertyView?.ShowProperties(SelectedNode, SelectedItemIndex);
+            RenderView?.SelectObject(SelectedNode, SelectedItemIndex);
         }
 
         public EndianReader CreateReader()

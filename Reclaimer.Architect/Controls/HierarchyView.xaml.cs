@@ -59,7 +59,7 @@ namespace Reclaimer.Controls
 
         private void ListItemMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            scenario.RenderView?.NavigateToObject(scenario.SelectedNodeType, scenario.SelectedItemIndex);
+            scenario.RenderView?.NavigateToObject(scenario.SelectedNode, scenario.SelectedItemIndex);
         }
 
         private void RecursiveToggle(IEnumerable<TreeItemModel> collection, bool value)

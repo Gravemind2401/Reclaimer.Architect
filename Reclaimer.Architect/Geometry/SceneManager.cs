@@ -21,6 +21,7 @@ using System.Windows.Data;
 using Reclaimer.Controls;
 using System.Collections.Concurrent;
 using Reclaimer.Resources;
+using Reclaimer.Models.Ai;
 
 namespace Reclaimer.Geometry
 {
@@ -38,6 +39,13 @@ namespace Reclaimer.Geometry
         public ObservableCollection<StartPosition3D> StartPositions { get; private set; }
         public ObservableCollection<BoxManipulator3D> TriggerVolumes { get; private set; }
 
+        public Dictionary<AiZone, Helix.GroupElement3D> ZoneAreaGroups { get; private set; }
+        public Dictionary<AiZone, ObservableCollection<PositionMarker3D>> ZoneAreas { get; private set; }
+        public Dictionary<AiZone, Helix.GroupElement3D> ZoneFiringPositionGroups { get; private set; }
+        public Dictionary<AiZone, ObservableCollection<PositionMarker3D>> ZoneFiringPositions { get; private set; }
+        public Dictionary<AiSquad, Helix.GroupElement3D> SquadStartLocationGroups { get; private set; }
+        public Dictionary<AiSquad, ObservableCollection<PositionRotationMarker3D>> SquadStartLocations { get; private set; }
+
         public IEnumerable<Task> ReadScenario(ScenarioModel scenario)
         {
             this.scenario = scenario;
@@ -46,6 +54,13 @@ namespace Reclaimer.Geometry
             PaletteHolders = new Dictionary<string, PaletteHolder>();
             StartPositions = new ObservableCollection<StartPosition3D>();
             TriggerVolumes = new ObservableCollection<BoxManipulator3D>();
+
+            ZoneAreaGroups = new Dictionary<AiZone, Helix.GroupElement3D>();
+            ZoneAreas = new Dictionary<AiZone, ObservableCollection<PositionMarker3D>>();
+            ZoneFiringPositionGroups = new Dictionary<AiZone, Helix.GroupElement3D>();
+            ZoneFiringPositions = new Dictionary<AiZone, ObservableCollection<PositionMarker3D>>();
+            SquadStartLocationGroups = new Dictionary<AiSquad, Helix.GroupElement3D>();
+            SquadStartLocations = new Dictionary<AiSquad, ObservableCollection<PositionRotationMarker3D>>();
 
             yield return Task.Run(() =>
             {
@@ -120,6 +135,57 @@ namespace Reclaimer.Geometry
 
                 TriggerVolumes.Add(box);
                 TriggerVolumeGroup.Children.Add(box);
+            }
+
+            foreach (var zone in scenario.SquadHierarchy.Zones)
+            {
+                var areaGroup = new Helix.GroupModel3D();
+                var areaMarkers = new ObservableCollection<PositionMarker3D>();
+
+                foreach (var area in zone.Areas)
+                {
+                    var areaMarker = new PositionMarker3D();
+                    BindZoneArea(area, areaMarker);
+                    areaMarkers.Add(areaMarker);
+                    areaGroup.Children.Add(areaMarker);
+                }
+
+                ZoneAreaGroups.Add(zone, areaGroup);
+                ZoneAreas.Add(zone, areaMarkers);
+
+                var fposGroup = new Helix.GroupModel3D();
+                var fposMarkers = new ObservableCollection<PositionMarker3D>();
+
+                foreach (var area in zone.FiringPositions)
+                {
+                    var fposMarker = new PositionMarker3D();
+                    BindZoneFiringPosition(area, fposMarker);
+                    fposMarkers.Add(fposMarker);
+                    fposGroup.Children.Add(fposMarker);
+                }
+
+                ZoneFiringPositionGroups.Add(zone, fposGroup);
+                ZoneFiringPositions.Add(zone, fposMarkers);
+
+                foreach (var enc in zone.Encounters)
+                {
+                    foreach (var squad in enc.Squads)
+                    {
+                        var locGroup = new Helix.GroupModel3D();
+                        var locMarkers = new ObservableCollection<PositionRotationMarker3D>();
+
+                        foreach (var loc in squad.StartingLocations)
+                        {
+                            var locMarker = new PositionRotationMarker3D();
+                            BindSquadStartLocation(loc, locMarker);
+                            locMarkers.Add(locMarker);
+                            locGroup.Children.Add(locMarker);
+                        }
+
+                        SquadStartLocationGroups.Add(squad, locGroup);
+                        SquadStartLocations.Add(squad, locMarkers);
+                    }
+                }
             }
         }
 
@@ -222,6 +288,32 @@ namespace Reclaimer.Geometry
                 new Binding(nameof(TriggerVolume.Position)) { Mode = BindingMode.TwoWay, Converter = SharpDXVectorConverter.Instance });
             BindingOperations.SetBinding(box, BoxManipulator3D.SizeProperty,
                 new Binding(nameof(TriggerVolume.Size)) { Mode = BindingMode.TwoWay, Converter = SharpDXVectorConverter.Instance });
+        }
+
+        private void BindZoneFiringPosition(AiFiringPosition fpos, Helix.Element3D model)
+        {
+            var binding = new Binding(nameof(AiFiringPosition.Position)) { Converter = TranslationTransformConverter.Instance, Mode = BindingMode.TwoWay };
+
+            model.DataContext = fpos;
+            BindingOperations.SetBinding(model, Helix.Element3D.TransformProperty, binding);
+        }
+
+        private void BindZoneArea(AiArea area, Helix.Element3D model)
+        {
+            var binding = new Binding(nameof(AiArea.Position)) { Converter = TranslationTransformConverter.Instance, Mode = BindingMode.TwoWay };
+
+            model.DataContext = area;
+            BindingOperations.SetBinding(model, Helix.Element3D.TransformProperty, binding);
+        }
+
+        private void BindSquadStartLocation(AiStartingLocation pos, Helix.Element3D model)
+        {
+            var binding = new MultiBinding { Converter = EulerTransformConverter.Instance, Mode = BindingMode.TwoWay };
+            binding.Bindings.Add(new Binding(nameof(AiStartingLocation.Position)) { Mode = BindingMode.TwoWay });
+            binding.Bindings.Add(new Binding(nameof(AiStartingLocation.Rotation)) { Mode = BindingMode.TwoWay });
+
+            model.DataContext = pos;
+            BindingOperations.SetBinding(model, Helix.Element3D.TransformProperty, binding);
         }
 
         public void Dispose()
