@@ -1,9 +1,9 @@
 ﻿using Adjutant.Geometry;
-using Adjutant.Spatial;
 using Reclaimer.Models;
 using Reclaimer.Models.Ai;
 using Reclaimer.Plugins.MetaViewer;
 using Reclaimer.Plugins.MetaViewer.Halo3;
+using Reclaimer.Resources;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,13 +12,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Xml;
 
 namespace Reclaimer.Controls
@@ -129,14 +122,14 @@ namespace Reclaimer.Controls
             {
                 if (nodeType == NodeType.Mission)
                 {
-                    rootNode = scenario.Sections["mission"].Node;
+                    rootNode = scenario.Sections[Section.Mission].Node;
                     baseAddress = scenario.RootAddress;
                     CurrentItem = null;
                     LoadData();
                 }
                 else if (nodeType == NodeType.StartPositions && itemIndex >= 0)
                 {
-                    var section = scenario.Sections["startpositions"];
+                    var section = scenario.Sections[Section.StartPositions];
 
                     rootNode = section.Node;
                     baseAddress = section.TagBlock.Pointer.Address
@@ -147,7 +140,7 @@ namespace Reclaimer.Controls
                 }
                 else if (nodeType == NodeType.StartProfiles && itemIndex >= 0)
                 {
-                    var section = scenario.Sections["startprofiles"];
+                    var section = scenario.Sections[Section.StartProfiles];
 
                     rootNode = section.Node;
                     baseAddress = section.TagBlock.Pointer.Address
@@ -158,7 +151,7 @@ namespace Reclaimer.Controls
                 }
                 else if (nodeType == NodeType.TriggerVolumes && itemIndex >= 0)
                 {
-                    var section = scenario.Sections["triggervolumes"];
+                    var section = scenario.Sections[Section.TriggerVolumes];
 
                     rootNode = section.Node;
                     baseAddress = section.TagBlock.Pointer.Address
@@ -171,11 +164,11 @@ namespace Reclaimer.Controls
                 {
                     var group = scenario.SquadHierarchy.SquadGroups[itemIndex];
 
-                    rootNode = scenario.SquadHierarchy.AiNodes["squadgroups"];
+                    rootNode = scenario.SquadHierarchy.AiNodes[AiSection.SquadGroups];
                     baseAddress = group.BlockReference.TagBlock.Pointer.Address
                         + group.BlockIndex * group.BlockReference.BlockSize;
 
-                    altNodes.Add(Tuple.Create(scenario.SquadHierarchy.AiNodes["squadgroups"], scenario.RootAddress));
+                    altNodes.Add(Tuple.Create(scenario.SquadHierarchy.AiNodes[AiSection.SquadGroups], scenario.RootAddress));
 
                     CurrentItem = group;
                     LoadData();
@@ -186,7 +179,7 @@ namespace Reclaimer.Controls
                         ? scenario.SquadHierarchy.Zones[itemIndex]
                         : scenario.SelectedNode.Tag as AiZone;
 
-                    rootNode = scenario.SquadHierarchy.AiNodes["zones"];
+                    rootNode = scenario.SquadHierarchy.AiNodes[AiSection.Zones];
                     baseAddress = zone.BlockReference.TagBlock.Pointer.Address
                         + zone.BlockIndex * zone.BlockReference.BlockSize;
 
@@ -197,12 +190,12 @@ namespace Reclaimer.Controls
                 {
                     var fpos = (scenario.SelectedNode.Parent.Tag as AiZone).FiringPositions[itemIndex];
 
-                    rootNode = scenario.SquadHierarchy.AiNodes["firingpositions"];
+                    rootNode = scenario.SquadHierarchy.AiNodes[AiSection.FiringPositions];
                     baseAddress = fpos.BlockReference.TagBlock.Pointer.Address
                         + fpos.BlockIndex * fpos.BlockReference.BlockSize;
 
                     var zoneAddress = fpos.Zone.BlockReference.TagBlock.Pointer.Address;
-                    altNodes.Add(Tuple.Create(scenario.SquadHierarchy.AiNodes["areas"], zoneAddress));
+                    altNodes.Add(Tuple.Create(scenario.SquadHierarchy.AiNodes[AiSection.Areas], zoneAddress));
 
                     CurrentItem = fpos;
                     LoadData();
@@ -211,7 +204,7 @@ namespace Reclaimer.Controls
                 {
                     var area = (scenario.SelectedNode.Parent.Tag as AiZone).Areas[itemIndex];
 
-                    rootNode = scenario.SquadHierarchy.AiNodes["areas"];
+                    rootNode = scenario.SquadHierarchy.AiNodes[AiSection.Areas];
                     baseAddress = area.BlockReference.TagBlock.Pointer.Address
                         + area.BlockIndex * area.BlockReference.BlockSize;
 
@@ -224,12 +217,12 @@ namespace Reclaimer.Controls
                         ? (scenario.SelectedNode.Parent.Tag as AiZone).Encounters[itemIndex]
                         : scenario.SelectedNode.Tag as AiEncounter;
 
-                    rootNode = scenario.SquadHierarchy.AiNodes["encounters"];
+                    rootNode = scenario.SquadHierarchy.AiNodes[AiSection.Encounters];
                     baseAddress = enc.BlockReference.TagBlock.Pointer.Address
                         + enc.BlockIndex * enc.BlockReference.BlockSize;
 
-                    altNodes.Add(Tuple.Create(scenario.SquadHierarchy.AiNodes["squadgroups"], scenario.RootAddress));
-                    altNodes.Add(Tuple.Create(scenario.SquadHierarchy.AiNodes["zones"], scenario.RootAddress));
+                    altNodes.Add(Tuple.Create(scenario.SquadHierarchy.AiNodes[AiSection.SquadGroups], scenario.RootAddress));
+                    altNodes.Add(Tuple.Create(scenario.SquadHierarchy.AiNodes[AiSection.Zones], scenario.RootAddress));
 
                     CurrentItem = enc;
                     LoadData();
@@ -240,7 +233,7 @@ namespace Reclaimer.Controls
                         ? (scenario.SelectedNode.Parent.Tag as AiEncounter).Squads[itemIndex]
                         : scenario.SelectedNode.Tag as AiSquad;
 
-                    rootNode = scenario.SquadHierarchy.AiNodes["squads"];
+                    rootNode = scenario.SquadHierarchy.AiNodes[AiSection.Squads];
                     baseAddress = squad.BlockReference.TagBlock.Pointer.Address
                         + squad.BlockIndex * squad.BlockReference.BlockSize;
 
@@ -254,7 +247,7 @@ namespace Reclaimer.Controls
                 {
                     var fpos = (scenario.SelectedNode.Parent.Tag as AiSquad).StartingLocations[itemIndex];
 
-                    rootNode = scenario.SquadHierarchy.AiNodes["startinglocations"];
+                    rootNode = scenario.SquadHierarchy.AiNodes[AiSection.StartLocations];
                     baseAddress = fpos.BlockReference.TagBlock.Pointer.Address
                         + fpos.BlockIndex * fpos.BlockReference.BlockSize;
 
