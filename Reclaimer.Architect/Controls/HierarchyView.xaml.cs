@@ -1,6 +1,7 @@
 ﻿using Adjutant.Blam.Common;
 using Reclaimer.Models;
 using Reclaimer.Plugins;
+using Reclaimer.Resources;
 using System;
 using System.Collections.Generic;
 using System.Linq;

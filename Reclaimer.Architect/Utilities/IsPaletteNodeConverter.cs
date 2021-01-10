@@ -1,4 +1,5 @@
 ﻿using Reclaimer.Models;
+using Reclaimer.Resources;
 using System;
 using System.Collections.Generic;
 using System.Globalization;

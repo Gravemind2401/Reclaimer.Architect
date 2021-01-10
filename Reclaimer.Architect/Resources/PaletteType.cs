@@ -1,11 +1,12 @@
-﻿using Reclaimer.Utilities;
+﻿using Reclaimer.Models;
+using Reclaimer.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Reclaimer.Models
+namespace Reclaimer.Resources
 {
     public static class PaletteType
     {

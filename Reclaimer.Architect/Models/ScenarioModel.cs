@@ -245,7 +245,7 @@ namespace Reclaimer.Models
 
         private void ReadSquadHierarchy(EndianReader reader)
         {
-            var blockNode = SquadHierarchy.AiNodes["squadgroups"];
+            var blockNode = SquadHierarchy.AiNodes[AiSection.SquadGroups];
             var blockRef = new BlockReference(blockNode, reader, RootAddress);
 
             var name = OffsetById(blockNode, FieldId.Name);
@@ -268,7 +268,7 @@ namespace Reclaimer.Models
         {
             var encounters = ReadEncounters(reader, RootAddress);
 
-            var blockNode = SquadHierarchy.AiNodes["zones"];
+            var blockNode = SquadHierarchy.AiNodes[AiSection.Zones];
             var blockRef = new BlockReference(blockNode, reader, RootAddress);
 
             var name = OffsetById(blockNode, FieldId.Name);
@@ -291,7 +291,7 @@ namespace Reclaimer.Models
 
         private void ReadFiringPositions(EndianReader reader, AiZone owner, long rootAddress)
         {
-            var blockNode = SquadHierarchy.AiNodes["firingpositions"];
+            var blockNode = SquadHierarchy.AiNodes[AiSection.FiringPositions];
             var blockRef = new BlockReference(blockNode, reader, rootAddress);
 
             var position = OffsetById(blockNode, FieldId.Position);
@@ -310,7 +310,7 @@ namespace Reclaimer.Models
 
         private void ReadAreas(EndianReader reader, AiZone owner, long rootAddress)
         {
-            var blockNode = SquadHierarchy.AiNodes["areas"];
+            var blockNode = SquadHierarchy.AiNodes[AiSection.Areas];
             var blockRef = new BlockReference(blockNode, reader, rootAddress);
 
             var name = OffsetById(blockNode, FieldId.Name);
@@ -335,7 +335,7 @@ namespace Reclaimer.Models
         {
             var results = new List<AiEncounter>();
 
-            var blockNode = SquadHierarchy.AiNodes["encounters"];
+            var blockNode = SquadHierarchy.AiNodes[AiSection.Encounters];
             var blockRef = new BlockReference(blockNode, reader, rootAddress);
 
             var name = OffsetById(blockNode, FieldId.Name);
@@ -362,7 +362,7 @@ namespace Reclaimer.Models
 
         private void ReadSquads(EndianReader reader, AiEncounter owner, long rootAddress)
         {
-            var blockNode = SquadHierarchy.AiNodes["squads"];
+            var blockNode = SquadHierarchy.AiNodes[AiSection.Squads];
             var blockRef = new BlockReference(blockNode, reader, rootAddress);
 
             for (int i = 0; i < blockRef.TagBlock.Count; i++)
@@ -378,7 +378,7 @@ namespace Reclaimer.Models
 
         private void ReadStartingLocations(EndianReader reader, AiSquad owner, long rootAddress)
         {
-            var blockNode = SquadHierarchy.AiNodes["startinglocations"];
+            var blockNode = SquadHierarchy.AiNodes[AiSection.StartLocations];
             var blockRef = new BlockReference(blockNode, reader, rootAddress);
 
             var name = OffsetById(blockNode, FieldId.Name);
@@ -397,7 +397,7 @@ namespace Reclaimer.Models
 
         private void ReadBsps(EndianReader reader)
         {
-            var section = Sections["structurebsps"];
+            var section = Sections[Section.StructureBsps];
             var refOffset = OffsetById(section.Node, FieldId.TagReference);
 
             for (int i = 0; i < section.TagBlock.Count; i++)
@@ -409,7 +409,7 @@ namespace Reclaimer.Models
 
         private void ReadSkies(EndianReader reader)
         {
-            var section = Sections["skies"];
+            var section = Sections[Section.Skies];
             var refOffset = OffsetById(section.Node, FieldId.TagReference);
 
             for (int i = 0; i < section.TagBlock.Count; i++)
@@ -421,7 +421,7 @@ namespace Reclaimer.Models
 
         private void ReadObjectNames(EndianReader reader)
         {
-            var section = Sections["objectnames"];
+            var section = Sections[Section.ObjectNames];
             var nameOffset = OffsetById(section.Node, FieldId.Name);
 
             for (int i = 0; i < section.TagBlock.Count; i++)
@@ -436,7 +436,7 @@ namespace Reclaimer.Models
 
         private void ReadPalettes(EndianReader reader)
         {
-            var section = Sections["palettes"];
+            var section = Sections[Section.Palettes];
             foreach (XmlNode paletteNode in section.Node.SelectNodes("*[@palette]"))
             {
                 var paletteDef = new PaletteDefinition
@@ -459,7 +459,7 @@ namespace Reclaimer.Models
 
         private void ReadPlacements(EndianReader reader)
         {
-            var section = Sections["placements"];
+            var section = Sections[Section.Placements];
             foreach (XmlNode placementNode in section.Node.SelectNodes("*[@placements]"))
             {
                 var paletteName = placementNode.GetStringAttribute("placements");
@@ -508,7 +508,7 @@ namespace Reclaimer.Models
 
         private void ReadStartPositions(EndianReader reader)
         {
-            var section = Sections["startpositions"];
+            var section = Sections[Section.StartPositions];
             var position = OffsetById(section.Node, FieldId.Position);
             var orientation = OffsetById(section.Node, FieldId.Orientation);
 
@@ -529,7 +529,7 @@ namespace Reclaimer.Models
 
         private void ReadTriggerVolumes(EndianReader reader)
         {
-            var section = Sections["triggervolumes"];
+            var section = Sections[Section.TriggerVolumes];
             var name = OffsetById(section.Node, FieldId.Name);
             var position = OffsetById(section.Node, FieldId.Position);
             var size = OffsetById(section.Node, FieldId.Size);
@@ -637,7 +637,7 @@ namespace Reclaimer.Models
 
         private void DisplayStartProfiles()
         {
-            var section = Sections["startprofiles"];
+            var section = Sections[Section.StartProfiles];
             var nameOffset = OffsetById(section.Node, FieldId.Name);
 
             using (var reader = CreateReader())

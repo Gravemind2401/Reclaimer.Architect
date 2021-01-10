@@ -17,7 +17,7 @@ namespace Reclaimer.Models.Ai
 
         public AiSquadHierarchy(ScenarioModel scenario)
         {
-            AiNodes = scenario.Sections["squads"].Node.SelectNodes("./tagblock[@id]")
+            AiNodes = scenario.Sections[Section.Squads].Node.SelectNodes("./tagblock[@id]")
                 .OfType<XmlNode>()
                 .ToDictionary(n => n.Attributes["id"].Value);
 

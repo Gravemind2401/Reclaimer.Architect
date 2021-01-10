@@ -39,7 +39,7 @@ namespace Reclaimer.Models
 
         protected override long GetFieldAddress(string fieldId)
         {
-            var section = Parent.Sections["triggervolumes"];
+            var section = Parent.Sections[Section.TriggerVolumes];
             var index = Parent.TriggerVolumes.IndexOf(this);
             var fieldOffset = section.Node.SelectSingleNode($"*[@id='{fieldId}']").GetIntAttribute("offset") ?? 0;
 
@@ -52,11 +52,11 @@ namespace Reclaimer.Models
         {
             switch (fieldId)
             {
-                case "position":
-                case "size":
+                case FieldId.Position:
+                case FieldId.Size:
                     var multi = meta as MultiValue;
                     var vector = new RealVector3D(multi.Value1, multi.Value2, multi.Value3);
-                    if (fieldId == "position")
+                    if (fieldId == FieldId.Position)
                         Position = vector;
                     else Size = vector;
                     break;

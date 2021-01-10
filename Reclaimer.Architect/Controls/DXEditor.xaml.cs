@@ -2,6 +2,7 @@
 using Reclaimer.Geometry;
 using Reclaimer.Models;
 using Reclaimer.Plugins;
+using Reclaimer.Resources;
 using Reclaimer.Utilities;
 using Studio.Controls;
 using System;

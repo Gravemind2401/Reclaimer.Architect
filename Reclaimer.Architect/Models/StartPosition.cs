@@ -27,7 +27,7 @@ namespace Reclaimer.Models
 
         protected override long GetFieldAddress(string fieldId)
         {
-            var section = Parent.Sections["startpositions"];
+            var section = Parent.Sections[Section.StartPositions];
             var index = Parent.StartingPositions.IndexOf(this);
             var fieldOffset = section.Node.SelectSingleNode($"*[@id='{fieldId}']").GetIntAttribute("offset") ?? 0;
 
@@ -43,10 +43,10 @@ namespace Reclaimer.Models
         {
             switch (fieldId)
             {
-                case "position":
-                case "orientation":
+                case FieldId.Position:
+                case FieldId.Orientation:
                     var multi = meta as MultiValue;
-                    if (fieldId == "position")
+                    if (fieldId == FieldId.Position)
                         Position = new RealVector3D(multi.Value1, multi.Value2, multi.Value3);
                     else Orientation = new RealVector2D(multi.Value1, multi.Value2);
                     break;

@@ -180,7 +180,7 @@
     <Compile Include="Models\IScenarioHandler.cs" />
     <Compile Include="Models\NodeType.cs" />
     <Compile Include="Models\ObjectPlacement.cs" />
-    <Compile Include="Models\PaletteType.cs" />
+    <Compile Include="Resources\PaletteType.cs" />
     <Compile Include="Models\ScenarioListItem.cs" />
     <Compile Include="Models\SceneNodeModel.cs" />
     <Compile Include="Models\Ai\AiSquadHierarchy.cs" />
@@ -197,11 +197,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Resources\FieldId.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>FieldId.resx</DependentUpon>
-    </Compile>
+    <Compile Include="Resources\AiSection.cs" />
+    <Compile Include="Resources\FieldId.cs" />
+    <Compile Include="Resources\Section.cs" />
     <Compile Include="Utilities\InMemoryMetadata.cs" />
     <Compile Include="Utilities\IsPaletteNodeConverter.cs" />
     <Compile Include="Utilities\SharpDXVectorConverter.cs" />
@@ -221,10 +219,6 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\FieldId.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>FieldId.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
