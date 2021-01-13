@@ -382,6 +382,8 @@ namespace Reclaimer.Models
             var blockRef = new BlockReference(blockNode, reader, rootAddress);
 
             var name = OffsetById(blockNode, FieldId.Name);
+            var position = OffsetById(blockNode, FieldId.Position);
+            var rotation = OffsetById(blockNode, FieldId.Rotation);
 
             for (int i = 0; i < blockRef.TagBlock.Count; i++)
             {
@@ -390,6 +392,12 @@ namespace Reclaimer.Models
 
                 reader.Seek(baseAddress + name, SeekOrigin.Begin);
                 loc.Name = reader.ReadObject<StringId>();
+
+                reader.Seek(baseAddress + position, SeekOrigin.Begin);
+                loc.Position = reader.ReadObject<RealVector3D>();
+
+                reader.Seek(baseAddress + rotation, SeekOrigin.Begin);
+                loc.Rotation = reader.ReadObject<RealVector3D>();
 
                 owner.StartingLocations.Add(loc);
             }
