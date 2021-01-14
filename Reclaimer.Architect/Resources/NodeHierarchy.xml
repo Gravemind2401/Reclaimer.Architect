@@ -33,8 +33,8 @@
                 <node header="Starting Locations" type="AiStartingLocations" />
               </placeholder>
             </node>
-            <node header="Group Starting Locations" type="AiGroupStartingLocations" minGame="Halo3ODST" />
-            <node header="Single Starting Locations" type="AiSoloStartingLocations" minGame="Halo3ODST" />
+            <node header="Spawn Formations" type="AiGroupStartingLocations" minGame="Halo3ODST" />
+            <node header="Spawn Points" type="AiSoloStartingLocations" minGame="Halo3ODST" />
           </placeholder>
         </node>
       </placeholder>
