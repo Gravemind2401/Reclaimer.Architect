@@ -41,10 +41,15 @@ namespace Reclaimer.Models
         AiZoneAreas,
         AiSquads,
         AiSquadItem,
+
+        //h3
         AiEncounters, //base squads
         AiEncounterItem,
         AiStartingLocations,
 
+        //odst
+        AiGroupStartingLocations,
+        AiSoloStartingLocations,
 
         // Sandbox
         ForgeVehicles,

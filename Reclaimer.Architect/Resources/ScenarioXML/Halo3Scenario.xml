@@ -2976,8 +2976,8 @@
         <option name="Spike" value="0x3" />
         <option name="Firebomb" value="0x4" />
       </enum16>
-      <blockIndex16 name="Equipment" targetId="scenario_equipment_palette" offset="0x10" visible="true" />
-      <blockIndex16 name="Vehicle" targetId="scenario_vehicle_palette" offset="0x12" visible="true" />
+      <blockIndex16 name="Initial Equipment" targetId="scenario_equipment_palette" offset="0x10" visible="true" />
+      <blockIndex16 name="Vehicle Type" targetId="scenario_vehicle_palette" offset="0x12" visible="true" />
       <stringid name="Vehicle Variant" offset="0x14" visible="true" />
       <ascii name="Command Script Name" offset="0x18" visible="true" length="0x20" />
       <int16 name="Command Script Index" offset="0x38" visible="true" />
@@ -3044,8 +3044,8 @@
       <blockIndex16 name="Character Type" targetId="scenario_character_palette" offset="0x28" visible="true" />
       <blockIndex16 name="Initial Primary Weapon" targetId="scenario_weapon_palette" offset="0x2A" visible="true" />
       <blockIndex16 name="Initial Secondary Weapon" targetId="scenario_weapon_palette" offset="0x2C" visible="true" />
-      <int16 name="Unknown" offset="0x2E" visible="false" />
-      <int16 name="Vehicle Type" offset="0x30" visible="true" />
+      <blockIndex16 name="Initial Equipment" targetId="scenario_equipment_palette" offset="0x2E" visible="true" />
+      <blockIndex16 name="Vehicle Type" targetId="scenario_vehicle_palette" offset="0x30" visible="true" />
       <enum16 name="Seat Type" offset="0x32" visible="true">
         <option name="Default" value="0x0" />
         <option name="Spawn In Passenger" value="0x1" />
@@ -3077,7 +3077,7 @@
       </enum16>
       <ascii name="Command Script Name" offset="0x4C" visible="true" length="0x20" />
       <int16 name="Command Script Index" offset="0x6C" visible="true" />
-      <blockIndex16 name="Equipment" targetId="scenario_equipment_palette" offset="0x6E" visible="true" />
+      <int16 name="Unknown" offset="0x6E" visible="false" />
       <stringid name="Initial State" offset="0x70" visible="true" />
       <int16 name="Unknown" offset="0x74" visible="false" />
       <int16 name="Unknown" offset="0x76" visible="false" />

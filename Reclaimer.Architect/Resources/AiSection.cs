@@ -13,7 +13,13 @@ namespace Reclaimer.Resources
         public const string FiringPositions = "firingpositions";
         public const string Areas = "areas";
         public const string Squads = "squads";
+
+        //h3 only
         public const string Encounters = "encounters";
         public const string StartLocations = "startinglocations";
+
+        //odst+
+        public const string GroupSTartLocations = "groupstartlocations";
+        public const string SoloStartLocations = "singlestartlocations";
     }
 }

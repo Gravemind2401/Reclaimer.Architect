@@ -244,18 +244,25 @@ namespace Reclaimer.Controls
                     CurrentItem = squad;
                     LoadData();
                 }
-                else if (nodeType == NodeType.AiStartingLocations && itemIndex >= 0)
+                else if ((nodeType == NodeType.AiStartingLocations
+                    || nodeType == NodeType.AiGroupStartingLocations
+                    || nodeType == NodeType.AiSoloStartingLocations) && itemIndex >= 0)
                 {
-                    var fpos = (scenario.SelectedNode.Parent.Tag as AiEncounter).StartingLocations[itemIndex];
+                    var tag = scenario.SelectedNode.Parent.Tag;
+                    var loc = nodeType == NodeType.AiStartingLocations
+                    ? (tag as AiEncounter).StartingLocations[itemIndex]
+                    : nodeType == NodeType.AiGroupStartingLocations
+                        ? (tag as AiSquad).GroupStartLocations[itemIndex]
+                        : (tag as AiSquad).SoloStartLocations[itemIndex];
 
-                    rootNode = scenario.SquadHierarchy.AiNodes[AiSection.StartLocations];
-                    baseAddress = fpos.BlockReference.TagBlock.Pointer.Address
-                        + fpos.BlockIndex * fpos.BlockReference.BlockSize;
+                    rootNode = scenario.SquadHierarchy.AiNodes[loc.SectionKey];
+                    baseAddress = loc.BlockReference.TagBlock.Pointer.Address
+                        + loc.BlockIndex * loc.BlockReference.BlockSize;
 
                     foreach (var palette in scenario.Palettes.Values)
                         altNodes.Add(Tuple.Create(palette.PaletteNode, scenario.RootAddress));
 
-                    CurrentItem = fpos;
+                    CurrentItem = loc;
                     LoadData();
                 }
                 else

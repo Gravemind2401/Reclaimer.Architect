@@ -13,7 +13,8 @@ namespace Reclaimer.Models.Ai
 {
     public class AiStartingLocation : ScenarioObject
     {
-        internal AiEncounter Squad { get; }
+        internal readonly string SectionKey;
+
         internal BlockReference BlockReference { get; }
         internal int BlockIndex { get; }
 
@@ -31,17 +32,17 @@ namespace Reclaimer.Models.Ai
             set { SetProperty(ref rotation, value, FieldId.Rotation); }
         }
 
-        public AiStartingLocation(ScenarioModel parent, AiEncounter squad, BlockReference blockRef, int index)
+        public AiStartingLocation(ScenarioModel parent, BlockReference blockRef, int index, string sectionKey)
             : base(parent)
         {
-            Squad = squad;
+            SectionKey = sectionKey;
             BlockReference = blockRef;
             BlockIndex = index;
         }
 
         protected override long GetFieldAddress(string fieldId)
         {
-            var fieldOffset = Parent.SquadHierarchy.AiNodes[AiSection.StartLocations].SelectSingleNode($"*[@id='{fieldId}']").GetIntAttribute("offset") ?? 0;
+            var fieldOffset = Parent.SquadHierarchy.AiNodes[SectionKey].SelectSingleNode($"*[@id='{fieldId}']").GetIntAttribute("offset") ?? 0;
             return BlockReference.TagBlock.Pointer.Address + BlockReference.BlockSize * BlockIndex + fieldOffset;
         }
 

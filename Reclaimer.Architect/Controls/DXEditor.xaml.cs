@@ -156,6 +156,12 @@ namespace Reclaimer.Controls
             foreach (var pair in sceneManager.AiStartLocationGroups)
                 pair.Value.IsRendering = node.NodeType == NodeType.AiStartingLocations && pair.Key == node.Tag;
 
+            foreach (var pair in sceneManager.AiGroupStartLocationGroups)
+                pair.Value.IsRendering = node.NodeType == NodeType.AiGroupStartingLocations && pair.Key == node.Tag;
+
+            foreach (var pair in sceneManager.AiSoloStartLocationGroups)
+                pair.Value.IsRendering = node.NodeType == NodeType.AiSoloStartingLocations && pair.Key == node.Tag;
+
             //if not a palette this will disable hit testing on all palettes
             var paletteKey = PaletteType.FromNodeType(node.NodeType);
             foreach (var palette in sceneManager.PaletteHolders.Values)
@@ -206,8 +212,18 @@ namespace Reclaimer.Controls
             }
             else if (node.NodeType == NodeType.AiStartingLocations)
             {
-                var squad = scenario.SelectedNode.Tag as AiEncounter;
-                renderer.SetSelectedElement(sceneManager.AiStartLocations[squad][itemIndex]);
+                var enc = scenario.SelectedNode.Tag as AiEncounter;
+                renderer.SetSelectedElement(sceneManager.AiStartLocations[enc][itemIndex]);
+            }
+            else if (node.NodeType == NodeType.AiGroupStartingLocations)
+            {
+                var squad = scenario.SelectedNode.Tag as AiSquad;
+                renderer.SetSelectedElement(sceneManager.AiGroupStartLocations[squad][itemIndex]);
+            }
+            else if (node.NodeType == NodeType.AiSoloStartingLocations)
+            {
+                var squad = scenario.SelectedNode.Tag as AiSquad;
+                renderer.SetSelectedElement(sceneManager.AiSoloStartLocations[squad][itemIndex]);
             }
         }
 
@@ -246,8 +262,20 @@ namespace Reclaimer.Controls
             }
             else if (node.NodeType == NodeType.AiStartingLocations)
             {
-                var squad = scenario.SelectedNode.Tag as AiEncounter;
-                var obj = sceneManager.AiStartLocations[squad][index];
+                var enc = scenario.SelectedNode.Tag as AiEncounter;
+                var obj = sceneManager.AiStartLocations[enc][index];
+                renderer.ZoomToBounds(obj.GetTotalBounds(), 500);
+            }
+            else if (node.NodeType == NodeType.AiGroupStartingLocations)
+            {
+                var squad = scenario.SelectedNode.Tag as AiSquad;
+                var obj = sceneManager.AiGroupStartLocations[squad][index];
+                renderer.ZoomToBounds(obj.GetTotalBounds(), 500);
+            }
+            else if (node.NodeType == NodeType.AiSoloStartingLocations)
+            {
+                var squad = scenario.SelectedNode.Tag as AiSquad;
+                var obj = sceneManager.AiSoloStartLocations[squad][index];
                 renderer.ZoomToBounds(obj.GetTotalBounds(), 500);
             }
         }
@@ -287,8 +315,18 @@ namespace Reclaimer.Controls
             }
             else if (scenario.SelectedNodeType == NodeType.AiStartingLocations)
             {
-                var squad = scenario.SelectedNode.Tag as AiEncounter;
-                scenario.SelectedItemIndex = squad.StartingLocations.IndexOf(element.DataContext as AiStartingLocation);
+                var enc = scenario.SelectedNode.Tag as AiEncounter;
+                scenario.SelectedItemIndex = enc.StartingLocations.IndexOf(element.DataContext as AiStartingLocation);
+            }
+            else if (scenario.SelectedNodeType == NodeType.AiGroupStartingLocations)
+            {
+                var squad = scenario.SelectedNode.Tag as AiSquad;
+                scenario.SelectedItemIndex = squad.GroupStartLocations.IndexOf(element.DataContext as AiStartingLocation);
+            }
+            else if (scenario.SelectedNodeType == NodeType.AiSoloStartingLocations)
+            {
+                var squad = scenario.SelectedNode.Tag as AiSquad;
+                scenario.SelectedItemIndex = squad.SoloStartLocations.IndexOf(element.DataContext as AiStartingLocation);
             }
             else
             {
@@ -346,7 +384,9 @@ namespace Reclaimer.Controls
 
                     foreach (var group in sceneManager.AiAreaGroups.Values
                         .Concat(sceneManager.AiFiringPositionGroups.Values)
-                        .Concat(sceneManager.AiStartLocationGroups.Values))
+                        .Concat(sceneManager.AiStartLocationGroups.Values)
+                        .Concat(sceneManager.AiGroupStartLocationGroups.Values)
+                        .Concat(sceneManager.AiSoloStartLocationGroups.Values))
                     {
                         group.IsRendering = false;
                         modelGroup.Children.Add(group);

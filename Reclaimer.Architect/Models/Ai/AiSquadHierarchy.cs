@@ -51,11 +51,15 @@ namespace Reclaimer.Models.Ai
         }
 
         public ObservableCollection<AiEncounter> Encounters { get; }
+        public ObservableCollection<AiStartingLocation> GroupStartLocations { get; }
+        public ObservableCollection<AiStartingLocation> SoloStartLocations { get; }
 
         public AiSquad(BlockReference blockRef, int index)
             : base(blockRef, index)
         {
             Encounters = new ObservableCollection<AiEncounter>();
+            GroupStartLocations = new ObservableCollection<AiStartingLocation>();
+            SoloStartLocations = new ObservableCollection<AiStartingLocation>();
         }
     }
 

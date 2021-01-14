@@ -28,11 +28,13 @@
         <node header="Areas" type="AiZoneAreas" />
         <node header="Squads" type="AiSquads">
           <placeholder header="#squad" type="AiSquadItem">
-            <node header="Encounters" type="AiEncounters">
+            <node header="Encounters" type="AiEncounters" maxGame="Halo3ODST">
               <placeholder header="#encounter" type="AiEncounterItem">
                 <node header="Starting Locations" type="AiStartingLocations" />
               </placeholder>
             </node>
+            <node header="Group Starting Locations" type="AiGroupStartingLocations" minGame="Halo3ODST" />
+            <node header="Single Starting Locations" type="AiSoloStartingLocations" minGame="Halo3ODST" />
           </placeholder>
         </node>
       </placeholder>

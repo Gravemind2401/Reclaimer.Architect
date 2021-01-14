@@ -200,6 +200,12 @@ namespace Reclaimer.Models
             var visible = xml.GetBoolAttribute("visible") ?? true;
             var visibility = visible ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
 
+            var minGame = xml.GetEnumAttribute<CacheType>("minGame");
+            var maxGame = xml.GetEnumAttribute<CacheType>("maxGame");
+
+            if (ScenarioTag.CacheFile.CacheType < minGame || ScenarioTag.CacheFile.CacheType >= maxGame)
+                return Enumerable.Empty<SceneNodeModel>();
+
             var nodeInstance = new SceneNodeModel(header, type) { Visibility = visibility, Tag = parent?.Tag };
 
             IEnumerable<SceneNodeModel> nodes;
@@ -352,7 +358,13 @@ namespace Reclaimer.Models
                 reader.Seek(baseAddress + parentIndex, SeekOrigin.Begin);
                 squad.ZoneIndex = reader.ReadInt16();
 
-                ReadEncounters(reader, squad, baseAddress);
+                if (ScenarioTag.CacheFile.CacheType < CacheType.Halo3ODST)
+                    ReadEncounters(reader, squad, baseAddress);
+                else
+                {
+                    squad.GroupStartLocations.AddRange(ReadStartingLocations(reader, baseAddress, AiSection.GroupSTartLocations));
+                    squad.SoloStartLocations.AddRange(ReadStartingLocations(reader, baseAddress, AiSection.SoloStartLocations));
+                }
 
                 results.Add(squad);
             }
@@ -370,15 +382,17 @@ namespace Reclaimer.Models
                 var enc = new AiEncounter(blockRef, i) { Name = $"Encounter {i}" };
                 var baseAddress = blockRef.TagBlock.Pointer.Address + blockRef.BlockSize * i;
 
-                ReadStartingLocations(reader, enc, baseAddress);
+                enc.StartingLocations.AddRange(ReadStartingLocations(reader, baseAddress, AiSection.StartLocations));
 
                 owner.Encounters.Add(enc);
             }
         }
 
-        private void ReadStartingLocations(EndianReader reader, AiEncounter owner, long rootAddress)
+        private List<AiStartingLocation> ReadStartingLocations(EndianReader reader, long rootAddress, string sectionKey)
         {
-            var blockNode = SquadHierarchy.AiNodes[AiSection.StartLocations];
+            var result = new List<AiStartingLocation>();
+
+            var blockNode = SquadHierarchy.AiNodes[sectionKey];
             var blockRef = new BlockReference(blockNode, reader, rootAddress);
 
             var name = OffsetById(blockNode, FieldId.Name);
@@ -387,7 +401,7 @@ namespace Reclaimer.Models
 
             for (int i = 0; i < blockRef.TagBlock.Count; i++)
             {
-                var loc = new AiStartingLocation(this, owner, blockRef, i);
+                var loc = new AiStartingLocation(this, blockRef, i, sectionKey);
                 var baseAddress = blockRef.TagBlock.Pointer.Address + blockRef.BlockSize * i;
 
                 reader.Seek(baseAddress + name, SeekOrigin.Begin);
@@ -399,8 +413,10 @@ namespace Reclaimer.Models
                 reader.Seek(baseAddress + rotation, SeekOrigin.Begin);
                 loc.Rotation = reader.ReadObject<RealVector3D>();
 
-                owner.StartingLocations.Add(loc);
+                result.Add(loc);
             }
+
+            return result;
         }
 
         private void ReadBsps(EndianReader reader)
@@ -634,9 +650,17 @@ namespace Reclaimer.Models
                 foreach (var enc in (SelectedNode.Parent.Tag as AiSquad).Encounters)
                     Items.Add(new ListBoxItem { Content = enc.Name, Tag = enc });
             }
-            else if (SelectedNodeType == NodeType.AiStartingLocations)
+            else if (SelectedNodeType == NodeType.AiStartingLocations
+                || SelectedNodeType == NodeType.AiGroupStartingLocations
+                || SelectedNodeType == NodeType.AiSoloStartingLocations)
             {
-                foreach (var loc in (SelectedNode.Parent.Tag as AiEncounter).StartingLocations)
+                var locations = SelectedNodeType == NodeType.AiStartingLocations
+                    ? (SelectedNode.Parent.Tag as AiEncounter).StartingLocations
+                    : SelectedNodeType == NodeType.AiGroupStartingLocations
+                        ? (SelectedNode.Parent.Tag as AiSquad).GroupStartLocations
+                        : (SelectedNode.Parent.Tag as AiSquad).SoloStartLocations;
+
+                foreach (var loc in locations)
                     Items.Add(new ListBoxItem { Content = loc.GetDisplayName(), Tag = loc });
             }
 

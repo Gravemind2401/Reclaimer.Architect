@@ -46,6 +46,11 @@ namespace Reclaimer.Geometry
         public Dictionary<AiEncounter, Helix.GroupElement3D> AiStartLocationGroups { get; private set; }
         public Dictionary<AiEncounter, ObservableCollection<PositionRotationMarker3D>> AiStartLocations { get; private set; }
 
+        public Dictionary<AiSquad, Helix.GroupElement3D> AiGroupStartLocationGroups { get; private set; }
+        public Dictionary<AiSquad, ObservableCollection<PositionRotationMarker3D>> AiGroupStartLocations { get; private set; }
+        public Dictionary<AiSquad, Helix.GroupElement3D> AiSoloStartLocationGroups { get; private set; }
+        public Dictionary<AiSquad, ObservableCollection<PositionRotationMarker3D>> AiSoloStartLocations { get; private set; }
+
         public IEnumerable<Task> ReadScenario(ScenarioModel scenario)
         {
             this.scenario = scenario;
@@ -61,6 +66,11 @@ namespace Reclaimer.Geometry
             AiFiringPositions = new Dictionary<AiZone, ObservableCollection<PositionMarker3D>>();
             AiStartLocationGroups = new Dictionary<AiEncounter, Helix.GroupElement3D>();
             AiStartLocations = new Dictionary<AiEncounter, ObservableCollection<PositionRotationMarker3D>>();
+
+            AiGroupStartLocationGroups = new Dictionary<AiSquad, Helix.GroupElement3D>();
+            AiGroupStartLocations = new Dictionary<AiSquad, ObservableCollection<PositionRotationMarker3D>>();
+            AiSoloStartLocationGroups = new Dictionary<AiSquad, Helix.GroupElement3D>();
+            AiSoloStartLocations = new Dictionary<AiSquad, ObservableCollection<PositionRotationMarker3D>>();
 
             yield return Task.Run(() =>
             {
@@ -169,15 +179,19 @@ namespace Reclaimer.Geometry
 
                 foreach (var squad in zone.Squads)
                 {
+                    Helix.GroupModel3D locGroup;
+                    ObservableCollection<PositionRotationMarker3D>  locMarkers;
+
+                    #region Encounter Starting Locations
                     foreach (var enc in squad.Encounters)
                     {
-                        var locGroup = new Helix.GroupModel3D();
-                        var locMarkers = new ObservableCollection<PositionRotationMarker3D>();
+                        locGroup = new Helix.GroupModel3D();
+                        locMarkers = new ObservableCollection<PositionRotationMarker3D>();
 
                         foreach (var loc in enc.StartingLocations)
                         {
                             var locMarker = new PositionRotationMarker3D();
-                            BindSquadStartLocation(loc, locMarker);
+                            BindAiStartLocation(loc, locMarker);
                             locMarkers.Add(locMarker);
                             locGroup.Children.Add(locMarker);
                         }
@@ -185,6 +199,39 @@ namespace Reclaimer.Geometry
                         AiStartLocationGroups.Add(enc, locGroup);
                         AiStartLocations.Add(enc, locMarkers);
                     }
+                    #endregion
+
+                    #region Group Starting Locations
+                    locGroup = new Helix.GroupModel3D();
+                    locMarkers = new ObservableCollection<PositionRotationMarker3D>();
+
+                    foreach (var loc in squad.GroupStartLocations)
+                    {
+                        var locMarker = new PositionRotationMarker3D();
+                        BindAiStartLocation(loc, locMarker);
+                        locMarkers.Add(locMarker);
+                        locGroup.Children.Add(locMarker);
+                    }
+
+                    AiGroupStartLocationGroups.Add(squad, locGroup);
+                    AiGroupStartLocations.Add(squad, locMarkers);
+                    #endregion
+
+                    #region Single Starting Locations
+                    locGroup = new Helix.GroupModel3D();
+                    locMarkers = new ObservableCollection<PositionRotationMarker3D>();
+
+                    foreach (var loc in squad.SoloStartLocations)
+                    {
+                        var locMarker = new PositionRotationMarker3D();
+                        BindAiStartLocation(loc, locMarker);
+                        locMarkers.Add(locMarker);
+                        locGroup.Children.Add(locMarker);
+                    }
+
+                    AiSoloStartLocationGroups.Add(squad, locGroup);
+                    AiSoloStartLocations.Add(squad, locMarkers);
+                    #endregion
                 }
             }
         }
@@ -306,7 +353,7 @@ namespace Reclaimer.Geometry
             BindingOperations.SetBinding(model, Helix.Element3D.TransformProperty, binding);
         }
 
-        private void BindSquadStartLocation(AiStartingLocation pos, Helix.Element3D model)
+        private void BindAiStartLocation(AiStartingLocation pos, Helix.Element3D model)
         {
             var binding = new MultiBinding { Converter = EulerTransformConverter.Instance, Mode = BindingMode.TwoWay };
             binding.Bindings.Add(new Binding(nameof(AiStartingLocation.Position)) { Mode = BindingMode.TwoWay });
