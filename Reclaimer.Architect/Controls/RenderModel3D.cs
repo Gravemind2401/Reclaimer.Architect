@@ -55,9 +55,10 @@ namespace Reclaimer.Controls
             var regions = new List<Region>();
             regions.Add(new Region(0, nameof(Region), permutations));
 
-            return new RenderModel3D(nameof(RenderModel3D), regions, Enumerable.Empty<InstanceGroup>());
+            return new RenderModel3D(nameof(RenderModel3D), regions, Enumerable.Empty<InstanceGroup>(), true);
         }
 
+        private readonly bool isError;
         private readonly List<GroupElement3D> regionGroups;
         private readonly List<GroupElement3D> instanceGroups;
 
@@ -66,7 +67,15 @@ namespace Reclaimer.Controls
         public IReadOnlyList<InstanceGroup> InstanceGroups { get; }
 
         public RenderModel3D(string name, IEnumerable<Region> regions, IEnumerable<InstanceGroup> instances)
+            : this(name, regions, instances, false)
         {
+
+        }
+
+        private RenderModel3D(string name, IEnumerable<Region> regions, IEnumerable<InstanceGroup> instances, bool isError)
+        {
+            this.isError = isError;
+
             ModelName = name;
             Regions = regions.ToList();
             regionGroups = regions.Select(r => r.Element).ToList();
@@ -140,6 +149,9 @@ namespace Reclaimer.Controls
 
         BoundingBox IMeshNode.GetNodeBounds()
         {
+            if (isError)
+                return this.GetTotalBounds();
+
             return Regions.OfType<IMeshNode>()
                 .Union(InstanceGroups.OfType<IMeshNode>())
                 .Select(n => n.GetNodeBounds())
