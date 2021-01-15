@@ -10,7 +10,7 @@ using System.Windows;
 using Media3D = System.Windows.Media.Media3D;
 using Media = System.Windows.Media;
 
-namespace Reclaimer.Controls
+namespace Reclaimer.Controls.Markers
 {
     public abstract class MarkerGeometry3D : GroupElement3D, IMeshNode, IManipulatable
     {

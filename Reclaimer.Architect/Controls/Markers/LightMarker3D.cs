@@ -9,14 +9,14 @@ using System.Windows;
 using Media3D = System.Windows.Media.Media3D;
 using Media = System.Windows.Media;
 
-namespace Reclaimer.Controls
+namespace Reclaimer.Controls.Markers
 {
-    public sealed class LightFixture3D : MarkerGeometry3D
+    public sealed class LightMarker3D : MarkerGeometry3D
     {
         private static readonly Material MarkerMaterial = DiffuseMaterials.LightBlue;
         private static readonly Geometry3D MarkerGeometry;
 
-        static LightFixture3D()
+        static LightMarker3D()
         {
             var builder = new MeshBuilder();
 

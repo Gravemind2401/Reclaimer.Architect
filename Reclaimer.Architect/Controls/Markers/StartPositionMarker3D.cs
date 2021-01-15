@@ -9,27 +9,28 @@ using System.Windows;
 using Media3D = System.Windows.Media.Media3D;
 using Media = System.Windows.Media;
 
-namespace Reclaimer.Controls
+namespace Reclaimer.Controls.Markers
 {
-    public sealed class PositionMarker3D : MarkerGeometry3D
+    public sealed class StartPositionMarker3D : MarkerGeometry3D
     {
-        private static readonly Material MarkerMaterial = DiffuseMaterials.Red;
+        private static readonly Material MarkerMaterial = DiffuseMaterials.LightBlue;
         private static readonly Geometry3D MarkerGeometry;
 
-        static PositionMarker3D()
+        static StartPositionMarker3D()
         {
             var builder = new MeshBuilder();
 
             var baseHeight = 0.075f;
-            var halfHeight = baseHeight / 2;
-            var sideLength = 0.75f;
+            var halfHeight = baseHeight / 2f;
+            var baseRadius = 0.2f;
 
-            builder.AddBox(Vector3.UnitZ * halfHeight, Vector3.UnitX, Vector3.UnitY, sideLength, sideLength, baseHeight);
+            builder.AddCylinder(Vector3.Zero, new Vector3(0, 0, baseHeight), baseRadius, 18, true, true);
+            builder.AddArrow(new Vector3(0, 0, halfHeight), new Vector3(baseRadius * 1.6f, 0, halfHeight), halfHeight, 3, 18);
 
             MarkerGeometry = builder.ToMesh();
         }
 
-        public override ManipulationFlags ManipulationFlags => ManipulationFlags.Translate;
+        public override ManipulationFlags ManipulationFlags => ManipulationFlags.Translate | ManipulationFlags.RotateYZ;
 
         protected override MeshGeometryModel3D GetMeshGeometry()
         {
