@@ -13,7 +13,7 @@ namespace Reclaimer.Models
 {
     public class ObjectPlacement : ScenarioObject
     {
-        private readonly string paletteKey;
+        internal readonly string PaletteKey;
 
         private int paletteIndex;
         public int PaletteIndex
@@ -22,7 +22,7 @@ namespace Reclaimer.Models
             set
             {
                 if (SetProperty(ref paletteIndex, value, FieldId.PaletteIndex))
-                    Parent.RenderView?.RefreshObject(paletteKey, this, FieldId.PaletteIndex);
+                    Parent.RenderView?.RefreshObject(PaletteKey, this, FieldId.PaletteIndex);
             }
         }
 
@@ -40,6 +40,13 @@ namespace Reclaimer.Models
             set { SetProperty(ref rotation, value, FieldId.Rotation); }
         }
 
+        private RealVector4D qrotation;
+        public RealVector4D QRotation
+        {
+            get { return qrotation; }
+            set { SetProperty(ref qrotation, value, FieldId.QRotation); }
+        }
+
         private float scale;
         public float Scale
         {
@@ -54,19 +61,19 @@ namespace Reclaimer.Models
             set
             {
                 if (SetProperty(ref variant, value, FieldId.Variant))
-                    Parent.RenderView?.RefreshObject(paletteKey, this, FieldId.Variant);
+                    Parent.RenderView?.RefreshObject(PaletteKey, this, FieldId.Variant);
             }
         }
 
         public ObjectPlacement(ScenarioModel parent, string paletteKey)
             : base(parent)
         {
-            this.paletteKey = paletteKey;
+            PaletteKey = paletteKey;
         }
 
         protected override long GetFieldAddress(string fieldId)
         {
-            var palette = Parent.Palettes[paletteKey];
+            var palette = Parent.Palettes[PaletteKey];
             var block = palette.PlacementBlockRef;
             var index = palette.Placements.IndexOf(this);
             var fieldOffset = palette.PlacementsNode.SelectSingleNode($"*[@id='{fieldId}']").GetIntAttribute("offset") ?? 0;
@@ -76,7 +83,7 @@ namespace Reclaimer.Models
 
         public override string GetDisplayName()
         {
-            var palette = Parent.Palettes[paletteKey];
+            var palette = Parent.Palettes[PaletteKey];
 
             if (PaletteIndex < 0 || PaletteIndex >= palette.Palette.Count)
                 return "<invalid>";
@@ -97,6 +104,10 @@ namespace Reclaimer.Models
                     if (fieldId == FieldId.Position)
                         Position = vector;
                     else Rotation = vector;
+                    break;
+                case FieldId.QRotation:
+                    multi = meta as MultiValue;
+                    QRotation = new RealVector4D(multi.Value1, multi.Value2, multi.Value3, multi.Value4);
                     break;
                 case FieldId.Scale:
                     var simple = meta as SimpleValue;

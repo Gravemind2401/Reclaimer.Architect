@@ -225,7 +225,7 @@ namespace Reclaimer.Models
 
         private int OffsetById(XmlNode node, string fieldId)
         {
-            return node.SelectSingleNode($"*[@id='{fieldId}']").GetIntAttribute("offset") ?? 0;
+            return node.SelectSingleNode($"*[@id='{fieldId}']")?.GetIntAttribute("offset") ?? -1;
         }
 
         private void LoadSections(EndianReader reader)
@@ -496,8 +496,9 @@ namespace Reclaimer.Models
                 var nameIndex = OffsetById(placementNode, FieldId.NameIndex);
                 var position = OffsetById(placementNode, FieldId.Position);
                 var rotation = OffsetById(placementNode, FieldId.Rotation);
+                var qrotation = OffsetById(placementNode, FieldId.QRotation);
                 var scale = OffsetById(placementNode, FieldId.Scale);
-                var variant = placementNode.SelectSingleNode($"*[@id='{FieldId.Variant}']")?.GetIntAttribute("offset");
+                var variant = OffsetById(placementNode, FieldId.Variant);
 
                 for (int i = 0; i < blockRef.TagBlock.Count; i++)
                 {
@@ -507,21 +508,34 @@ namespace Reclaimer.Models
                     reader.Seek(baseAddress + paletteIndex, SeekOrigin.Begin);
                     placement.PaletteIndex = reader.ReadInt16();
 
-                    reader.Seek(baseAddress + nameIndex, SeekOrigin.Begin);
-                    placement.NameIndex = reader.ReadInt16();
+                    if (nameIndex >= 0)
+                    {
+                        reader.Seek(baseAddress + nameIndex, SeekOrigin.Begin);
+                        placement.NameIndex = reader.ReadInt16();
+                    }
+                    else placement.NameIndex = -1;
 
                     reader.Seek(baseAddress + position, SeekOrigin.Begin);
                     placement.Position = reader.ReadObject<RealVector3D>();
 
-                    reader.Seek(baseAddress + rotation, SeekOrigin.Begin);
-                    placement.Rotation = reader.ReadObject<RealVector3D>();
+                    if (rotation >= 0)
+                    {
+                        reader.Seek(baseAddress + rotation, SeekOrigin.Begin);
+                        placement.Rotation = reader.ReadObject<RealVector3D>();
+                    }
+
+                    if (qrotation >= 0)
+                    {
+                        reader.Seek(baseAddress + qrotation, SeekOrigin.Begin);
+                        placement.QRotation = reader.ReadObject<RealVector4D>();
+                    }
 
                     reader.Seek(baseAddress + scale, SeekOrigin.Begin);
                     placement.Scale = reader.ReadSingle();
 
-                    if (variant.HasValue)
+                    if (variant >= 0)
                     {
-                        reader.Seek(baseAddress + variant.Value, SeekOrigin.Begin);
+                        reader.Seek(baseAddress + variant, SeekOrigin.Begin);
                         placement.Variant = reader.ReadObject<StringId>();
                     }
 

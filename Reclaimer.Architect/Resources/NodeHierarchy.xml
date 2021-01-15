@@ -69,7 +69,7 @@
     <node header="Netgame Equipment" visible="False" />
     <node header="Starting profiles" type="StartProfiles" />
     <node header="Detail objects" visible="False" />
-    <node header="Decals" type="Decals" visible="False" />
+    <node header="Decals" type="Decals" />
   </node>
   <node header="Cluster properties" visible="False">
 

@@ -25,7 +25,11 @@ namespace Reclaimer.Utilities
 
         public static RealVector3D ToRealVector3D(this SharpDX.Vector3 v) => new RealVector3D(v.X, v.Y, v.Z);
 
+        public static RealVector4D ToRealVector4D(this SharpDX.Quaternion q) => new RealVector4D(q.X, q.Y, q.Z, q.W);
+
         public static SharpDX.Quaternion ToQuaternion(this IRealVector4D v) => new SharpDX.Quaternion(v.X, v.Y, v.Z, v.W);
+
+        public static SharpDX.Quaternion ToQuaternion(this IXMVector q) => new SharpDX.Quaternion(q.X, q.Y, q.Z, q.W);
 
         public static SharpDX.Matrix ToMatrix3(this IRealBounds5D bounds)
         {

@@ -146,6 +146,7 @@
     <Compile Include="Controls\IRendererHost.cs" />
     <Compile Include="Controls\ManipulationFlags.cs" />
     <Compile Include="Controls\Markers\MarkerGeometry3D.cs" />
+    <Compile Include="Controls\Markers\DecalMarker3D.cs" />
     <Compile Include="Controls\ObjectModel3D.cs" />
     <Compile Include="Controls\PaletteEditorWindow.xaml.cs">
       <DependentUpon>PaletteEditorWindow.xaml</DependentUpon>
@@ -202,6 +203,7 @@
     <Compile Include="Resources\AiSection.cs" />
     <Compile Include="Resources\FieldId.cs" />
     <Compile Include="Resources\Section.cs" />
+    <Compile Include="Utilities\QuaternionTransformConverter.cs" />
     <Compile Include="Utilities\TranslationTransformConverter.cs" />
     <Compile Include="Utilities\InMemoryMetadata.cs" />
     <Compile Include="Utilities\IsPaletteNodeConverter.cs" />

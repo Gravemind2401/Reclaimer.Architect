@@ -19,6 +19,7 @@ namespace Reclaimer.Resources
         public const string Control = "control";
         public const string LightFixture = "lightfixture";
         public const string Crate = "crate";
+        public const string Decal = "decal";
 
         private static Dictionary<NodeType, string> ByNodeType = new Dictionary<NodeType, string>
         {
@@ -30,7 +31,8 @@ namespace Reclaimer.Resources
             { NodeType.Machines, PaletteType.Machine },
             { NodeType.Controls, PaletteType.Control },
             { NodeType.LightFixtures, PaletteType.LightFixture },
-            { NodeType.Crates, PaletteType.Crate }
+            { NodeType.Crates, PaletteType.Crate },
+            { NodeType.Decals, PaletteType.Decal }
         };
 
         public static string FromNodeType(NodeType type) => ByNodeType.ValueOrDefault(type);

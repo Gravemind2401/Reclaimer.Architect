@@ -15,6 +15,7 @@ namespace Reclaimer.Resources
         public const string ParentIndex = "parentindex";
         public const string Position = "position";
         public const string Rotation = "rotation";
+        public const string QRotation = "qrotation";
         public const string Scale = "scale";
         public const string Size = "size";
         public const string TagReference = "tagreference";

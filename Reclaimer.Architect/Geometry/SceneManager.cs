@@ -261,7 +261,9 @@ namespace Reclaimer.Geometry
             }
 
             Helix.Element3D inst;
-            if (holder.Definition.Name == PaletteType.LightFixture)
+            if (holder.Definition.Name == PaletteType.Decal)
+                inst = new DecalMarker3D();
+            else if (holder.Definition.Name == PaletteType.LightFixture)
                 inst = new LightMarker3D();
             else
             {
@@ -310,9 +312,18 @@ namespace Reclaimer.Geometry
 
         private void BindPlacement(ObjectPlacement placement, Helix.Element3D model)
         {
-            var binding = new MultiBinding { Converter = EulerTransformConverter.Instance, Mode = BindingMode.TwoWay };
+            IMultiValueConverter converter = EulerTransformConverter.Instance;
+            var rotationPath = nameof(ObjectPlacement.Rotation);
+
+            if (placement.PaletteKey == PaletteType.Decal)
+            {
+                converter = QuaternionTransformConverter.Instance;
+                rotationPath = nameof(ObjectPlacement.QRotation);
+            }
+
+            var binding = new MultiBinding { Converter = converter, Mode = BindingMode.TwoWay };
             binding.Bindings.Add(new Binding(nameof(ObjectPlacement.Position)) { Mode = BindingMode.TwoWay });
-            binding.Bindings.Add(new Binding(nameof(ObjectPlacement.Rotation)) { Mode = BindingMode.TwoWay });
+            binding.Bindings.Add(new Binding(rotationPath) { Mode = BindingMode.TwoWay });
             binding.Bindings.Add(new Binding(nameof(ObjectPlacement.Scale)) { Mode = BindingMode.TwoWay });
 
             model.DataContext = placement;
