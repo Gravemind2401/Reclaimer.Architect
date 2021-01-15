@@ -144,6 +144,7 @@ namespace Reclaimer.Controls
         {
             if (node == null || !isReady) return;
 
+            sceneManager.PaletteHolders[PaletteType.Decal].GroupElement.IsRendering = node.NodeType == NodeType.Decals;
             sceneManager.StartPositionGroup.IsRendering = node.NodeType == NodeType.StartPositions;
             sceneManager.TriggerVolumeGroup.IsRendering = node.NodeType == NodeType.TriggerVolumes;
 
@@ -376,6 +377,7 @@ namespace Reclaimer.Controls
                         renderer.ZoomToBounds(bounds);
                     }
 
+                    sceneManager.PaletteHolders[PaletteType.Decal].GroupElement.IsRendering = false;
                     sceneManager.StartPositionGroup.IsRendering = false;
                     sceneManager.TriggerVolumeGroup.IsRendering = false;
 
@@ -427,6 +429,9 @@ namespace Reclaimer.Controls
 
                     foreach (var holder in sceneManager.PaletteHolders.Values)
                     {
+                        if (holder.Name == PaletteType.Decal)
+                            continue;
+
                         var paletteNode = new TreeItemModel { Header = holder.Name, IsChecked = true };
 
                         for (int i = 0; i < holder.Elements.Count; i++)
