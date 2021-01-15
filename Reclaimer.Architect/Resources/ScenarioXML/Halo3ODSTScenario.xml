@@ -200,6 +200,9 @@
     <tagblock palette="character" srcId="scenario_character_palette" offset="0x3FC" elementSize="0x10">
       <tagRef name="Character" offset="0x0" visible="true" id="tagreference" />
     </tagblock>
+    <tagblock palette="decal" srcId="scenario_decal_palette" offset="0x39C" elementSize="0x10">
+      <tagRef name="Decal" offset="0x0" visible="true" id="tagreference" />
+    </tagblock>
   </section>
   <section name="placements">
     <tagblock placements="scenery" offset="0xE4" elementSize="0xB4">
@@ -2679,6 +2682,14 @@
       <float32 name="Top" offset="0xA4" visible="true" />
       <float32 name="Bottom" offset="0xA8" visible="true" />
       <undefined name="Unknown" offset="0xAC" visible="false" />
+    </tagblock>
+    <tagblock placements="decal" offset="0x390" elementSize="0x24">
+      <blockIndex16 name="Palette Index" targetId="scenario_decal_palette" offset="0x0" visible="true" id="paletteindex" />
+      <flags8 name="Flags" offset="0x2" visible="true" />
+      <int8 name="Padding" offset="0x3" visible="false" />
+      <vector4 name="Rotation" offset="0x4" visible="true" id="qrotation" />
+      <point3 name="Position" offset="0x14" visible="true" id="position" />
+      <float32 name="Scale" offset="0x20" visible="true" id="scale" />
     </tagblock>
   </section>
   <section name="startpositions" offset="0x294" elementSize="0x1C">

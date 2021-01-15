@@ -164,6 +164,9 @@
     <tagblock palette="character" srcId="scenario_character_palette" offset="0x400" elementSize="0x10">
       <tagRef name="Character" offset="0x0" visible="true" id="tagreference" />
     </tagblock>
+    <tagblock palette="decal" srcId="scenario_decal_palette" offset="0x37C" elementSize="0x10">
+      <tagRef name="Decal" offset="0x0" visible="true" id="tagreference" />
+    </tagblock>
   </section>
   <section name="placements">
     <tagblock placements="scenery" offset="0x110" elementSize="0xDC">
@@ -2799,6 +2802,15 @@
       <undefined name="Unknown" offset="0xD0" visible="false" />
       <comment title="Unknown Data" />
       <undefined name="Unknown" offset="0xD4" visible="true" />
+    </tagblock>
+    <tagblock placements="decal" offset="0x370" elementSize="0x28">
+      <blockIndex16 name="Palette Index" targetId="scenario_decal_palette" offset="0x0" visible="true" id="paletteindex" />
+      <flags8 name="Flags" offset="0x2" visible="true" />
+      <int8 name="Padding" offset="0x3" visible="false" />
+      <vector4 name="Rotation" offset="0x4" visible="true" id="qrotation" />
+      <point3 name="Position" offset="0x14" visible="true" id="position" />
+      <float32 name="Scale X" offset="0x20" visible="true" id="scale" />
+      <float32 name="Scale Y" offset="0x20" visible="true" />
     </tagblock>
   </section>
   <section name="startpositions" offset="0x27C" elementSize="0x1C">
