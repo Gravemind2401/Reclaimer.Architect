@@ -739,7 +739,7 @@ namespace Reclaimer.Controls
                         break;
                 }
 
-                if (UniformScaling)
+                if ((target as IManipulatable)?.UniformScaling ?? UniformScaling)
                     scaleVector = Vector3.One;
 
                 var axisX = Vector3.TransformNormal(Vector3.UnitX, rotationMatrix);

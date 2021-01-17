@@ -23,6 +23,8 @@ namespace Reclaimer.Controls.Markers
 
         public virtual bool UseLocalOrigin => true;
 
+        public virtual bool UniformScaling => true;
+
         protected abstract MeshGeometryModel3D GetMeshGeometry();
 
         #region IMeshNode

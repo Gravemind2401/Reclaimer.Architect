@@ -10,5 +10,6 @@ namespace Reclaimer.Controls
     {
         ManipulationFlags ManipulationFlags { get; }
         bool UseLocalOrigin { get; }
+        bool UniformScaling { get; }
     }
 }
