@@ -44,6 +44,9 @@ namespace Reclaimer.Utilities
 
             matrix.DecomposeUniformScale(out scale, out rotation, out position);
 
+            //floating point error in rotation conversion makes it hard to keep the scale still
+            scale = (float)Math.Round(scale, 4);
+
             var result = new object[3];
             result[0] = position.ToRealVector3D();
             result[1] = rotation.ToRealVector4D();
