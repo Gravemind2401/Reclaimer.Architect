@@ -235,8 +235,8 @@ namespace Reclaimer.Controls
         {
             get
             {
-                if ((Target as IManipulatable)?.UseLocalOrigin == true)
-                    return centerOffset - Target.GetTotalBounds(true).Center;
+                if ((target as IManipulatable)?.UseLocalOrigin == true)
+                    return centerOffset - target.GetTotalBounds(true).Center;
                 else return centerOffset;
             }
         }
@@ -392,7 +392,7 @@ namespace Reclaimer.Controls
         {
             var flags = ManipulationFlags;
 
-            var obj = Target as IManipulatable;
+            var obj = target as IManipulatable;
             if (obj != null)
                 flags &= obj.ManipulationFlags;
 
@@ -519,6 +519,9 @@ namespace Reclaimer.Controls
                 var moveDir = hit - currentHit;
                 currentHit = hit;
 
+                if (LocalAxes)
+                    moveDir = Vector3.TransformNormal(moveDir, rotationMatrix.Inverted());
+
                 var moveVector = Vector3.Zero;
                 switch (manipulationType)
                 {
@@ -609,12 +612,16 @@ namespace Reclaimer.Controls
             Vector3 hit;
             if (currentViewport.UnProjectOnPlane(e.Position.ToVector2(), lastHitPosWS, normal, out hit))
             {
-                var position = this.translationVector + localCenterOffset;
+                var position = translationVector + localCenterOffset;
                 var v = Vector3.Normalize(currentHit - position);
                 var u = Vector3.Normalize(hit - position);
                 var currentAxis = Vector3.Cross(u, v);
                 var axis = Vector3.UnitX;
                 currentHit = hit;
+
+                if (LocalAxes)
+                    currentAxis = Vector3.TransformNormal(currentAxis, rotationMatrix.Inverted());
+
                 switch (manipulationType)
                 {
                     case ManipulationType.RotationX:
@@ -710,6 +717,10 @@ namespace Reclaimer.Controls
             {
                 var moveDir = hit - currentHit;
                 currentHit = hit;
+
+                if (LocalAxes)
+                    moveDir = Vector3.TransformNormal(moveDir, rotationMatrix.Inverted());
+
                 var scaleVector = Vector3.Zero;
                 float scale = 1;
                 switch (manipulationType)
