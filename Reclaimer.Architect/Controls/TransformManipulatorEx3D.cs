@@ -781,33 +781,40 @@ namespace Reclaimer.Controls
         /// <summary>
         /// Called when [target changed]. Use target boundingbox center as Manipulator center
         /// </summary>
-        /// <param name="target">The target.</param>
-        private void OnTargetChanged(Element3D target)
+        /// <param name="newTarget">The target.</param>
+        private void OnTargetChanged(Element3D newTarget)
         {
             Debug.WriteLine("OnTargetChanged");
-            //if(target != null)
-            //{
-            //    target.SceneNode.OnTransformChanged -= SceneNode_OnTransformChanged;
-            //}
-            this.target = target;
-            if (target == null)
+            if (target != null)
+                target.SceneNode.TransformChanged -= SceneNode_TransformChanged;
+            target = newTarget;
+            if (newTarget == null)
                 ResetTransforms();
             else
             {
-                //target.SceneNode.OnTransformChanged += SceneNode_OnTransformChanged;
-                SceneNode_OnTransformChanged(target.SceneNode, new TransformArgs(target.SceneNode.ModelMatrix));
+                target.SceneNode.TransformChanged += SceneNode_TransformChanged;
+                UpdateMatrixFromTarget();
             }
 
             UpdateVisibleGeometry();
         }
 
-        private void SceneNode_OnTransformChanged(object sender, TransformArgs e)
+        private void SceneNode_TransformChanged(object sender, TransformArgs e)
+        {
+            //only do this when the change came from an external source
+            if (isCaptured)
+                return;
+
+            UpdateMatrixFromTarget();
+        }
+
+        private void UpdateMatrixFromTarget()
         {
             Vector3 scale;
             Quaternion rotation;
             Vector3 translation;
 
-            var m = e.Transform;
+            var m = target.SceneNode.ModelMatrix;
             m.Decompose(out scale, out rotation, out translation);
             scaleMatrix = Matrix.Scaling(scale);
             rotationMatrix = Matrix.RotationQuaternion(rotation);
