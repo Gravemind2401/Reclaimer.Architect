@@ -839,7 +839,16 @@ namespace Reclaimer.Controls
             var scale = sizeScale;
             if (target != null && AutoSizeScale)
             {
-                var bounds = target.GetTotalBounds();
+                Vector3 targetScale;
+                Quaternion r;
+                Vector3 t;
+
+                target.TotalModelMatrix.Decompose(out targetScale, out r, out t);
+
+                //we want to transform the bounds with scale but not rotation
+                //otherwise diagonal rotations cause the box to get larger when the scale hasn't changed
+                var bounds = target.GetTotalBounds(true);
+                bounds = bounds.Transform(Matrix.Scaling(targetScale));
 
                 //minBound results in tiny manipulator for big thin things like walls
                 //var minBound = Math.Min(Math.Min(bounds.Width, bounds.Height), bounds.Depth);
