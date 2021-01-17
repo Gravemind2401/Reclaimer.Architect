@@ -60,6 +60,7 @@ namespace Reclaimer.Models.Ai
                     Name = str.StringIdValue;
                     break;
                 case FieldId.Position:
+                case FieldId.Rotation:
                     var multi = meta as MultiValue;
                     var vector = new RealVector3D(multi.Value1, multi.Value2, multi.Value3);
                     if (fieldId == FieldId.Position)

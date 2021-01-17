@@ -189,7 +189,7 @@ namespace Reclaimer.Controls
         }
 
         public static readonly DependencyProperty ManipulationFlagsProperty =
-            DependencyProperty.Register(nameof(ManipulationFlags), typeof(ManipulationFlags), typeof(TransformManipulatorEx3D), new PropertyMetadata(ManipulationFlags.ManipulateAll, (d, e) =>
+            DependencyProperty.Register(nameof(ManipulationFlags), typeof(ManipulationFlags), typeof(TransformManipulatorEx3D), new PropertyMetadata(ManipulationFlags.Default, (d, e) =>
             {
                 (d as TransformManipulatorEx3D).UpdateVisibleGeometry();
             }));
@@ -230,6 +230,16 @@ namespace Reclaimer.Controls
         private bool isCaptured = false;
         private double sizeScale = 1;
         private Color4 currentColor;
+
+        private Vector3 localCenterOffset
+        {
+            get
+            {
+                if ((Target as IManipulatable)?.UseLocalOrigin == true)
+                    return centerOffset - Target.GetTotalBounds(true).Center;
+                else return centerOffset;
+            }
+        }
         #endregion
 
         private enum ManipulationType
@@ -599,7 +609,7 @@ namespace Reclaimer.Controls
             Vector3 hit;
             if (currentViewport.UnProjectOnPlane(e.Position.ToVector2(), lastHitPosWS, normal, out hit))
             {
-                var position = this.translationVector + centerOffset;
+                var position = this.translationVector + localCenterOffset;
                 var v = Vector3.Normalize(currentHit - position);
                 var u = Vector3.Normalize(hit - position);
                 var currentAxis = Vector3.Cross(u, v);
@@ -790,9 +800,9 @@ namespace Reclaimer.Controls
             m.Decompose(out scale, out rotation, out translation);
             scaleMatrix = Matrix.Scaling(scale);
             rotationMatrix = Matrix.RotationQuaternion(rotation);
-            if (centerOffset != Vector3.Zero)
+            if (localCenterOffset != Vector3.Zero)
             {
-                var org = Matrix.Translation(-centerOffset) * scaleMatrix * rotationMatrix * Matrix.Translation(centerOffset);
+                var org = Matrix.Translation(-localCenterOffset) * scaleMatrix * rotationMatrix * Matrix.Translation(localCenterOffset);
                 translationVector = translation - org.TranslationVector;
             }
             else translationVector = m.TranslationVector;
@@ -806,7 +816,7 @@ namespace Reclaimer.Controls
             if (target == null)
                 return;
 
-            targetMatrix = Matrix.Translation(-centerOffset) * scaleMatrix * rotationMatrix * Matrix.Translation(centerOffset) * Matrix.Translation(translationVector);
+            targetMatrix = Matrix.Translation(-localCenterOffset) * scaleMatrix * rotationMatrix * Matrix.Translation(localCenterOffset) * Matrix.Translation(translationVector);
             target.Transform = new Media3D.MatrixTransform3D(targetMatrix.ToMatrix3D());
 
             if (LocalAxes)
@@ -819,14 +829,14 @@ namespace Reclaimer.Controls
             if (target != null && AutoSizeScale)
             {
                 var bounds = target.GetTotalBounds();
-                
+
                 //minBound results in tiny manipulator for big thin things like walls
                 //var minBound = Math.Min(Math.Min(bounds.Width, bounds.Height), bounds.Depth);
 
                 scale = Math.Max(0.35, bounds.Size.Length() * 0.25);
             }
 
-            var m = Matrix.Translation(centerOffset + translationVector);
+            var m = Matrix.Translation(localCenterOffset + translationVector);
             m.M11 = m.M22 = m.M33 = (float)scale;
 
             if (LocalAxes)

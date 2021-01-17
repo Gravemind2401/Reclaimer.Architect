@@ -19,7 +19,9 @@ namespace Reclaimer.Controls.Markers
             Children.Add(GetMeshGeometry());
         }
 
-        public virtual ManipulationFlags ManipulationFlags => ManipulationFlags.ManipulateAll;
+        public virtual ManipulationFlags ManipulationFlags => ManipulationFlags.Default;
+
+        public virtual bool UseLocalOrigin => true;
 
         protected abstract MeshGeometryModel3D GetMeshGeometry();
 

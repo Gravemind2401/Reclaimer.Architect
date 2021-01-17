@@ -99,7 +99,7 @@ namespace Reclaimer.Controls
             DependencyProperty.Register(nameof(ManipulationEnabled), typeof(bool), typeof(DXRenderer), new PropertyMetadata(false));
 
         public static readonly DependencyProperty ManipulationFlagsProperty =
-            DependencyProperty.Register(nameof(ManipulationFlags), typeof(ManipulationFlags), typeof(DXRenderer), new PropertyMetadata(ManipulationFlags.ManipulateAll, (d, e) =>
+            DependencyProperty.Register(nameof(ManipulationFlags), typeof(ManipulationFlags), typeof(DXRenderer), new PropertyMetadata(ManipulationFlags.Default, (d, e) =>
             {
                 var c = (d as DXRenderer);
                 c.manipulator.ManipulationFlags = c.ManipulationFlags;

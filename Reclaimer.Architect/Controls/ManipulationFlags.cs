@@ -36,6 +36,6 @@ namespace Reclaimer.Controls
         ScaleYZ = ScaleY | ScaleZ,
         Scale = ScaleX | ScaleY | ScaleZ,
 
-        ManipulateAll = Translate | Rotate | Scale
+        Default = Translate | Rotate | Scale
     }
 }
