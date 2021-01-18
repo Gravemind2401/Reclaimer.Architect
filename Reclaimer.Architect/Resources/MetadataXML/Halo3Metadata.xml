@@ -1,4 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--derived from https://github.com/XboxChaos/Assembly/blob/dev/src/Assembly/Plugins/Halo3/scnr.xml-->
 <plugin game="Halo3" baseSize="0x7B8">
   <tagblock name="Structure BSPs" offset="0x14" elementSize="0x6C"/>
   <tagblock name="Sky References" offset="0x30" elementSize="0x14"/>

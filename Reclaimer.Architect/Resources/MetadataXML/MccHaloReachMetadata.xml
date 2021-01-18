@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--derived from https://github.com/XboxChaos/Assembly/blob/dev/src/Assembly/Plugins/ReachMCC/scnr.xml-->
 <plugin game="ReachMCC" baseSize="0x884">
   <tagblock name="Structure BSPs" offset="0x4C" elementSize="0xAC"/>
   <tagblock name="Structure Design" offset="0x58" elementSize="0x20"/>

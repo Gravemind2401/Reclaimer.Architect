@@ -1,4 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
+<!--derived from https://github.com/XboxChaos/Assembly/blob/dev/src/Assembly/Plugins/ODSTMCC/scnr.xml-->
 <scenario>
   <section name="mission">
     <enum8 name="Map Type" offset="0x0" visible="true">

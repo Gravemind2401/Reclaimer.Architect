@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--derived from https://github.com/XboxChaos/Assembly/blob/dev/src/Assembly/Plugins/ODST/scnr.xml-->
 <plugin game="ODST" baseSize="0x834">
   <tagblock name="Structure BSPs" offset="0x14" elementSize="0x6C"/>
   <tagblock name="Sky References" offset="0x4C" elementSize="0x14"/>
