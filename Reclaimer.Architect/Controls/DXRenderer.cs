@@ -400,7 +400,7 @@ namespace Reclaimer.Controls
             if (Viewport == null)
                 return;
 
-            var bounds = Viewport.Items.GetTotalBounds();
+            var bounds = children.GetTotalBounds();
 
             Viewport.FixedRotationPoint = bounds.Center.ToPoint3D();
             (Viewport.Camera as Helix.PerspectiveCamera).FarPlaneDistance = bounds.Size.Length() * 2;
