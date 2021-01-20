@@ -105,6 +105,7 @@ namespace Reclaimer.Controls
 
         private bool isReady;
         private ScenarioModel scenario;
+        private TreeItemModel volumesNode;
 
         public TabModel TabModel { get; }
         public ObservableCollection<TreeItemModel> TreeViewItems { get; }
@@ -147,6 +148,11 @@ namespace Reclaimer.Controls
             sceneManager.PaletteHolders[PaletteType.Decal].GroupElement.IsRendering = node.NodeType == NodeType.Decals;
             sceneManager.StartPositionGroup.IsRendering = node.NodeType == NodeType.StartPositions;
             sceneManager.TriggerVolumeGroup.IsRendering = node.NodeType == NodeType.TriggerVolumes;
+
+            if (node.NodeType == NodeType.TriggerVolumes && !TreeViewItems.Contains(volumesNode))
+                TreeViewItems.Add(volumesNode);
+            else if (node.NodeType != NodeType.TriggerVolumes && TreeViewItems.Contains(volumesNode))
+                TreeViewItems.Remove(volumesNode);
 
             foreach (var pair in sceneManager.AiFiringPositionGroups)
                 pair.Value.IsRendering = node.NodeType == NodeType.AiFiringPositions && pair.Key == node.Tag;
@@ -200,6 +206,8 @@ namespace Reclaimer.Controls
                 var selected = sceneManager.TriggerVolumes[itemIndex];
                 selected.DiffuseColor = TriggerVolume.SelectedColour;
                 selected.Tag = true;
+
+                RefreshTriggerVolumes(itemIndex);
             }
             else if (node.NodeType == NodeType.AiFiringPositions)
             {
@@ -247,7 +255,7 @@ namespace Reclaimer.Controls
             else if (node.NodeType == NodeType.TriggerVolumes)
             {
                 var obj = sceneManager.TriggerVolumes[index];
-                renderer.ZoomToBounds(new SharpDX.BoundingBox(obj.Position, obj.Position + obj.Size), 500);
+                renderer.ZoomToBounds(obj.GetTotalBounds(), 500);
             }
             else if (node.NodeType == NodeType.AiFiringPositions)
             {
@@ -347,111 +355,132 @@ namespace Reclaimer.Controls
 
                 Dispatcher.Invoke(() =>
                 {
-                    sceneManager.RenderScenario();
-
-                    foreach (var instance in sceneManager.BspHolder.Elements)
-                    {
-                        instance.IsHitTestVisible = false;
-                        modelGroup.Children.Add(instance);
-                    }
-
-                    foreach (var instance in sceneManager.SkyHolder.Elements)
-                    {
-                        instance.IsHitTestVisible = false;
-                        modelGroup.Children.Add(instance);
-                    }
-
-                    foreach (var holder in sceneManager.PaletteHolders.Values)
-                    {
-                        holder.GroupElement.IsHitTestVisible = false;
-                        modelGroup.Children.Add(holder.GroupElement);
-                    }
-
-                    renderer.ScaleToContent();
-                    var elements = sceneManager.BspHolder.Elements.Where(i => i != null);
-
-                    if (elements.Any())
-                    {
-                        var bounds = elements.GetTotalBounds();
-                        renderer.CameraSpeed = Math.Ceiling(bounds.Size.Length());
-                        renderer.ZoomToBounds(bounds);
-                    }
-
-                    sceneManager.PaletteHolders[PaletteType.Decal].GroupElement.IsRendering = false;
-                    sceneManager.StartPositionGroup.IsRendering = false;
-                    sceneManager.TriggerVolumeGroup.IsRendering = false;
-
-                    modelGroup.Children.Add(sceneManager.StartPositionGroup);
-                    modelGroup.Children.Add(sceneManager.TriggerVolumeGroup);
-
-                    foreach (var group in sceneManager.AiAreaGroups.Values
-                        .Concat(sceneManager.AiFiringPositionGroups.Values)
-                        .Concat(sceneManager.AiStartLocationGroups.Values)
-                        .Concat(sceneManager.AiGroupStartLocationGroups.Values)
-                        .Concat(sceneManager.AiSoloStartLocationGroups.Values))
-                    {
-                        group.IsRendering = false;
-                        modelGroup.Children.Add(group);
-                    }
-
-                    modelGroup.Visibility = Visibility.Visible;
-
-                    #region Generate Tree Nodes
-                    var bspNode = new TreeItemModel { Header = sceneManager.BspHolder.Name, IsChecked = true };
-                    for (int i = 0; i < sceneManager.BspHolder.Elements.Count; i++)
-                    {
-                        var bsp = sceneManager.BspHolder.Elements[i];
-                        var tag = scenario.Bsps[i].Tag;
-                        if (bsp == null)
-                            continue;
-
-                        var permNode = new TreeItemModel { Header = tag?.FileName() ?? "<null>", IsChecked = true, Tag = bsp };
-                        bspNode.Items.Add(permNode);
-                    }
-
-                    if (bspNode.HasItems)
-                        TreeViewItems.Add(bspNode);
-
-                    var skyNode = new TreeItemModel { Header = sceneManager.SkyHolder.Name, IsChecked = true };
-                    for (int i = 0; i < sceneManager.SkyHolder.Elements.Count; i++)
-                    {
-                        var sky = sceneManager.SkyHolder.Elements[i];
-                        var tag = scenario.Skies[i].Tag;
-                        if (sky == null)
-                            continue;
-
-                        var permNode = new TreeItemModel { Header = tag?.FileName() ?? "<null>", IsChecked = true, Tag = sky };
-                        skyNode.Items.Add(permNode);
-                    }
-
-                    if (skyNode.HasItems)
-                        TreeViewItems.Add(skyNode);
-
-                    foreach (var holder in sceneManager.PaletteHolders.Values)
-                    {
-                        if (holder.Name == PaletteType.Decal)
-                            continue;
-
-                        var paletteNode = new TreeItemModel { Header = holder.Name, IsChecked = true };
-
-                        for (int i = 0; i < holder.Elements.Count; i++)
-                        {
-                            var info = holder.GetInfoForIndex(i);
-
-                            var permNode = info.TreeItem = new TreeItemModel { Header = info.Placement.GetDisplayName(), IsChecked = true, Tag = info.Element };
-                            paletteNode.Items.Add(permNode);
-                        }
-
-                        if (paletteNode.HasItems)
-                            TreeViewItems.Add(paletteNode);
-                    }
-                    #endregion
+                    PostLoadScenario();
 
                     isReady = true;
                     IsEnabled = true;
                     spinner.Visibility = Visibility.Collapsed;
                 });
             });
+        }
+
+        private void PostLoadScenario()
+        {
+            sceneManager.RenderScenario();
+
+            foreach (var instance in sceneManager.BspHolder.Elements)
+            {
+                instance.IsHitTestVisible = false;
+                modelGroup.Children.Add(instance);
+            }
+
+            foreach (var instance in sceneManager.SkyHolder.Elements)
+            {
+                instance.IsHitTestVisible = false;
+                modelGroup.Children.Add(instance);
+            }
+
+            foreach (var holder in sceneManager.PaletteHolders.Values)
+            {
+                holder.GroupElement.IsHitTestVisible = false;
+                modelGroup.Children.Add(holder.GroupElement);
+            }
+
+            renderer.ScaleToContent();
+            var elements = sceneManager.BspHolder.Elements.Where(i => i != null);
+
+            if (elements.Any())
+            {
+                var bounds = elements.GetTotalBounds();
+                renderer.CameraSpeed = Math.Ceiling(bounds.Size.Length());
+                renderer.ZoomToBounds(bounds);
+            }
+
+            sceneManager.PaletteHolders[PaletteType.Decal].GroupElement.IsRendering = false;
+            sceneManager.StartPositionGroup.IsRendering = false;
+            sceneManager.TriggerVolumeGroup.IsRendering = false;
+
+            modelGroup.Children.Add(sceneManager.StartPositionGroup);
+            modelGroup.Children.Add(sceneManager.TriggerVolumeGroup);
+
+            foreach (var group in sceneManager.AiAreaGroups.Values
+                .Concat(sceneManager.AiFiringPositionGroups.Values)
+                .Concat(sceneManager.AiStartLocationGroups.Values)
+                .Concat(sceneManager.AiGroupStartLocationGroups.Values)
+                .Concat(sceneManager.AiSoloStartLocationGroups.Values))
+            {
+                group.IsRendering = false;
+                modelGroup.Children.Add(group);
+            }
+
+            modelGroup.Visibility = Visibility.Visible;
+
+            #region Generate Tree Nodes
+            var bspNode = new TreeItemModel { Header = sceneManager.BspHolder.Name, IsChecked = true };
+            for (int i = 0; i < sceneManager.BspHolder.Elements.Count; i++)
+            {
+                var bsp = sceneManager.BspHolder.Elements[i];
+                var tag = scenario.Bsps[i].Tag;
+                if (bsp == null)
+                    continue;
+
+                var permNode = new TreeItemModel { Header = tag?.FileName() ?? "<null>", IsChecked = true, Tag = bsp };
+                bspNode.Items.Add(permNode);
+            }
+
+            if (bspNode.HasItems)
+                TreeViewItems.Add(bspNode);
+
+            var skyNode = new TreeItemModel { Header = sceneManager.SkyHolder.Name, IsChecked = true };
+            for (int i = 0; i < sceneManager.SkyHolder.Elements.Count; i++)
+            {
+                var sky = sceneManager.SkyHolder.Elements[i];
+                var tag = scenario.Skies[i].Tag;
+                if (sky == null)
+                    continue;
+
+                var permNode = new TreeItemModel { Header = tag?.FileName() ?? "<null>", IsChecked = true, Tag = sky };
+                skyNode.Items.Add(permNode);
+            }
+
+            if (skyNode.HasItems)
+                TreeViewItems.Add(skyNode);
+
+            foreach (var holder in sceneManager.PaletteHolders.Values)
+            {
+                if (holder.Name == PaletteType.Decal)
+                    continue;
+
+                var paletteNode = new TreeItemModel { Header = holder.Name, IsChecked = true };
+
+                for (int i = 0; i < holder.Elements.Count; i++)
+                {
+                    var info = holder.GetInfoForIndex(i);
+
+                    var permNode = info.TreeItem = new TreeItemModel { Header = info.Placement.GetDisplayName(), IsChecked = true, Tag = info.Element };
+                    paletteNode.Items.Add(permNode);
+                }
+
+                if (paletteNode.HasItems)
+                    TreeViewItems.Add(paletteNode);
+            }
+
+            volumesNode = new TreeItemModel { Header = "trigger volumes", IsChecked = true };
+            foreach (var tv in sceneManager.TriggerVolumes)
+            {
+                var permNode = new TreeItemModel { Header = (tv.DataContext as TriggerVolume).Name, IsChecked = true, Tag = tv };
+                volumesNode.Items.Add(permNode);
+            }
+            #endregion
+        }
+
+        private void RefreshTriggerVolumes(int selectedIndex)
+        {
+            for (int i = 0; i < volumesNode.Items.Count; i++)
+            {
+                var node = volumesNode.Items[i];
+                (node.Tag as IMeshNode).SetVisibility(node.IsChecked == true || i == selectedIndex);
+            }
         }
 
         #region Treeview Events
@@ -475,6 +504,9 @@ namespace Reclaimer.Controls
             isWorking = true;
             SetState((e.OriginalSource as FrameworkElement).DataContext as TreeItemModel, true);
             isWorking = false;
+
+            if (scenario.SelectedNodeType == NodeType.TriggerVolumes)
+                RefreshTriggerVolumes(scenario.SelectedItemIndex);
         }
 
         private void SetState(TreeItemModel item, bool updateRender)

@@ -14,11 +14,13 @@ using Media3D = System.Windows.Media.Media3D;
 using HelixToolkit.Wpf.SharpDX;
 using HelixToolkit.Wpf.SharpDX.Model.Scene;
 using HelixToolkit.Wpf.SharpDX.Utilities;
+using Reclaimer.Utilities;
 
 namespace Reclaimer.Controls
 {
-    public class BoxManipulator3D : GroupElement3D
+    public class BoxManipulator3D : GroupElement3D, IMeshNode
     {
+        #region Dependency Properties
         public static readonly DependencyProperty PositionProperty =
             DependencyProperty.Register(nameof(Position), typeof(Vector3), typeof(BoxManipulator3D), new PropertyMetadata(Vector3.Zero, (d, e) =>
             {
@@ -56,6 +58,7 @@ namespace Reclaimer.Controls
             get { return (Color)GetValue(DiffuseColorProperty); }
             set { SetValue(DiffuseColorProperty, value); }
         }
+        #endregion
 
         private readonly MeshGeometryModel3D negX, negY, negZ;
         private readonly MeshGeometryModel3D posX, posY, posZ;
@@ -265,5 +268,20 @@ namespace Reclaimer.Controls
             m *= Matrix.Translation(Position);
             facesGroup.Transform = new Media3D.MatrixTransform3D(m.ToMatrix3D());
         }
+
+        #region IMeshNode
+        string IMeshNode.Name => Name;
+
+        bool IMeshNode.IsVisible
+        {
+            get { return IsRendering; }
+            set { IsRendering = value; }
+        }
+
+        BoundingBox IMeshNode.GetNodeBounds()
+        {
+            return this.GetTotalBounds();
+        } 
+        #endregion
     }
 }
