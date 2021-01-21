@@ -137,6 +137,11 @@ namespace Reclaimer.Controls
             }
         }
 
+        protected override SceneNode OnCreateSceneNode()
+        {
+            return new ViewDistanceGroupNode(this);
+        }
+
         #region IMeshNode
 
         string IMeshNode.Name => ModelName;

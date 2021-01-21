@@ -221,6 +221,7 @@
     </Compile>
     <Compile Include="Utilities\MatrixTransformConverter.cs" />
     <Compile Include="Utilities\EulerTransformConverter.cs" />
+    <Compile Include="Utilities\ViewDistanceGroupNode.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

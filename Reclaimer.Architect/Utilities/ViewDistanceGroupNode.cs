@@ -1,0 +1,73 @@
+﻿using HelixToolkit.Wpf.SharpDX;
+using HelixToolkit.Wpf.SharpDX.Model.Scene;
+using SharpDX;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Reclaimer.Utilities
+{
+    public sealed class ViewDistanceGroupNode : GroupNode
+    {
+        private readonly Element3D element;
+
+        private bool isDormant;
+        private BoundingBox originalBounds;
+
+        public ViewDistanceGroupNode(Element3D element)
+        {
+            this.element = element;
+        }
+
+        private void ScanAncestors()
+        {
+            //if one of the ancestors is already a ViewDistanceGroupNode
+            //then this node should act like a regular GroupNode
+            //so it does not interfere with the ancestor
+
+            isDormant = false;
+            var ancestor = Parent;
+            while (ancestor != null)
+            {
+                if (ancestor is ViewDistanceGroupNode)
+                {
+                    isDormant = true;
+                    return;
+                }
+                else ancestor = ancestor.Parent;
+            }
+        }
+
+        protected override void OnAttached()
+        {
+            base.OnAttached();
+
+            isDormant = true;
+            //ScanAncestors();
+            //originalBounds = element.GetTotalBounds(true);
+        }
+
+        protected override bool CanRender(RenderContext context)
+        {
+            var baseValue = base.CanRender(context);
+            if (isDormant || !baseValue)
+                return baseValue;
+
+            var bounds = originalBounds.Transform(element.Transform.ToMatrix());
+            var camPos = context.Camera.Position;
+            if (bounds.Contains(ref camPos) == ContainmentType.Contains)
+                return true;
+
+            var radius = bounds.Size.Length() / 2;
+            var length = (bounds.Center - camPos).Length();
+            var angle = MathUtil.RadiansToDegrees((float)Math.Atan2(radius, length));
+
+            if (angle > 0.50)
+                return true;
+
+            return false;
+        }
+    }
+}
