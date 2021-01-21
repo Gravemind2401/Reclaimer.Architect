@@ -2847,12 +2847,8 @@
     <stringid name="Node Name" offset="0x8" visible="true" />
     <int16 name="Unknown" offset="0xC" visible="false" />
     <int16 name="Unknown" offset="0xE" visible="false" />
-    <float32 name="Unknown" offset="0x10" visible="false" />
-    <float32 name="Unknown" offset="0x14" visible="false" />
-    <float32 name="Unknown" offset="0x18" visible="false" />
-    <float32 name="Unknown" offset="0x1C" visible="false" />
-    <float32 name="Unknown" offset="0x20" visible="false" />
-    <float32 name="Unknown" offset="0x24" visible="false" />
+    <vector3 name="Forward Vector" offset="0x10" visible="true" id="forwardvector" />
+    <vector3 name="Up Vector" offset="0x1C" visible="true" id="upvector" />
     <point3 name="Position" offset="0x28" visible="true" id="position" />
     <vector3 name="Size" offset="0x34" visible="true" id="size" />
     <float32 name="Unknown" offset="0x40" visible="false" />

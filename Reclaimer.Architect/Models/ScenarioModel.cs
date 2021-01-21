@@ -569,6 +569,8 @@ namespace Reclaimer.Models
         {
             var section = Sections[Section.TriggerVolumes];
             var name = OffsetById(section.Node, FieldId.Name);
+            var forward = OffsetById(section.Node, FieldId.ForwardVector);
+            var up = OffsetById(section.Node, FieldId.UpVector);
             var position = OffsetById(section.Node, FieldId.Position);
             var size = OffsetById(section.Node, FieldId.Size);
 
@@ -579,6 +581,12 @@ namespace Reclaimer.Models
 
                 reader.Seek(baseAddress + name, SeekOrigin.Begin);
                 volume.Name = reader.ReadObject<StringId>();
+
+                reader.Seek(baseAddress + forward, SeekOrigin.Begin);
+                volume.ForwardVector = reader.ReadObject<RealVector3D>();
+
+                reader.Seek(baseAddress + up, SeekOrigin.Begin);
+                volume.UpVector = reader.ReadObject<RealVector3D>();
 
                 reader.Seek(baseAddress + position, SeekOrigin.Begin);
                 volume.Position = reader.ReadObject<RealVector3D>();

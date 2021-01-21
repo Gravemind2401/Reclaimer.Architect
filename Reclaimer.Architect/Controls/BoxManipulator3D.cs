@@ -21,6 +21,18 @@ namespace Reclaimer.Controls
     public class BoxManipulator3D : GroupElement3D, IMeshNode
     {
         #region Dependency Properties
+        public static readonly DependencyProperty ForwardVectorProperty =
+            DependencyProperty.Register(nameof(ForwardVector), typeof(Vector3), typeof(BoxManipulator3D), new PropertyMetadata(Vector3.UnitX, (d, e) =>
+            {
+                (d as BoxManipulator3D).UpdateTransform();
+            }));
+
+        public static readonly DependencyProperty UpVectorProperty =
+            DependencyProperty.Register(nameof(UpVector), typeof(Vector3), typeof(BoxManipulator3D), new PropertyMetadata(Vector3.UnitZ, (d, e) =>
+            {
+                (d as BoxManipulator3D).UpdateTransform();
+            }));
+
         public static readonly DependencyProperty PositionProperty =
             DependencyProperty.Register(nameof(Position), typeof(Vector3), typeof(BoxManipulator3D), new PropertyMetadata(Vector3.Zero, (d, e) =>
             {
@@ -38,6 +50,20 @@ namespace Reclaimer.Controls
             {
                 (d as BoxManipulator3D).OnDiffuseColorChanged();
             }));
+
+        [TypeConverter(typeof(Vector3Converter))]
+        public Vector3 ForwardVector
+        {
+            get { return (Vector3)GetValue(ForwardVectorProperty); }
+            set { SetValue(ForwardVectorProperty, value); }
+        }
+
+        [TypeConverter(typeof(Vector3Converter))]
+        public Vector3 UpVector
+        {
+            get { return (Vector3)GetValue(UpVectorProperty); }
+            set { SetValue(UpVectorProperty, value); }
+        }
 
         [TypeConverter(typeof(Vector3Converter))]
         public Vector3 Position

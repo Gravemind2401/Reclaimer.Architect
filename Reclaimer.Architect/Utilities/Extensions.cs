@@ -194,14 +194,24 @@ namespace Reclaimer.Utilities
 
         public static SharpDX.BoundingBox GetTotalBounds(this Helix.Element3D element, bool original = false)
         {
-            return GetTotalBounds(Enumerable.Repeat(element, 1), original);
+            return GetTotalBounds(Enumerable.Repeat(element.SceneNode, 1), original);
         }
 
         public static SharpDX.BoundingBox GetTotalBounds(this IEnumerable<Helix.Element3D> elements, bool original = false)
         {
+            return GetTotalBounds(elements.Select(e => e.SceneNode), original);
+        }
+
+        public static SharpDX.BoundingBox GetTotalBounds(this Helix.Model.Scene.SceneNode node, bool original = false)
+        {
+            return GetTotalBounds(Enumerable.Repeat(node, 1), original);
+        }
+
+        public static SharpDX.BoundingBox GetTotalBounds(this IEnumerable<Helix.Model.Scene.SceneNode> nodes, bool original = false)
+        {
             var boundsList = new List<SharpDX.BoundingBox>();
-            foreach (var element in elements)
-                CollectChildBounds(element.SceneNode, boundsList, original);
+            foreach (var node in nodes)
+                CollectChildBounds(node, boundsList, original);
 
             return boundsList.GetTotalBounds();
         }

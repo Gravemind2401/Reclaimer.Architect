@@ -343,6 +343,10 @@ namespace Reclaimer.Geometry
         private void BindTriggerVolume(TriggerVolume vol, BoxManipulator3D box)
         {
             box.DataContext = vol;
+            BindingOperations.SetBinding(box, BoxManipulator3D.ForwardVectorProperty,
+                new Binding(nameof(TriggerVolume.ForwardVector)) { Mode = BindingMode.TwoWay, Converter = SharpDXVectorConverter.Instance });
+            BindingOperations.SetBinding(box, BoxManipulator3D.UpVectorProperty,
+                new Binding(nameof(TriggerVolume.UpVector)) { Mode = BindingMode.TwoWay, Converter = SharpDXVectorConverter.Instance });
             BindingOperations.SetBinding(box, BoxManipulator3D.PositionProperty,
                 new Binding(nameof(TriggerVolume.Position)) { Mode = BindingMode.TwoWay, Converter = SharpDXVectorConverter.Instance });
             BindingOperations.SetBinding(box, BoxManipulator3D.SizeProperty,

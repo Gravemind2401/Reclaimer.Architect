@@ -26,6 +26,20 @@ namespace Reclaimer.Models
             set { SetProperty(ref name, value, FieldId.Name); }
         }
 
+        private RealVector3D forwardVector;
+        public RealVector3D ForwardVector
+        {
+            get { return forwardVector; }
+            set { SetProperty(ref forwardVector, value, FieldId.ForwardVector); }
+        }
+
+        private RealVector3D upVector;
+        public RealVector3D UpVector
+        {
+            get { return upVector; }
+            set { SetProperty(ref upVector, value, FieldId.UpVector); }
+        }
+
         private RealVector3D size;
         public RealVector3D Size
         {
@@ -50,15 +64,22 @@ namespace Reclaimer.Models
 
         public override void UpdateFromMetaValue(MetaValueBase meta, string fieldId)
         {
+            var multi = meta as MultiValue;
+            var vector = new RealVector3D(multi.Value1, multi.Value2, multi.Value3);
+
             switch (fieldId)
             {
+                case FieldId.ForwardVector:
+                    ForwardVector = vector;
+                    break;
+                case FieldId.UpVector:
+                    UpVector = vector;
+                    break;
                 case FieldId.Position:
+                    Position = vector;
+                    break;
                 case FieldId.Size:
-                    var multi = meta as MultiValue;
-                    var vector = new RealVector3D(multi.Value1, multi.Value2, multi.Value3);
-                    if (fieldId == FieldId.Position)
-                        Position = vector;
-                    else Size = vector;
+                    Size = vector;
                     break;
             }
         }

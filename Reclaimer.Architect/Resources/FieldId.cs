@@ -16,6 +16,8 @@ namespace Reclaimer.Resources
         public const string Position = "position";
         public const string Rotation = "rotation";
         public const string QRotation = "qrotation";
+        public const string ForwardVector = "forwardvector";
+        public const string UpVector = "upvector";
         public const string Scale = "scale";
         public const string Size = "size";
         public const string TagReference = "tagreference";
