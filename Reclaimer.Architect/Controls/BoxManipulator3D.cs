@@ -247,33 +247,47 @@ namespace Reclaimer.Controls
             Vector3 hit;
             if (currentViewport.UnProjectOnPlane(e.Position.ToVector2(), lastHitPosWS, normal, out hit))
             {
+                var rotationMatrix = GetRotationMatrix();
+
                 var moveDir = hit - currentHit;
                 currentHit = hit;
 
+                moveDir = Vector3.TransformNormal(moveDir, rotationMatrix.Inverted());
+
+                var sizeDir = Vector3.Zero;
                 switch (manipulationType)
                 {
                     case ManipulationType.PosX:
-                        Position += new Vector3(moveDir.X, 0, 0);
-                        Size -= new Vector3(moveDir.X, 0, 0);
+                        moveDir = new Vector3(moveDir.X, 0, 0);
+                        sizeDir -= moveDir;
                         break;
                     case ManipulationType.PosY:
-                        Position += new Vector3(0, moveDir.Y, 0);
-                        Size -= new Vector3(0, moveDir.Y, 0);
+                        moveDir = new Vector3(0, moveDir.Y, 0);
+                        sizeDir -= moveDir;
                         break;
                     case ManipulationType.PosZ:
-                        Position += new Vector3(0, 0, moveDir.Z);
-                        Size -= new Vector3(0, 0, moveDir.Z);
+                        moveDir = new Vector3(0, 0, moveDir.Z);
+                        sizeDir -= moveDir;
                         break;
                     case ManipulationType.SizeX:
-                        Size += new Vector3(moveDir.X, 0, 0);
+                        sizeDir = new Vector3(moveDir.X, 0, 0);
+                        moveDir = Vector3.Zero;
                         break;
                     case ManipulationType.SizeY:
-                        Size += new Vector3(0, moveDir.Y, 0);
+                        sizeDir = new Vector3(0, moveDir.Y, 0);
+                        moveDir = Vector3.Zero;
                         break;
                     case ManipulationType.SizeZ:
-                        Size += new Vector3(0, 0, moveDir.Z);
+                        sizeDir = new Vector3(0, 0, moveDir.Z);
+                        moveDir = Vector3.Zero;
                         break;
                 }
+
+                moveDir = Vector3.TransformNormal(moveDir, rotationMatrix);
+                //dont re-transform sizeDir as it should always be axis aligned
+
+                Position += moveDir;
+                Size += sizeDir;
             }
         }
 
@@ -288,9 +302,23 @@ namespace Reclaimer.Controls
             isCaptured = false;
         }
 
+        private Matrix GetRotationMatrix()
+        {
+            var rightVector = Vector3.Cross(ForwardVector, UpVector);
+
+            var yaw = Vector3.UnitX.AngleBetween(ForwardVector);
+            if (ForwardVector.Y < 0) yaw *= -1;
+
+            var pitch = Vector3.UnitZ.AngleBetween(UpVector);
+            if (ForwardVector.X > 0) pitch *= -1;
+
+            return Matrix.RotationZ(yaw) * Matrix.RotationAxis(rightVector, pitch);
+        }
+
         private void UpdateTransform()
         {
             var m = Matrix.Scaling(Size);
+            m *= GetRotationMatrix();
             m *= Matrix.Translation(Position);
             facesGroup.Transform = new Media3D.MatrixTransform3D(m.ToMatrix3D());
         }

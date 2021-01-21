@@ -353,7 +353,7 @@ namespace Reclaimer.Controls
                 .Where(i => i != null)
                 .FirstOrDefault() as Helix.GroupElement3D;
 
-            if (targeted != null && targeted == selector.Target)
+            if (targeted is BoxManipulator3D || (targeted != null && targeted == selector.Target))
                 return;
 
             highlighter.Target = targeted;
@@ -376,7 +376,7 @@ namespace Reclaimer.Controls
                 return;
             else model = model?.FindInstanceParent();
 
-            if (model == selector.Target)
+            if (model is BoxManipulator3D || model == selector.Target)
                 return;
 
             if (model != null)
@@ -403,7 +403,7 @@ namespace Reclaimer.Controls
             var bounds = children.GetTotalBounds();
 
             Viewport.FixedRotationPoint = bounds.Center.ToPoint3D();
-            (Viewport.Camera as Helix.PerspectiveCamera).FarPlaneDistance = bounds.Size.Length() * 2;
+            (Viewport.Camera as Helix.PerspectiveCamera).FarPlaneDistance = Math.Max(50f, bounds.Size.Length() * 2);
             (Viewport.Camera as Helix.PerspectiveCamera).NearPlaneDistance = 0.01;
 
             ZoomToBounds(bounds);
