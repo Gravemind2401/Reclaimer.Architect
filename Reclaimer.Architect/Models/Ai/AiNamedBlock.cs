@@ -14,6 +14,8 @@ namespace Reclaimer.Models.Ai
         internal BlockReference BlockReference { get; }
         internal int BlockIndex { get; }
 
+        internal long BlockStartAddress => BlockReference.TagBlock.Pointer.Address + BlockIndex * BlockReference.BlockSize;
+
         private string name;
         public string Name
         {

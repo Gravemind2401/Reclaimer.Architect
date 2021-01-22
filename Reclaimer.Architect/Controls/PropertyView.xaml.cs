@@ -166,8 +166,7 @@ namespace Reclaimer.Controls
                     var group = scenario.SquadHierarchy.SquadGroups[itemIndex];
 
                     rootNode = scenario.SquadHierarchy.AiNodes[AiSection.SquadGroups];
-                    baseAddress = group.BlockReference.TagBlock.Pointer.Address
-                        + group.BlockIndex * group.BlockReference.BlockSize;
+                    baseAddress = group.BlockStartAddress;
 
                     altNodes.Add(Tuple.Create(scenario.SquadHierarchy.AiNodes[AiSection.SquadGroups], scenario.RootAddress));
 
@@ -181,8 +180,7 @@ namespace Reclaimer.Controls
                         : scenario.SelectedNode.Tag as AiZone;
 
                     rootNode = scenario.SquadHierarchy.AiNodes[AiSection.Zones];
-                    baseAddress = zone.BlockReference.TagBlock.Pointer.Address
-                        + zone.BlockIndex * zone.BlockReference.BlockSize;
+                    baseAddress = zone.BlockStartAddress;
 
                     CurrentItem = zone;
                     LoadData();
@@ -195,8 +193,7 @@ namespace Reclaimer.Controls
                     baseAddress = fpos.BlockReference.TagBlock.Pointer.Address
                         + fpos.BlockIndex * fpos.BlockReference.BlockSize;
 
-                    var zoneAddress = fpos.Zone.BlockReference.TagBlock.Pointer.Address;
-                    altNodes.Add(Tuple.Create(scenario.SquadHierarchy.AiNodes[AiSection.Areas], zoneAddress));
+                    altNodes.Add(Tuple.Create(scenario.SquadHierarchy.AiNodes[AiSection.Areas], fpos.Zone.BlockStartAddress));
 
                     CurrentItem = fpos;
                     LoadData();
@@ -214,34 +211,32 @@ namespace Reclaimer.Controls
                 }
                 else if ((nodeType == NodeType.AiSquadItem && scenario.SelectedNode.Tag is AiSquad) || (nodeType == NodeType.AiSquads && itemIndex >= 0))
                 {
-                    var enc = nodeType == NodeType.AiSquads
+                    var squad = nodeType == NodeType.AiSquads
                         ? (scenario.SelectedNode.Parent.Tag as AiZone).Squads[itemIndex]
                         : scenario.SelectedNode.Tag as AiSquad;
 
                     rootNode = scenario.SquadHierarchy.AiNodes[AiSection.Squads];
-                    baseAddress = enc.BlockReference.TagBlock.Pointer.Address
-                        + enc.BlockIndex * enc.BlockReference.BlockSize;
+                    baseAddress = squad.BlockStartAddress;
 
                     altNodes.Add(Tuple.Create(scenario.SquadHierarchy.AiNodes[AiSection.SquadGroups], scenario.RootAddress));
                     altNodes.Add(Tuple.Create(scenario.SquadHierarchy.AiNodes[AiSection.Zones], scenario.RootAddress));
 
-                    CurrentItem = enc;
+                    CurrentItem = squad;
                     LoadData();
                 }
                 else if ((nodeType == NodeType.AiEncounterItem && scenario.SelectedNode.Tag is AiEncounter) || (nodeType == NodeType.AiEncounters && itemIndex >= 0))
                 {
-                    var squad = nodeType == NodeType.AiEncounters
+                    var enc = nodeType == NodeType.AiEncounters
                         ? (scenario.SelectedNode.Parent.Tag as AiSquad).Encounters[itemIndex]
                         : scenario.SelectedNode.Tag as AiEncounter;
 
                     rootNode = scenario.SquadHierarchy.AiNodes[AiSection.Encounters];
-                    baseAddress = squad.BlockReference.TagBlock.Pointer.Address
-                        + squad.BlockIndex * squad.BlockReference.BlockSize;
+                    baseAddress = enc.BlockStartAddress;
 
                     foreach (var palette in scenario.Palettes.Values)
                         altNodes.Add(Tuple.Create(palette.PaletteNode, scenario.RootAddress));
 
-                    CurrentItem = squad;
+                    CurrentItem = enc;
                     LoadData();
                 }
                 else if ((nodeType == NodeType.AiStartingLocations
