@@ -368,13 +368,13 @@ namespace Reclaimer.Controls
         {
             sceneManager.RenderScenario();
 
-            foreach (var instance in sceneManager.BspHolder.Elements)
+            foreach (var instance in sceneManager.BspHolder.Elements.WhereNotNull())
             {
                 instance.IsHitTestVisible = false;
                 modelGroup.Children.Add(instance);
             }
 
-            foreach (var instance in sceneManager.SkyHolder.Elements)
+            foreach (var instance in sceneManager.SkyHolder.Elements.WhereNotNull())
             {
                 instance.IsHitTestVisible = false;
                 modelGroup.Children.Add(instance);
@@ -387,7 +387,7 @@ namespace Reclaimer.Controls
             }
 
             renderer.ScaleToContent();
-            var elements = sceneManager.BspHolder.Elements.Where(i => i != null);
+            var elements = sceneManager.BspHolder.Elements.WhereNotNull();
 
             if (elements.Any())
             {

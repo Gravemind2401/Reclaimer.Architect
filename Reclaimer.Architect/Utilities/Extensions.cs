@@ -277,5 +277,10 @@ namespace Reclaimer.Utilities
                 list.AddRange(Enumerable.Repeat(default(T), newSize - prevSize));
             }
         }
+
+        public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T> enumerable)
+        {
+            return enumerable.Where(i => i != null);
+        }
     }
 }
