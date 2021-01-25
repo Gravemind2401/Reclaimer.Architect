@@ -21,6 +21,8 @@ namespace Reclaimer.Controls.Markers
 
         public virtual ManipulationFlags ManipulationFlags => ManipulationFlags.Default;
 
+        public virtual float ScaleMultiplier => 1f;
+
         public virtual bool UseLocalOrigin => true;
 
         public virtual bool UniformScaling => true;

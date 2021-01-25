@@ -31,6 +31,8 @@ namespace Reclaimer.Controls.Markers
 
         public override ManipulationFlags ManipulationFlags => ManipulationFlags.Translate;
 
+        public override float ScaleMultiplier => 1.5f;
+
         protected override MeshGeometryModel3D GetMeshGeometry()
         {
             return new MeshGeometryModel3D

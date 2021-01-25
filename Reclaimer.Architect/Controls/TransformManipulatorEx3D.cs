@@ -863,6 +863,8 @@ namespace Reclaimer.Controls
                 scale = Math.Max(0.35, bounds.Size.Length() * 0.25);
             }
 
+            scale *= (target as IManipulatable)?.ScaleMultiplier ?? 1f;
+
             var m = Matrix.Translation(localCenterOffset + translationVector);
             m.M11 = m.M22 = m.M33 = (float)scale;
 

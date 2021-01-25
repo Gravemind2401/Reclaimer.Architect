@@ -9,6 +9,7 @@ namespace Reclaimer.Controls
     public interface IManipulatable
     {
         ManipulationFlags ManipulationFlags { get; }
+        float ScaleMultiplier { get; }
         bool UseLocalOrigin { get; }
         bool UniformScaling { get; }
     }
