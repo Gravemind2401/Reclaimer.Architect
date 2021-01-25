@@ -31,6 +31,8 @@ namespace Reclaimer.Models
         public XmlDocument Xml { get; }
         public InMemoryMetadataStream MetadataStream { get; }
 
+        internal Geometry.AiNodeHandler AiNodeHandler { get; }
+
         public Dictionary<string, ScenarioSection> Sections { get; }
         public ObservableCollection<SceneNodeModel> Hierarchy { get; }
         public ObservableCollection<ListBoxItem> Items { get; }
@@ -156,6 +158,8 @@ namespace Reclaimer.Models
                 ReadPlacements(reader);
                 ReadStartPositions(reader);
                 ReadTriggerVolumes(reader);
+
+                AiNodeHandler = new Geometry.AiNodeHandler(this);
             }
 
             IsBusy = false;

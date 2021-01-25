@@ -154,20 +154,7 @@ namespace Reclaimer.Controls
             else if (node.NodeType != NodeType.TriggerVolumes && TreeViewItems.Contains(volumesNode))
                 TreeViewItems.Remove(volumesNode);
 
-            foreach (var pair in sceneManager.AiFiringPositionGroups)
-                pair.Value.IsRendering = node.NodeType == NodeType.AiFiringPositions && pair.Key == node.Tag;
-
-            foreach (var pair in sceneManager.AiAreaGroups)
-                pair.Value.IsRendering = node.NodeType == NodeType.AiZoneAreas && pair.Key == node.Tag;
-
-            foreach (var pair in sceneManager.AiStartLocationGroups)
-                pair.Value.IsRendering = node.NodeType == NodeType.AiStartingLocations && pair.Key == node.Tag;
-
-            foreach (var pair in sceneManager.AiGroupStartLocationGroups)
-                pair.Value.IsRendering = node.NodeType == NodeType.AiGroupStartingLocations && pair.Key == node.Tag;
-
-            foreach (var pair in sceneManager.AiSoloStartLocationGroups)
-                pair.Value.IsRendering = node.NodeType == NodeType.AiSoloStartingLocations && pair.Key == node.Tag;
+            scenario.AiNodeHandler.OnSelectedTreeNodeChanged(node);
 
             //if not a palette this will disable hit testing on all palettes
             var paletteKey = PaletteType.FromNodeType(node.NodeType);
@@ -209,31 +196,8 @@ namespace Reclaimer.Controls
 
                 RefreshTriggerVolumes(itemIndex);
             }
-            else if (node.NodeType == NodeType.AiFiringPositions)
-            {
-                var zone = scenario.SelectedNode.Tag as AiZone;
-                renderer.SetSelectedElement(sceneManager.AiFiringPositions[zone][itemIndex]);
-            }
-            else if (node.NodeType == NodeType.AiZoneAreas)
-            {
-                var zone = scenario.SelectedNode.Tag as AiZone;
-                renderer.SetSelectedElement(sceneManager.AiAreas[zone][itemIndex]);
-            }
-            else if (node.NodeType == NodeType.AiStartingLocations)
-            {
-                var enc = scenario.SelectedNode.Tag as AiEncounter;
-                renderer.SetSelectedElement(sceneManager.AiStartLocations[enc][itemIndex]);
-            }
-            else if (node.NodeType == NodeType.AiGroupStartingLocations)
-            {
-                var squad = scenario.SelectedNode.Tag as AiSquad;
-                renderer.SetSelectedElement(sceneManager.AiGroupStartLocations[squad][itemIndex]);
-            }
-            else if (node.NodeType == NodeType.AiSoloStartingLocations)
-            {
-                var squad = scenario.SelectedNode.Tag as AiSquad;
-                renderer.SetSelectedElement(sceneManager.AiSoloStartLocations[squad][itemIndex]);
-            }
+            else if (scenario.AiNodeHandler.HandlesNodeType(node.NodeType))
+                renderer.SetSelectedElement(scenario.AiNodeHandler.GetElement(node, itemIndex));
         }
 
         public void NavigateToObject(SceneNodeModel node, int index)
@@ -257,36 +221,8 @@ namespace Reclaimer.Controls
                 var obj = sceneManager.TriggerVolumes[index];
                 renderer.ZoomToBounds(obj.GetTotalBounds(), 500);
             }
-            else if (node.NodeType == NodeType.AiFiringPositions)
-            {
-                var zone = scenario.SelectedNode.Tag as AiZone;
-                var obj = sceneManager.AiFiringPositions[zone][index];
-                renderer.ZoomToBounds(obj.GetTotalBounds(), 500);
-            }
-            else if (node.NodeType == NodeType.AiZoneAreas)
-            {
-                var zone = scenario.SelectedNode.Tag as AiZone;
-                var obj = sceneManager.AiAreas[zone][index];
-                renderer.ZoomToBounds(obj.GetTotalBounds(), 500);
-            }
-            else if (node.NodeType == NodeType.AiStartingLocations)
-            {
-                var enc = scenario.SelectedNode.Tag as AiEncounter;
-                var obj = sceneManager.AiStartLocations[enc][index];
-                renderer.ZoomToBounds(obj.GetTotalBounds(), 500);
-            }
-            else if (node.NodeType == NodeType.AiGroupStartingLocations)
-            {
-                var squad = scenario.SelectedNode.Tag as AiSquad;
-                var obj = sceneManager.AiGroupStartLocations[squad][index];
-                renderer.ZoomToBounds(obj.GetTotalBounds(), 500);
-            }
-            else if (node.NodeType == NodeType.AiSoloStartingLocations)
-            {
-                var squad = scenario.SelectedNode.Tag as AiSquad;
-                var obj = sceneManager.AiSoloStartLocations[squad][index];
-                renderer.ZoomToBounds(obj.GetTotalBounds(), 500);
-            }
+            else if (scenario.AiNodeHandler.HandlesNodeType(node.NodeType))
+                renderer.ZoomToBounds(scenario.AiNodeHandler.GetObjectBounds(node, index), 500);
         }
 
         public void RefreshPalette(string paletteKey, int index)
@@ -312,31 +248,8 @@ namespace Reclaimer.Controls
             {
 
             }
-            else if (scenario.SelectedNodeType == NodeType.AiFiringPositions)
-            {
-                var zone = scenario.SelectedNode.Tag as AiZone;
-                scenario.SelectedItemIndex = zone.FiringPositions.IndexOf(element.DataContext as AiFiringPosition);
-            }
-            else if (scenario.SelectedNodeType == NodeType.AiZoneAreas)
-            {
-                var zone = scenario.SelectedNode.Tag as AiZone;
-                scenario.SelectedItemIndex = zone.Areas.IndexOf(element.DataContext as AiArea);
-            }
-            else if (scenario.SelectedNodeType == NodeType.AiStartingLocations)
-            {
-                var enc = scenario.SelectedNode.Tag as AiEncounter;
-                scenario.SelectedItemIndex = enc.StartingLocations.IndexOf(element.DataContext as AiStartingLocation);
-            }
-            else if (scenario.SelectedNodeType == NodeType.AiGroupStartingLocations)
-            {
-                var squad = scenario.SelectedNode.Tag as AiSquad;
-                scenario.SelectedItemIndex = squad.GroupStartLocations.IndexOf(element.DataContext as AiStartingLocation);
-            }
-            else if (scenario.SelectedNodeType == NodeType.AiSoloStartingLocations)
-            {
-                var squad = scenario.SelectedNode.Tag as AiSquad;
-                scenario.SelectedItemIndex = squad.SoloStartLocations.IndexOf(element.DataContext as AiStartingLocation);
-            }
+            else if (scenario.AiNodeHandler.HandlesNodeType(scenario.SelectedNodeType))
+                scenario.SelectedItemIndex = scenario.AiNodeHandler.GetElementIndex(scenario.SelectedNode, element);
             else
             {
                 var paletteKey = PaletteType.FromNodeType(scenario.SelectedNodeType);
@@ -403,15 +316,10 @@ namespace Reclaimer.Controls
             modelGroup.Children.Add(sceneManager.StartPositionGroup);
             modelGroup.Children.Add(sceneManager.TriggerVolumeGroup);
 
-            foreach (var group in sceneManager.AiAreaGroups.Values
-                .Concat(sceneManager.AiFiringPositionGroups.Values)
-                .Concat(sceneManager.AiStartLocationGroups.Values)
-                .Concat(sceneManager.AiGroupStartLocationGroups.Values)
-                .Concat(sceneManager.AiSoloStartLocationGroups.Values))
-            {
-                group.IsRendering = false;
+            foreach (var group in scenario.AiNodeHandler.GetElements())
                 modelGroup.Children.Add(group);
-            }
+
+            scenario.AiNodeHandler.OnSelectedTreeNodeChanged(scenario.SelectedNode);
 
             modelGroup.Visibility = Visibility.Visible;
 

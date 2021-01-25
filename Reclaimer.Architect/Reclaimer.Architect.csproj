@@ -171,6 +171,7 @@
     <Compile Include="Geometry\ModelProperties.cs" />
     <Compile Include="Geometry\ObjectHolder.cs" />
     <Compile Include="Geometry\BspManager.cs" />
+    <Compile Include="Geometry\AiNodeHandler.cs" />
     <Compile Include="Geometry\SceneManager.cs" />
     <Compile Include="Models\Ai\AiFiringPosition.cs" />
     <Compile Include="Models\Ai\AiNamedBlock.cs" />

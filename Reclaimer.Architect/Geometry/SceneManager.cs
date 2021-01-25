@@ -40,18 +40,6 @@ namespace Reclaimer.Geometry
         public ObservableCollection<StartPositionMarker3D> StartPositions { get; private set; }
         public ObservableCollection<BoxManipulator3D> TriggerVolumes { get; private set; }
 
-        public Dictionary<AiZone, Helix.GroupElement3D> AiAreaGroups { get; private set; }
-        public Dictionary<AiZone, ObservableCollection<PositionMarker3D>> AiAreas { get; private set; }
-        public Dictionary<AiZone, Helix.GroupElement3D> AiFiringPositionGroups { get; private set; }
-        public Dictionary<AiZone, ObservableCollection<PositionMarker3D>> AiFiringPositions { get; private set; }
-        public Dictionary<AiEncounter, Helix.GroupElement3D> AiStartLocationGroups { get; private set; }
-        public Dictionary<AiEncounter, ObservableCollection<SpawnPointMarker3D>> AiStartLocations { get; private set; }
-
-        public Dictionary<AiSquad, Helix.GroupElement3D> AiGroupStartLocationGroups { get; private set; }
-        public Dictionary<AiSquad, ObservableCollection<SpawnPointMarker3D>> AiGroupStartLocations { get; private set; }
-        public Dictionary<AiSquad, Helix.GroupElement3D> AiSoloStartLocationGroups { get; private set; }
-        public Dictionary<AiSquad, ObservableCollection<SpawnPointMarker3D>> AiSoloStartLocations { get; private set; }
-
         public IEnumerable<Task> ReadScenario(ScenarioModel scenario)
         {
             this.scenario = scenario;
@@ -60,18 +48,6 @@ namespace Reclaimer.Geometry
             PaletteHolders = new Dictionary<string, PaletteHolder>();
             StartPositions = new ObservableCollection<StartPositionMarker3D>();
             TriggerVolumes = new ObservableCollection<BoxManipulator3D>();
-
-            AiAreaGroups = new Dictionary<AiZone, Helix.GroupElement3D>();
-            AiAreas = new Dictionary<AiZone, ObservableCollection<PositionMarker3D>>();
-            AiFiringPositionGroups = new Dictionary<AiZone, Helix.GroupElement3D>();
-            AiFiringPositions = new Dictionary<AiZone, ObservableCollection<PositionMarker3D>>();
-            AiStartLocationGroups = new Dictionary<AiEncounter, Helix.GroupElement3D>();
-            AiStartLocations = new Dictionary<AiEncounter, ObservableCollection<SpawnPointMarker3D>>();
-
-            AiGroupStartLocationGroups = new Dictionary<AiSquad, Helix.GroupElement3D>();
-            AiGroupStartLocations = new Dictionary<AiSquad, ObservableCollection<SpawnPointMarker3D>>();
-            AiSoloStartLocationGroups = new Dictionary<AiSquad, Helix.GroupElement3D>();
-            AiSoloStartLocations = new Dictionary<AiSquad, ObservableCollection<SpawnPointMarker3D>>();
 
             yield return Task.Run(() =>
             {
@@ -148,93 +124,7 @@ namespace Reclaimer.Geometry
                 TriggerVolumeGroup.Children.Add(box);
             }
 
-            foreach (var zone in scenario.SquadHierarchy.Zones)
-            {
-                var areaGroup = new Helix.GroupModel3D();
-                var areaMarkers = new ObservableCollection<PositionMarker3D>();
-
-                foreach (var area in zone.Areas)
-                {
-                    var areaMarker = new PositionMarker3D();
-                    BindZoneArea(area, areaMarker);
-                    areaMarkers.Add(areaMarker);
-                    areaGroup.Children.Add(areaMarker);
-                }
-
-                AiAreaGroups.Add(zone, areaGroup);
-                AiAreas.Add(zone, areaMarkers);
-
-                var fposGroup = new Helix.GroupModel3D();
-                var fposMarkers = new ObservableCollection<PositionMarker3D>();
-
-                foreach (var area in zone.FiringPositions)
-                {
-                    var fposMarker = new PositionMarker3D();
-                    BindZoneFiringPosition(area, fposMarker);
-                    fposMarkers.Add(fposMarker);
-                    fposGroup.Children.Add(fposMarker);
-                }
-
-                AiFiringPositionGroups.Add(zone, fposGroup);
-                AiFiringPositions.Add(zone, fposMarkers);
-
-                foreach (var squad in zone.Squads)
-                {
-                    Helix.GroupModel3D locGroup;
-                    ObservableCollection<SpawnPointMarker3D> locMarkers;
-
-                    #region Encounter Starting Locations
-                    foreach (var enc in squad.Encounters)
-                    {
-                        locGroup = new Helix.GroupModel3D();
-                        locMarkers = new ObservableCollection<SpawnPointMarker3D>();
-
-                        foreach (var loc in enc.StartingLocations)
-                        {
-                            var locMarker = new SpawnPointMarker3D();
-                            BindAiStartLocation(loc, locMarker);
-                            locMarkers.Add(locMarker);
-                            locGroup.Children.Add(locMarker);
-                        }
-
-                        AiStartLocationGroups.Add(enc, locGroup);
-                        AiStartLocations.Add(enc, locMarkers);
-                    }
-                    #endregion
-
-                    #region Group Starting Locations
-                    locGroup = new Helix.GroupModel3D();
-                    locMarkers = new ObservableCollection<SpawnPointMarker3D>();
-
-                    foreach (var loc in squad.GroupStartLocations)
-                    {
-                        var locMarker = new SpawnPointMarker3D();
-                        BindAiStartLocation(loc, locMarker);
-                        locMarkers.Add(locMarker);
-                        locGroup.Children.Add(locMarker);
-                    }
-
-                    AiGroupStartLocationGroups.Add(squad, locGroup);
-                    AiGroupStartLocations.Add(squad, locMarkers);
-                    #endregion
-
-                    #region Single Starting Locations
-                    locGroup = new Helix.GroupModel3D();
-                    locMarkers = new ObservableCollection<SpawnPointMarker3D>();
-
-                    foreach (var loc in squad.SoloStartLocations)
-                    {
-                        var locMarker = new SpawnPointMarker3D();
-                        BindAiStartLocation(loc, locMarker);
-                        locMarkers.Add(locMarker);
-                        locGroup.Children.Add(locMarker);
-                    }
-
-                    AiSoloStartLocationGroups.Add(squad, locGroup);
-                    AiSoloStartLocations.Add(squad, locMarkers);
-                    #endregion
-                }
-            }
+            scenario.AiNodeHandler.InitializeElements();
         }
 
         private void RemovePlacement(PaletteHolder holder, int index)
@@ -351,32 +241,6 @@ namespace Reclaimer.Geometry
                 new Binding(nameof(TriggerVolume.Position)) { Mode = BindingMode.TwoWay, Converter = SharpDXVectorConverter.Instance });
             BindingOperations.SetBinding(box, BoxManipulator3D.SizeProperty,
                 new Binding(nameof(TriggerVolume.Size)) { Mode = BindingMode.TwoWay, Converter = SharpDXVectorConverter.Instance });
-        }
-
-        private void BindZoneFiringPosition(AiFiringPosition fpos, Helix.Element3D model)
-        {
-            var binding = new Binding(nameof(AiFiringPosition.Position)) { Converter = TranslationTransformConverter.Instance, Mode = BindingMode.TwoWay };
-
-            model.DataContext = fpos;
-            BindingOperations.SetBinding(model, Helix.Element3D.TransformProperty, binding);
-        }
-
-        private void BindZoneArea(AiArea area, Helix.Element3D model)
-        {
-            var binding = new Binding(nameof(AiArea.Position)) { Converter = TranslationTransformConverter.Instance, Mode = BindingMode.TwoWay };
-
-            model.DataContext = area;
-            BindingOperations.SetBinding(model, Helix.Element3D.TransformProperty, binding);
-        }
-
-        private void BindAiStartLocation(AiStartingLocation pos, Helix.Element3D model)
-        {
-            var binding = new MultiBinding { Converter = EulerTransformConverter.Instance, Mode = BindingMode.TwoWay };
-            binding.Bindings.Add(new Binding(nameof(AiStartingLocation.Position)) { Mode = BindingMode.TwoWay });
-            binding.Bindings.Add(new Binding(nameof(AiStartingLocation.Rotation)) { Mode = BindingMode.TwoWay });
-
-            model.DataContext = pos;
-            BindingOperations.SetBinding(model, Helix.Element3D.TransformProperty, binding);
         }
 
         public void Dispose()
