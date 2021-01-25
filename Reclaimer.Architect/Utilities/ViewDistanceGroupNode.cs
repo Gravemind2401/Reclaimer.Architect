@@ -60,14 +60,12 @@ namespace Reclaimer.Utilities
             if (bounds.Contains(ref camPos) == ContainmentType.Contains)
                 return true;
 
-            var radius = bounds.Size.Length() / 2;
-            var length = (bounds.Center - camPos).Length();
-            var angle = MathUtil.RadiansToDegrees((float)Math.Atan2(radius, length));
+            //var length = (bounds.Center - camPos).Length();
+            //if (length < 5)
+            //    return true;
 
-            if (angle > 0.50)
-                return true;
-
-            return false;
+            var screenBounds = bounds.Project(context);
+            return screenBounds.Width > 3 && screenBounds.Height > 3;
         }
     }
 }

@@ -249,6 +249,21 @@ namespace Reclaimer.Utilities
             }
         }
 
+        public static SharpDX.RectangleF Project(this SharpDX.BoundingBox bounds, Helix.RenderContext context)
+        {
+            var corners = bounds.GetCorners();
+            for (int i = 0; i < corners.Length; i++)
+                corners[i] = SharpDX.Vector3.Project(corners[i], 0, 0, context.ActualWidth, context.ActualHeight, 0, 1, context.GlobalTransform.ViewProjection);
+
+            return new SharpDX.RectangleF
+            {
+                Left = corners.Min(v => v.X),
+                Top = corners.Min(v => v.Y),
+                Right = corners.Max(v => v.X),
+                Bottom = corners.Max(v => v.Y),
+            };
+        }
+
         public static T[] ToArray<T>(this IEnumerable<T> source, int size)
         {
             var result = new T[size];
