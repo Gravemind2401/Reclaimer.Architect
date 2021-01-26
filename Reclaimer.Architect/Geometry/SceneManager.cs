@@ -77,6 +77,9 @@ namespace Reclaimer.Geometry
                             factory.LoadTag(definition.Palette[i].Tag, false);
                 });
             }
+
+            foreach (var c in scenario.ComponentManagers)
+                yield return c.InitializeResourcesAsync();
         }
 
         public void RenderScenario()
@@ -124,7 +127,8 @@ namespace Reclaimer.Geometry
                 TriggerVolumeGroup.Children.Add(box);
             }
 
-            scenario.AiNodeHandler.InitializeElements();
+            foreach (var c in scenario.ComponentManagers)
+                c.InitializeElements();
         }
 
         private void RemovePlacement(PaletteHolder holder, int index)

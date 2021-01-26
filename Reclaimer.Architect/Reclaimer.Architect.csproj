@@ -125,6 +125,7 @@
     <Compile Include="Blam\Halo3\scenario_structure_bsp.cs" />
     <Compile Include="Blam\HaloReach\model.cs" />
     <Compile Include="Blam\HaloReach\object.cs" />
+    <Compile Include="Components\ComponentManager.cs" />
     <Compile Include="Controls\BoxManipulator3D.cs" />
     <Compile Include="Controls\BspEditor.xaml.cs">
       <DependentUpon>BspEditor.xaml</DependentUpon>
@@ -171,12 +172,13 @@
     <Compile Include="Geometry\ModelProperties.cs" />
     <Compile Include="Geometry\ObjectHolder.cs" />
     <Compile Include="Geometry\BspManager.cs" />
-    <Compile Include="Geometry\AiNodeHandler.cs" />
+    <Compile Include="Components\AiComponentManager.cs" />
     <Compile Include="Geometry\SceneManager.cs" />
     <Compile Include="Models\Ai\AiFiringPosition.cs" />
     <Compile Include="Models\Ai\AiNamedBlock.cs" />
     <Compile Include="Models\Ai\AiArea.cs" />
     <Compile Include="Models\Ai\AiStartingLocation.cs" />
+    <Compile Include="Models\BlockPropertiesLocator.cs" />
     <Compile Include="Models\IBspGeometryInstanceBlock.cs" />
     <Compile Include="Models\IMetaUpdateReceiver.cs" />
     <Compile Include="Models\InstancePlacement.cs" />

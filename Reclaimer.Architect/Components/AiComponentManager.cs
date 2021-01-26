@@ -16,12 +16,10 @@ using Media = System.Windows.Media;
 using Media3D = System.Windows.Media.Media3D;
 using Helix = HelixToolkit.Wpf.SharpDX;
 
-namespace Reclaimer.Geometry
+namespace Reclaimer.Components
 {
-    internal class AiNodeHandler
+    public class AiComponentManager : ComponentManager
     {
-        private readonly ScenarioModel scenario;
-
         private readonly Dictionary<AiZone, Helix.GroupElement3D> AreaGroups;
         private readonly Dictionary<AiZone, ObservableCollection<PositionMarker3D>> Areas;
         private readonly Dictionary<AiZone, Helix.GroupElement3D> FiringPositionGroups;
@@ -53,10 +51,9 @@ namespace Reclaimer.Geometry
             }
         }
 
-        public AiNodeHandler(ScenarioModel scenario)
+        public AiComponentManager(ScenarioModel scenario)
+            : base(scenario)
         {
-            this.scenario = scenario;
-
             AreaGroups = new Dictionary<AiZone, Helix.GroupElement3D>();
             Areas = new Dictionary<AiZone, ObservableCollection<PositionMarker3D>>();
             FiringPositionGroups = new Dictionary<AiZone, Helix.GroupElement3D>();
@@ -70,14 +67,9 @@ namespace Reclaimer.Geometry
             SoloStartLocations = new Dictionary<AiSquad, ObservableCollection<SpawnPointMarker3D>>();
         }
 
-        public bool HandlesNodeType(NodeType nodeType) => HandledNodeTypes.Any(t => t == nodeType);
+        public override bool HandlesNodeType(NodeType nodeType) => HandledNodeTypes.Any(t => t == nodeType);
 
-        public Task InitializeResourcesAsync()
-        {
-            return Task.CompletedTask;
-        }
-
-        public void InitializeElements()
+        public override void InitializeElements()
         {
             foreach (var zone in scenario.SquadHierarchy.Zones)
             {
@@ -172,7 +164,7 @@ namespace Reclaimer.Geometry
             }
         }
 
-        public IEnumerable<Helix.Element3D> GetElements()
+        public override IEnumerable<Helix.Element3D> GetElements()
         {
             return FiringPositionGroups.Values
                 .Concat(AreaGroups.Values)
@@ -181,12 +173,7 @@ namespace Reclaimer.Geometry
                 .Concat(SoloStartLocationGroups.Values);
         }
 
-        public SharpDX.BoundingBox GetObjectBounds(SceneNodeModel treeNode, int itemIndex)
-        {
-            return GetElement(treeNode, itemIndex).GetTotalBounds();
-        }
-
-        public void OnSelectedTreeNodeChanged(SceneNodeModel newNode)
+        public override void OnSelectedTreeNodeChanged(SceneNodeModel newNode)
         {
             var nodeType = newNode?.NodeType;
             var nodeTag = newNode?.Tag;
@@ -207,7 +194,7 @@ namespace Reclaimer.Geometry
                 pair.Value.IsRendering = nodeType == NodeType.AiSoloStartingLocations && pair.Key == nodeTag;
         }
 
-        public Helix.Element3D GetElement(SceneNodeModel treeNode, int itemIndex)
+        public override Helix.Element3D GetElement(SceneNodeModel treeNode, int itemIndex)
         {
             var nodeTag = treeNode.Tag;
 
@@ -225,7 +212,12 @@ namespace Reclaimer.Geometry
                 return null;
         }
 
-        public int GetElementIndex(SceneNodeModel treeNode, Helix.Element3D element)
+        public override SharpDX.BoundingBox GetObjectBounds(SceneNodeModel treeNode, int itemIndex)
+        {
+            return GetElement(treeNode, itemIndex).GetTotalBounds();
+        }
+
+        public override int GetElementIndex(SceneNodeModel treeNode, Helix.Element3D element)
         {
             var nodeTag = treeNode.Tag;
 
@@ -242,7 +234,7 @@ namespace Reclaimer.Geometry
             else throw new ArgumentException();
         }
 
-        public BlockPropertiesLocator GetPropertiesLocator(SceneNodeModel treeNode, int itemIndex)
+        internal override BlockPropertiesLocator GetPropertiesLocator(SceneNodeModel treeNode, int itemIndex)
         {
             XmlNode rootNode;
             long baseAddress;
@@ -379,13 +371,5 @@ namespace Reclaimer.Geometry
             BindingOperations.SetBinding(model, Helix.Element3D.TransformProperty, binding);
         }
         #endregion
-    }
-
-    internal class BlockPropertiesLocator
-    {
-        public XmlNode RootNode { get; set; }
-        public long BaseAddress { get; set; }
-        public IList<Tuple<XmlNode, long>> AdditionalNodes { get; set; }
-        public IMetaUpdateReceiver TargetObject { get; set; }
     }
 }

@@ -17,6 +17,7 @@ using System.IO;
 using Reclaimer.Resources;
 using Adjutant.Blam.Common.Gen3;
 using Reclaimer.Models.Ai;
+using Reclaimer.Components;
 
 namespace Reclaimer.Models
 {
@@ -31,7 +32,7 @@ namespace Reclaimer.Models
         public XmlDocument Xml { get; }
         public InMemoryMetadataStream MetadataStream { get; }
 
-        internal Geometry.AiNodeHandler AiNodeHandler { get; }
+        internal List<ComponentManager> ComponentManagers { get; }
 
         public Dictionary<string, ScenarioSection> Sections { get; }
         public ObservableCollection<SceneNodeModel> Hierarchy { get; }
@@ -158,9 +159,10 @@ namespace Reclaimer.Models
                 ReadPlacements(reader);
                 ReadStartPositions(reader);
                 ReadTriggerVolumes(reader);
-
-                AiNodeHandler = new Geometry.AiNodeHandler(this);
             }
+
+            ComponentManagers = new List<ComponentManager>();
+            ComponentManagers.Add(new AiComponentManager(this));
 
             IsBusy = false;
         }

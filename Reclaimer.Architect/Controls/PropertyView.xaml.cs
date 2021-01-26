@@ -161,9 +161,10 @@ namespace Reclaimer.Controls
                     CurrentItem = scenario.TriggerVolumes[itemIndex];
                     LoadData();
                 }
-                else if (scenario.AiNodeHandler.HandlesNodeType(nodeType))
+                else
                 {
-                    var details = scenario.AiNodeHandler.GetPropertiesLocator(node, itemIndex);
+                    var handler = scenario.ComponentManagers.FirstOrDefault(c => c.HandlesNodeType(nodeType));
+                    var details = handler?.GetPropertiesLocator(node, itemIndex);
                     if (details == null)
                     {
                         CurrentItem = null;
@@ -175,11 +176,6 @@ namespace Reclaimer.Controls
                     altNodes.AddRange(details.AdditionalNodes);
                     CurrentItem = details.TargetObject;
                     LoadData();
-                }
-                else
-                {
-                    CurrentItem = null;
-                    return;
                 }
             }
 

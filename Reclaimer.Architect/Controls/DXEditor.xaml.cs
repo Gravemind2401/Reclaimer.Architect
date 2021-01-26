@@ -154,7 +154,8 @@ namespace Reclaimer.Controls
             else if (node.NodeType != NodeType.TriggerVolumes && TreeViewItems.Contains(volumesNode))
                 TreeViewItems.Remove(volumesNode);
 
-            scenario.AiNodeHandler.OnSelectedTreeNodeChanged(node);
+            foreach (var c in scenario.ComponentManagers)
+                c.OnSelectedTreeNodeChanged(node);
 
             //if not a palette this will disable hit testing on all palettes
             var paletteKey = PaletteType.FromNodeType(node.NodeType);
@@ -196,8 +197,11 @@ namespace Reclaimer.Controls
 
                 RefreshTriggerVolumes(itemIndex);
             }
-            else if (scenario.AiNodeHandler.HandlesNodeType(node.NodeType))
-                renderer.SetSelectedElement(scenario.AiNodeHandler.GetElement(node, itemIndex));
+            else
+            {
+                var handler = scenario.ComponentManagers.FirstOrDefault(c => c.HandlesNodeType(scenario.SelectedNodeType));
+                renderer.SetSelectedElement(handler?.GetElement(node, itemIndex));
+            }
         }
 
         public void NavigateToObject(SceneNodeModel node, int index)
@@ -221,8 +225,12 @@ namespace Reclaimer.Controls
                 var obj = sceneManager.TriggerVolumes[index];
                 renderer.ZoomToBounds(obj.GetTotalBounds(), 500);
             }
-            else if (scenario.AiNodeHandler.HandlesNodeType(node.NodeType))
-                renderer.ZoomToBounds(scenario.AiNodeHandler.GetObjectBounds(node, index), 500);
+            else
+            {
+                var handler = scenario.ComponentManagers.FirstOrDefault(c => c.HandlesNodeType(scenario.SelectedNodeType));
+                if (handler != null)
+                    renderer.ZoomToBounds(handler.GetObjectBounds(node, index), 500);
+            }
         }
 
         public void RefreshPalette(string paletteKey, int index)
@@ -242,18 +250,20 @@ namespace Reclaimer.Controls
             if (element?.DataContext == null)
                 return;
 
+            var paletteKey = PaletteType.FromNodeType(scenario.SelectedNodeType);
+            if (paletteKey != null)
+                scenario.SelectedItemIndex = scenario.Palettes[paletteKey].Placements.IndexOf(element.DataContext as ObjectPlacement);
             if (scenario.SelectedNodeType == NodeType.StartPositions)
                 scenario.SelectedItemIndex = scenario.StartingPositions.IndexOf(element.DataContext as StartPosition);
             else if (scenario.SelectedNodeType == NodeType.TriggerVolumes)
             {
 
             }
-            else if (scenario.AiNodeHandler.HandlesNodeType(scenario.SelectedNodeType))
-                scenario.SelectedItemIndex = scenario.AiNodeHandler.GetElementIndex(scenario.SelectedNode, element);
             else
             {
-                var paletteKey = PaletteType.FromNodeType(scenario.SelectedNodeType);
-                scenario.SelectedItemIndex = scenario.Palettes[paletteKey].Placements.IndexOf(element.DataContext as ObjectPlacement);
+                var handler = scenario.ComponentManagers.FirstOrDefault(c => c.HandlesNodeType(scenario.SelectedNodeType));
+                if (handler != null)
+                    scenario.SelectedItemIndex = handler.GetElementIndex(scenario.SelectedNode, element);
             }
         }
 
@@ -316,10 +326,11 @@ namespace Reclaimer.Controls
             modelGroup.Children.Add(sceneManager.StartPositionGroup);
             modelGroup.Children.Add(sceneManager.TriggerVolumeGroup);
 
-            foreach (var group in scenario.AiNodeHandler.GetElements())
+            foreach (var group in scenario.ComponentManagers.SelectMany(c => c.GetElements()))
                 modelGroup.Children.Add(group);
 
-            scenario.AiNodeHandler.OnSelectedTreeNodeChanged(scenario.SelectedNode);
+            foreach (var c in scenario.ComponentManagers)
+                c.OnSelectedTreeNodeChanged(scenario.SelectedNode);
 
             modelGroup.Visibility = Visibility.Visible;
 
