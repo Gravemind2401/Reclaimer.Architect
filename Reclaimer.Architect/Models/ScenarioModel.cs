@@ -162,6 +162,7 @@ namespace Reclaimer.Models
             }
 
             ComponentManagers = new List<ComponentManager>();
+            ComponentManagers.Add(new TerrainComponentManager(this));
             ComponentManagers.Add(new AiComponentManager(this));
 
             IsBusy = false;

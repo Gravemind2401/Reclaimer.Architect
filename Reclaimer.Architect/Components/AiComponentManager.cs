@@ -1,4 +1,5 @@
 ﻿using Reclaimer.Controls.Markers;
+using Reclaimer.Geometry;
 using Reclaimer.Models;
 using Reclaimer.Models.Ai;
 using Reclaimer.Resources;
@@ -69,7 +70,7 @@ namespace Reclaimer.Components
 
         public override bool HandlesNodeType(NodeType nodeType) => HandledNodeTypes.Any(t => t == nodeType);
 
-        public override void InitializeElements()
+        public override void InitializeElements(ModelFactory factory)
         {
             foreach (var zone in scenario.SquadHierarchy.Zones)
             {
@@ -164,7 +165,7 @@ namespace Reclaimer.Components
             }
         }
 
-        public override IEnumerable<Helix.Element3D> GetElements()
+        public override IEnumerable<Helix.Element3D> GetSceneElements()
         {
             return FiringPositionGroups.Values
                 .Concat(AreaGroups.Values)
@@ -342,6 +343,24 @@ namespace Reclaimer.Components
                 AdditionalNodes = altNodes,
                 TargetObject = target
             };
+        }
+
+        public override void DisposeSceneElements()
+        {
+            foreach (var element in GetSceneElements())
+                element.Dispose();
+
+            AreaGroups.Clear();
+            Areas.Clear();
+            FiringPositionGroups.Clear();
+            FiringPositions.Clear();
+            StartLocationGroups.Clear();
+            StartLocations.Clear();
+
+            GroupStartLocationGroups.Clear();
+            GroupStartLocations.Clear();
+            SoloStartLocationGroups.Clear();
+            SoloStartLocations.Clear();
         }
 
         #region Binding Setup

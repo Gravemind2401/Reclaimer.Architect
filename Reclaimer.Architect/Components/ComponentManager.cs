@@ -1,4 +1,5 @@
-﻿using Reclaimer.Models;
+﻿using Reclaimer.Geometry;
+using Reclaimer.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -26,13 +27,13 @@ namespace Reclaimer.Components
         public virtual bool HandlesNodeType(NodeType nodeType) => false;
 
         //if it can be loaded asynchronously do it here
-        public virtual Task InitializeResourcesAsync() => Task.CompletedTask;
+        public virtual Task InitializeResourcesAsync(ModelFactory factory) => Task.CompletedTask;
 
         //anything that must be synchronous such as building elements can be done here
-        public virtual void InitializeElements() { }
+        public virtual void InitializeElements(ModelFactory factory) { }
 
         //provide any elements that shoule be added to the scene
-        public virtual IEnumerable<Helix.Element3D> GetElements() => Enumerable.Empty<Helix.Element3D>();
+        public virtual IEnumerable<Helix.Element3D> GetSceneElements() => Enumerable.Empty<Helix.Element3D>();
 
         //provide any nodes that should be added to the scene tree
         public virtual IEnumerable<TreeItemModel> GetSceneNodes() => Enumerable.Empty<TreeItemModel>();
@@ -63,5 +64,7 @@ namespace Reclaimer.Components
         {
             throw new NotImplementedException();
         }
+
+        public virtual void DisposeSceneElements() { }
     }
 }

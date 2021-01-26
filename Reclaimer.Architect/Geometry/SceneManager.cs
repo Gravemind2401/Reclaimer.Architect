@@ -31,8 +31,6 @@ namespace Reclaimer.Geometry
         private readonly ModelFactory factory = new ModelFactory();
 
         private ScenarioModel scenario;
-        public ObjectHolder BspHolder { get; private set; }
-        public ObjectHolder SkyHolder { get; private set; }
         public Dictionary<string, PaletteHolder> PaletteHolders { get; private set; }
 
         public Helix.GroupElement3D StartPositionGroup { get; private set; }
@@ -43,23 +41,9 @@ namespace Reclaimer.Geometry
         public IEnumerable<Task> ReadScenario(ScenarioModel scenario)
         {
             this.scenario = scenario;
-            BspHolder = new ObjectHolder("sbsp");
-            SkyHolder = new ObjectHolder("sky");
             PaletteHolders = new Dictionary<string, PaletteHolder>();
             StartPositions = new ObservableCollection<StartPositionMarker3D>();
             TriggerVolumes = new ObservableCollection<BoxManipulator3D>();
-
-            yield return Task.Run(() =>
-            {
-                for (int i = 0; i < scenario.Bsps.Count; i++)
-                    factory.LoadTag(scenario.Bsps[i].Tag, false);
-            });
-
-            yield return Task.Run(() =>
-            {
-                for (int i = 0; i < scenario.Skies.Count; i++)
-                    factory.LoadTag(scenario.Skies[i].Tag, false);
-            });
 
             foreach (var definition in scenario.Palettes.Values)
             {
@@ -79,19 +63,13 @@ namespace Reclaimer.Geometry
             }
 
             foreach (var c in scenario.ComponentManagers)
-                yield return c.InitializeResourcesAsync();
+                yield return c.InitializeResourcesAsync(factory);
         }
 
         public void RenderScenario()
         {
             if (scenario == null)
                 throw new InvalidOperationException();
-
-            foreach (var bsp in scenario.Bsps)
-                BspHolder.Elements.Add(bsp.Tag == null ? null : factory.CreateRenderModel(bsp.Tag.Id));
-
-            foreach (var sky in scenario.Skies)
-                SkyHolder.Elements.Add(sky.Tag == null ? null : factory.CreateObjectModel(sky.Tag.Id));
 
             foreach (var holder in PaletteHolders.Values)
             {
@@ -128,7 +106,7 @@ namespace Reclaimer.Geometry
             }
 
             foreach (var c in scenario.ComponentManagers)
-                c.InitializeElements();
+                c.InitializeElements(factory);
         }
 
         private void RemovePlacement(PaletteHolder holder, int index)
@@ -249,8 +227,8 @@ namespace Reclaimer.Geometry
 
         public void Dispose()
         {
-            BspHolder?.Dispose();
-            SkyHolder?.Dispose();
+            foreach (var c in scenario.ComponentManagers)
+                c.DisposeSceneElements();
 
             if (PaletteHolders != null)
             {

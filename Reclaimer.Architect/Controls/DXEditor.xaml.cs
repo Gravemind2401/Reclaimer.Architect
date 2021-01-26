@@ -291,18 +291,6 @@ namespace Reclaimer.Controls
         {
             sceneManager.RenderScenario();
 
-            foreach (var instance in sceneManager.BspHolder.Elements.WhereNotNull())
-            {
-                instance.IsHitTestVisible = false;
-                modelGroup.Children.Add(instance);
-            }
-
-            foreach (var instance in sceneManager.SkyHolder.Elements.WhereNotNull())
-            {
-                instance.IsHitTestVisible = false;
-                modelGroup.Children.Add(instance);
-            }
-
             foreach (var holder in sceneManager.PaletteHolders.Values)
             {
                 holder.GroupElement.IsHitTestVisible = false;
@@ -310,7 +298,7 @@ namespace Reclaimer.Controls
             }
 
             renderer.ScaleToContent();
-            var elements = sceneManager.BspHolder.Elements.WhereNotNull();
+            var elements = scenario.ComponentManagers.OfType<Components.TerrainComponentManager>().First().BspHolder.Elements.WhereNotNull();
 
             if (elements.Any())
             {
@@ -326,8 +314,7 @@ namespace Reclaimer.Controls
             modelGroup.Children.Add(sceneManager.StartPositionGroup);
             modelGroup.Children.Add(sceneManager.TriggerVolumeGroup);
 
-            foreach (var group in scenario.ComponentManagers.SelectMany(c => c.GetElements()))
-                modelGroup.Children.Add(group);
+            modelGroup.Children.AddRange(scenario.ComponentManagers.SelectMany(c => c.GetSceneElements()));
 
             foreach (var c in scenario.ComponentManagers)
                 c.OnSelectedTreeNodeChanged(scenario.SelectedNode);
@@ -335,35 +322,7 @@ namespace Reclaimer.Controls
             modelGroup.Visibility = Visibility.Visible;
 
             #region Generate Tree Nodes
-            var bspNode = new TreeItemModel { Header = sceneManager.BspHolder.Name, IsChecked = true };
-            for (int i = 0; i < sceneManager.BspHolder.Elements.Count; i++)
-            {
-                var bsp = sceneManager.BspHolder.Elements[i];
-                var tag = scenario.Bsps[i].Tag;
-                if (bsp == null)
-                    continue;
-
-                var permNode = new TreeItemModel { Header = tag?.FileName() ?? "<null>", IsChecked = true, Tag = bsp };
-                bspNode.Items.Add(permNode);
-            }
-
-            if (bspNode.HasItems)
-                TreeViewItems.Add(bspNode);
-
-            var skyNode = new TreeItemModel { Header = sceneManager.SkyHolder.Name, IsChecked = true };
-            for (int i = 0; i < sceneManager.SkyHolder.Elements.Count; i++)
-            {
-                var sky = sceneManager.SkyHolder.Elements[i];
-                var tag = scenario.Skies[i].Tag;
-                if (sky == null)
-                    continue;
-
-                var permNode = new TreeItemModel { Header = tag?.FileName() ?? "<null>", IsChecked = true, Tag = sky };
-                skyNode.Items.Add(permNode);
-            }
-
-            if (skyNode.HasItems)
-                TreeViewItems.Add(skyNode);
+            TreeViewItems.AddRange(scenario.ComponentManagers.SelectMany(c => c.GetSceneNodes()));
 
             foreach (var holder in sceneManager.PaletteHolders.Values)
             {
