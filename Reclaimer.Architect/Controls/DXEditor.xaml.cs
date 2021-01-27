@@ -105,7 +105,6 @@ namespace Reclaimer.Controls
 
         private bool isReady;
         private ScenarioModel scenario;
-        private TreeItemModel volumesNode;
 
         public TabModel TabModel { get; }
         public ObservableCollection<TreeItemModel> TreeViewItems { get; }
@@ -146,13 +145,6 @@ namespace Reclaimer.Controls
             if (node == null || !isReady) return;
 
             sceneManager.PaletteHolders[PaletteType.Decal].GroupElement.IsRendering = node.NodeType == NodeType.Decals;
-            sceneManager.StartPositionGroup.IsRendering = node.NodeType == NodeType.StartPositions;
-            sceneManager.TriggerVolumeGroup.IsRendering = node.NodeType == NodeType.TriggerVolumes;
-
-            if (node.NodeType == NodeType.TriggerVolumes && !TreeViewItems.Contains(volumesNode))
-                TreeViewItems.Add(volumesNode);
-            else if (node.NodeType != NodeType.TriggerVolumes && TreeViewItems.Contains(volumesNode))
-                TreeViewItems.Remove(volumesNode);
 
             foreach (var c in scenario.ComponentManagers)
                 c.OnSelectedTreeNodeChanged(node);
@@ -178,25 +170,6 @@ namespace Reclaimer.Controls
                 var selected = sceneManager.PaletteHolders[paletteKey];
                 renderer.SetSelectedElement(selected.Elements[itemIndex]);
             }
-            else if (node.NodeType == NodeType.StartPositions)
-            {
-                renderer.SetSelectedElement(sceneManager.StartPositions[itemIndex]);
-            }
-            else if (node.NodeType == NodeType.TriggerVolumes)
-            {
-                var prev = sceneManager.TriggerVolumes.FirstOrDefault(t => t.Tag != null);
-                if (prev != null)
-                {
-                    prev.DiffuseColor = TriggerVolume.DefaultColour;
-                    prev.Tag = null;
-                }
-
-                var selected = sceneManager.TriggerVolumes[itemIndex];
-                selected.DiffuseColor = TriggerVolume.SelectedColour;
-                selected.Tag = true;
-
-                RefreshTriggerVolumes(itemIndex);
-            }
             else
             {
                 var handler = scenario.ComponentManagers.FirstOrDefault(c => c.HandlesNodeType(scenario.SelectedNodeType));
@@ -214,16 +187,6 @@ namespace Reclaimer.Controls
                 var obj = sceneManager.PaletteHolders[paletteKey].Elements[index] as IMeshNode;
                 if (obj != null)
                     renderer.ZoomToBounds(obj.GetNodeBounds(), 500);
-            }
-            else if (node.NodeType == NodeType.StartPositions)
-            {
-                var obj = sceneManager.StartPositions[index];
-                renderer.ZoomToBounds(obj.GetTotalBounds(), 500);
-            }
-            else if (node.NodeType == NodeType.TriggerVolumes)
-            {
-                var obj = sceneManager.TriggerVolumes[index];
-                renderer.ZoomToBounds(obj.GetTotalBounds(), 500);
             }
             else
             {
@@ -253,12 +216,6 @@ namespace Reclaimer.Controls
             var paletteKey = PaletteType.FromNodeType(scenario.SelectedNodeType);
             if (paletteKey != null)
                 scenario.SelectedItemIndex = scenario.Palettes[paletteKey].Placements.IndexOf(element.DataContext as ObjectPlacement);
-            if (scenario.SelectedNodeType == NodeType.StartPositions)
-                scenario.SelectedItemIndex = scenario.StartingPositions.IndexOf(element.DataContext as StartPosition);
-            else if (scenario.SelectedNodeType == NodeType.TriggerVolumes)
-            {
-
-            }
             else
             {
                 var handler = scenario.ComponentManagers.FirstOrDefault(c => c.HandlesNodeType(scenario.SelectedNodeType));
@@ -308,21 +265,14 @@ namespace Reclaimer.Controls
             }
 
             sceneManager.PaletteHolders[PaletteType.Decal].GroupElement.IsRendering = false;
-            sceneManager.StartPositionGroup.IsRendering = false;
-            sceneManager.TriggerVolumeGroup.IsRendering = false;
-
-            modelGroup.Children.Add(sceneManager.StartPositionGroup);
-            modelGroup.Children.Add(sceneManager.TriggerVolumeGroup);
 
             modelGroup.Children.AddRange(scenario.ComponentManagers.SelectMany(c => c.GetSceneElements()));
+            TreeViewItems.AddRange(scenario.ComponentManagers.SelectMany(c => c.GetSceneNodes()));
 
             foreach (var c in scenario.ComponentManagers)
                 c.OnSelectedTreeNodeChanged(scenario.SelectedNode);
 
-            modelGroup.Visibility = Visibility.Visible;
-
             #region Generate Tree Nodes
-            TreeViewItems.AddRange(scenario.ComponentManagers.SelectMany(c => c.GetSceneNodes()));
 
             foreach (var holder in sceneManager.PaletteHolders.Values)
             {
@@ -342,23 +292,9 @@ namespace Reclaimer.Controls
                 if (paletteNode.HasItems)
                     TreeViewItems.Add(paletteNode);
             }
-
-            volumesNode = new TreeItemModel { Header = "trigger volumes", IsChecked = true };
-            foreach (var tv in sceneManager.TriggerVolumes)
-            {
-                var permNode = new TreeItemModel { Header = (tv.DataContext as TriggerVolume).Name, IsChecked = true, Tag = tv };
-                volumesNode.Items.Add(permNode);
-            }
             #endregion
-        }
 
-        private void RefreshTriggerVolumes(int selectedIndex)
-        {
-            for (int i = 0; i < volumesNode.Items.Count; i++)
-            {
-                var node = volumesNode.Items[i];
-                (node.Tag as IMeshNode).SetVisibility(node.IsChecked == true || i == selectedIndex);
-            }
+            modelGroup.Visibility = Visibility.Visible;
         }
 
         #region Treeview Events
@@ -383,8 +319,7 @@ namespace Reclaimer.Controls
             SetState((e.OriginalSource as FrameworkElement).DataContext as TreeItemModel, true);
             isWorking = false;
 
-            if (scenario.SelectedNodeType == NodeType.TriggerVolumes)
-                RefreshTriggerVolumes(scenario.SelectedItemIndex);
+            scenario.ComponentManagers.OfType<Components.TriggerVolumeComponentManager>().First().RefreshTriggerVolumes(scenario.SelectedItemIndex);
         }
 
         private void SetState(TreeItemModel item, bool updateRender)

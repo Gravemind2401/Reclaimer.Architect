@@ -128,17 +128,6 @@ namespace Reclaimer.Controls
                     CurrentItem = null;
                     LoadData();
                 }
-                else if (nodeType == NodeType.StartPositions && itemIndex >= 0)
-                {
-                    var section = scenario.Sections[Section.StartPositions];
-
-                    rootNode = section.Node;
-                    baseAddress = section.TagBlock.Pointer.Address
-                        + itemIndex * section.BlockSize;
-
-                    CurrentItem = scenario.StartingPositions[itemIndex];
-                    LoadData();
-                }
                 else if (nodeType == NodeType.StartProfiles && itemIndex >= 0)
                 {
                     var section = scenario.Sections[Section.StartProfiles];
@@ -148,17 +137,6 @@ namespace Reclaimer.Controls
                         + itemIndex * section.BlockSize;
 
                     CurrentItem = scenario.Items[itemIndex];
-                    LoadData();
-                }
-                else if (nodeType == NodeType.TriggerVolumes && itemIndex >= 0)
-                {
-                    var section = scenario.Sections[Section.TriggerVolumes];
-
-                    rootNode = section.Node;
-                    baseAddress = section.TagBlock.Pointer.Address
-                        + itemIndex * section.BlockSize;
-
-                    CurrentItem = scenario.TriggerVolumes[itemIndex];
                     LoadData();
                 }
                 else
@@ -173,8 +151,10 @@ namespace Reclaimer.Controls
 
                     rootNode = details.RootNode;
                     baseAddress = details.BaseAddress;
-                    altNodes.AddRange(details.AdditionalNodes);
+                    if (details.AdditionalNodes != null)
+                        altNodes.AddRange(details.AdditionalNodes);
                     CurrentItem = details.TargetObject;
+
                     LoadData();
                 }
             }

@@ -163,6 +163,8 @@ namespace Reclaimer.Models
 
             ComponentManagers = new List<ComponentManager>();
             ComponentManagers.Add(new TerrainComponentManager(this));
+            ComponentManagers.Add(new StartPositionComponentManager(this));
+            ComponentManagers.Add(new TriggerVolumeComponentManager(this));
             ComponentManagers.Add(new AiComponentManager(this));
 
             IsBusy = false;

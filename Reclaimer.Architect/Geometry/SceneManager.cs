@@ -33,17 +33,10 @@ namespace Reclaimer.Geometry
         private ScenarioModel scenario;
         public Dictionary<string, PaletteHolder> PaletteHolders { get; private set; }
 
-        public Helix.GroupElement3D StartPositionGroup { get; private set; }
-        public Helix.GroupElement3D TriggerVolumeGroup { get; private set; }
-        public ObservableCollection<StartPositionMarker3D> StartPositions { get; private set; }
-        public ObservableCollection<BoxManipulator3D> TriggerVolumes { get; private set; }
-
         public IEnumerable<Task> ReadScenario(ScenarioModel scenario)
         {
             this.scenario = scenario;
             PaletteHolders = new Dictionary<string, PaletteHolder>();
-            StartPositions = new ObservableCollection<StartPositionMarker3D>();
-            TriggerVolumes = new ObservableCollection<BoxManipulator3D>();
 
             foreach (var definition in scenario.Palettes.Values)
             {
@@ -78,31 +71,6 @@ namespace Reclaimer.Geometry
 
                 for (int i = 0; i < holder.Definition.Placements.Count; i++)
                     ConfigurePlacement(holder, i);
-            }
-
-            StartPositionGroup = new Helix.GroupModel3D();
-            foreach (var pos in scenario.StartingPositions)
-            {
-                var element = new StartPositionMarker3D();
-                BindStartPosition(pos, element);
-                StartPositions.Add(element);
-                StartPositionGroup.Children.Add(element);
-            }
-
-            TriggerVolumeGroup = new Helix.GroupModel3D();
-            foreach (var vol in scenario.TriggerVolumes)
-            {
-                var box = new BoxManipulator3D
-                {
-                    DiffuseColor = TriggerVolume.DefaultColour,
-                    Position = ((IRealVector3D)vol.Position).ToVector3(),
-                    Size = ((IRealVector3D)vol.Size).ToVector3()
-                };
-
-                BindTriggerVolume(vol, box);
-
-                TriggerVolumes.Add(box);
-                TriggerVolumeGroup.Children.Add(box);
             }
 
             foreach (var c in scenario.ComponentManagers)
@@ -200,29 +168,6 @@ namespace Reclaimer.Geometry
 
             model.DataContext = placement;
             BindingOperations.SetBinding(model, Helix.Element3D.TransformProperty, binding);
-        }
-
-        private void BindStartPosition(StartPosition pos, Helix.Element3D model)
-        {
-            var binding = new MultiBinding { Converter = EulerTransformConverter.Instance, Mode = BindingMode.TwoWay };
-            binding.Bindings.Add(new Binding(nameof(StartPosition.Position)) { Mode = BindingMode.TwoWay });
-            binding.Bindings.Add(new Binding(nameof(StartPosition.Orientation)) { Mode = BindingMode.TwoWay });
-
-            model.DataContext = pos;
-            BindingOperations.SetBinding(model, Helix.Element3D.TransformProperty, binding);
-        }
-
-        private void BindTriggerVolume(TriggerVolume vol, BoxManipulator3D box)
-        {
-            box.DataContext = vol;
-            BindingOperations.SetBinding(box, BoxManipulator3D.ForwardVectorProperty,
-                new Binding(nameof(TriggerVolume.ForwardVector)) { Mode = BindingMode.TwoWay, Converter = SharpDXVectorConverter.Instance });
-            BindingOperations.SetBinding(box, BoxManipulator3D.UpVectorProperty,
-                new Binding(nameof(TriggerVolume.UpVector)) { Mode = BindingMode.TwoWay, Converter = SharpDXVectorConverter.Instance });
-            BindingOperations.SetBinding(box, BoxManipulator3D.PositionProperty,
-                new Binding(nameof(TriggerVolume.Position)) { Mode = BindingMode.TwoWay, Converter = SharpDXVectorConverter.Instance });
-            BindingOperations.SetBinding(box, BoxManipulator3D.SizeProperty,
-                new Binding(nameof(TriggerVolume.Size)) { Mode = BindingMode.TwoWay, Converter = SharpDXVectorConverter.Instance });
         }
 
         public void Dispose()
