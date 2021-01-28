@@ -120,6 +120,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Blam\Common\CacheSegmenter.cs" />
     <Compile Include="Blam\Halo3\model.cs" />
     <Compile Include="Blam\Halo3\object.cs" />
     <Compile Include="Blam\Halo3\scenario_structure_bsp.cs" />
