@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 
 using Helix = HelixToolkit.Wpf.SharpDX;
+using System.Windows.Controls;
 
 namespace Reclaimer.Components
 {
@@ -107,6 +108,11 @@ namespace Reclaimer.Components
             return TriggerVolumes[itemIndex].GetTotalBounds();
         }
 
+        public override IEnumerable<ScenarioListItem> GetListItems(SceneNodeModel treeNode)
+        {
+            return scenario.TriggerVolumes.Select(vol => new ScenarioListItem(vol.GetDisplayName(), vol));
+        }
+
         internal override BlockPropertiesLocator GetPropertiesLocator(SceneNodeModel treeNode, int itemIndex)
         {
             if (itemIndex < 0)
@@ -118,7 +124,7 @@ namespace Reclaimer.Components
                 RootNode = section.Node,
                 BaseAddress = section.TagBlock.Pointer.Address
                     + itemIndex * section.BlockSize,
-                TargetObject = scenario.TriggerVolumes[itemIndex]
+                TargetObject = scenario.Items[itemIndex]
             };
         }
 

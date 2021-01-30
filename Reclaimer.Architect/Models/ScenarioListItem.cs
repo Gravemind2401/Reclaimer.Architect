@@ -7,29 +7,34 @@ using System.Threading.Tasks;
 using Reclaimer.Plugins.MetaViewer;
 using Reclaimer.Resources;
 using Reclaimer.Plugins.MetaViewer.Halo3;
+using System.Windows.Controls;
 
 namespace Reclaimer.Models
 {
-    public class ScenarioListItem : BindableBase, IMetaUpdateReceiver
+    public class ScenarioListItem : ListBoxItem, IMetaUpdateReceiver
     {
-        public int Index { get; }
+        public ScenarioListItem(string content)
+            : this(content, null)
+        { }
 
-        public ScenarioListItem(int index)
+        public ScenarioListItem(string content, object tag)
         {
-            Index = index;
+            Content = content;
+            Tag = tag;
         }
 
-        private string name;
-        public string Name
+        void IMetaUpdateReceiver.UpdateFromMetaValue(MetaValueBase meta, string fieldId)
         {
-            get { return name; }
-            set { SetProperty(ref name, value); }
+            var receiver = Tag as IMetaUpdateReceiver;
+            if (receiver == null)
+                return;
+
+            receiver.UpdateFromMetaValue(meta, fieldId);
+
+            if (fieldId == FieldId.Name || fieldId == FieldId.TagReference)
+                Content = receiver.GetDisplayName();
         }
 
-        public void UpdateFromMetaValue(MetaValueBase meta, string fieldId)
-        {
-            if (fieldId == FieldId.Name)
-                Name = (meta as SimpleValue)?.Value?.ToString();
-        }
+        string IMetaUpdateReceiver.GetDisplayName() => (Tag as IMetaUpdateReceiver)?.GetDisplayName();
     }
 }

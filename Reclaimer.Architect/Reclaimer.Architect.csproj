@@ -127,6 +127,7 @@
     <Compile Include="Blam\HaloReach\model.cs" />
     <Compile Include="Blam\HaloReach\object.cs" />
     <Compile Include="Components\ComponentManager.cs" />
+    <Compile Include="Components\MissionComponentManager.cs" />
     <Compile Include="Components\StartPositionComponentManager.cs" />
     <Compile Include="Components\TerrainComponentManager.cs" />
     <Compile Include="Components\TriggerVolumeComponentManager.cs" />

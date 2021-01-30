@@ -36,7 +36,7 @@ namespace Reclaimer.Models
 
         public Dictionary<string, ScenarioSection> Sections { get; }
         public ObservableCollection<SceneNodeModel> Hierarchy { get; }
-        public ObservableCollection<ListBoxItem> Items { get; }
+        public ObservableCollection<ScenarioListItem> Items { get; }
 
         public ObservableCollection<TagReference> Bsps { get; }
         public ObservableCollection<TagReference> Skies { get; }
@@ -130,7 +130,7 @@ namespace Reclaimer.Models
             MetadataStream = new InMemoryMetadataStream(item, GetXmlData(ScenarioTag.CacheFile, "Metadata"));
             Sections = new Dictionary<string, ScenarioSection>();
             Hierarchy = new ObservableCollection<SceneNodeModel>();
-            Items = new ObservableCollection<ListBoxItem>();
+            Items = new ObservableCollection<ScenarioListItem>();
 
             Bsps = new ObservableCollection<TagReference>();
             Skies = new ObservableCollection<TagReference>();
@@ -162,6 +162,7 @@ namespace Reclaimer.Models
             }
 
             ComponentManagers = new List<ComponentManager>();
+            ComponentManagers.Add(new MissionComponentManager(this));
             ComponentManagers.Add(new TerrainComponentManager(this));
             ComponentManagers.Add(new StartPositionComponentManager(this));
             ComponentManagers.Add(new TriggerVolumeComponentManager(this));
@@ -169,6 +170,10 @@ namespace Reclaimer.Models
 
             IsBusy = false;
         }
+
+        internal T GetComponent<T>() where T : ComponentManager => ComponentManagers.OfType<T>().FirstOrDefault();
+
+        internal ComponentManager GetNodeTypeHandler(NodeType handlesNodeType) => ComponentManagers.FirstOrDefault(c => c.HandlesNodeType(handlesNodeType));
 
         private string GetXmlData(ICacheFile cache, string suffix)
         {
@@ -635,64 +640,13 @@ namespace Reclaimer.Models
             if (paletteKey != null)
             {
                 foreach (var placement in Palettes[paletteKey].Placements)
-                    Items.Add(new ListBoxItem { Content = placement.GetDisplayName(), Tag = placement });
-
-                return;
+                    Items.Add(new ScenarioListItem(placement.GetDisplayName(), placement));
             }
-            else if (SelectedNodeType == NodeType.StartPositions)
+            else
             {
-                foreach (var pos in StartingPositions)
-                    Items.Add(new ListBoxItem { Content = pos.GetDisplayName(), Tag = pos });
-            }
-            else if (SelectedNodeType == NodeType.StartProfiles)
-                DisplayStartProfiles();
-            else if (SelectedNodeType == NodeType.TriggerVolumes)
-            {
-                foreach (var vol in TriggerVolumes)
-                    Items.Add(new ListBoxItem { Content = vol.GetDisplayName(), Tag = vol });
-            }
-            else if (SelectedNodeType == NodeType.AiSquadGroups)
-            {
-                foreach (var group in SquadHierarchy.SquadGroups)
-                    Items.Add(new ListBoxItem { Content = group.Name, Tag = group });
-            }
-            else if (SelectedNodeType == NodeType.AiZones)
-            {
-                foreach (var zone in SquadHierarchy.Zones)
-                    Items.Add(new ListBoxItem { Content = zone.Name, Tag = zone });
-            }
-            else if (SelectedNodeType == NodeType.AiZoneAreas)
-            {
-                foreach (var area in (SelectedNode.Parent.Tag as AiZone).Areas)
-                    Items.Add(new ListBoxItem { Content = area.GetDisplayName(), Tag = area });
-            }
-            else if (SelectedNodeType == NodeType.AiFiringPositions)
-            {
-                foreach (var fpos in (SelectedNode.Parent.Tag as AiZone).FiringPositions)
-                    Items.Add(new ListBoxItem { Content = fpos.GetDisplayName(), Tag = fpos });
-            }
-            else if (SelectedNodeType == NodeType.AiSquads)
-            {
-                foreach (var squad in (SelectedNode.Parent.Tag as AiZone).Squads)
-                    Items.Add(new ListBoxItem { Content = squad.Name, Tag = squad });
-            }
-            else if (SelectedNodeType == NodeType.AiEncounters)
-            {
-                foreach (var enc in (SelectedNode.Parent.Tag as AiSquad).Encounters)
-                    Items.Add(new ListBoxItem { Content = enc.Name, Tag = enc });
-            }
-            else if (SelectedNodeType == NodeType.AiStartingLocations
-                || SelectedNodeType == NodeType.AiGroupStartingLocations
-                || SelectedNodeType == NodeType.AiSoloStartingLocations)
-            {
-                var locations = SelectedNodeType == NodeType.AiStartingLocations
-                    ? (SelectedNode.Parent.Tag as AiEncounter).StartingLocations
-                    : SelectedNodeType == NodeType.AiGroupStartingLocations
-                        ? (SelectedNode.Parent.Tag as AiSquad).GroupStartLocations
-                        : (SelectedNode.Parent.Tag as AiSquad).SoloStartLocations;
-
-                foreach (var loc in locations)
-                    Items.Add(new ListBoxItem { Content = loc.GetDisplayName(), Tag = loc });
+                var handler = GetNodeTypeHandler(SelectedNodeType);
+                if (handler != null)
+                    Items.AddRange(handler.GetListItems(selectedNode));
             }
 
             HierarchyView.ShowCurrentSelection();
@@ -711,8 +665,7 @@ namespace Reclaimer.Models
                     reader.Seek(baseAddress + nameOffset, SeekOrigin.Begin);
 
                     var name = reader.ReadNullTerminatedString();
-                    var item = new ScenarioListItem(i) { Name = name };
-                    Items.Add(new ListBoxItem { Content = item.Name, Tag = item });
+                    Items.Add(new ScenarioListItem(name));
                 }
             }
         }

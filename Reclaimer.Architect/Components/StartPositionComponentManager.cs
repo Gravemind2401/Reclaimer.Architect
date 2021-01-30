@@ -67,6 +67,11 @@ namespace Reclaimer.Components
             return GetElement(treeNode, itemIndex).GetTotalBounds();
         }
 
+        public override IEnumerable<ScenarioListItem> GetListItems(SceneNodeModel treeNode)
+        {
+            return scenario.StartingPositions.Select(pos => new ScenarioListItem(pos.GetDisplayName(), pos));
+        }
+
         internal override BlockPropertiesLocator GetPropertiesLocator(SceneNodeModel treeNode, int itemIndex)
         {
             if (itemIndex < 0)
@@ -78,7 +83,7 @@ namespace Reclaimer.Components
                 RootNode = section.Node,
                 BaseAddress = section.TagBlock.Pointer.Address
                     + itemIndex * section.BlockSize,
-                //TargetObject = scenario.Items[itemIndex]
+                TargetObject = scenario.Items[itemIndex]
             };
         }
 

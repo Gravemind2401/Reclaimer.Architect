@@ -1,4 +1,5 @@
 ﻿using Adjutant.Blam.Common;
+using Reclaimer.Components;
 using Reclaimer.Geometry;
 using Reclaimer.Models;
 using Reclaimer.Models.Ai;
@@ -153,13 +154,15 @@ namespace Reclaimer.Controls
             var paletteKey = PaletteType.FromNodeType(node.NodeType);
             foreach (var palette in sceneManager.PaletteHolders.Values)
                 palette.GroupElement.IsHitTestVisible = palette.Name == paletteKey;
+
+            var selection = renderer.GetSelectedElement();
+            if (selection != null && (selection.IsRendering == false || selection.EnumerateAncestors().Any(e => e.IsRendering == false)))
+                renderer.SetSelectedElement(null);
         }
 
         public void SelectObject(SceneNodeModel node, int itemIndex)
         {
             if (node == null || !isReady) return;
-
-            SelectPalette(node);
 
             if (itemIndex < 0)
                 return;
@@ -172,7 +175,7 @@ namespace Reclaimer.Controls
             }
             else
             {
-                var handler = scenario.ComponentManagers.FirstOrDefault(c => c.HandlesNodeType(scenario.SelectedNodeType));
+                var handler = scenario.GetNodeTypeHandler(scenario.SelectedNodeType);
                 renderer.SetSelectedElement(handler?.GetElement(node, itemIndex));
             }
         }
@@ -190,7 +193,7 @@ namespace Reclaimer.Controls
             }
             else
             {
-                var handler = scenario.ComponentManagers.FirstOrDefault(c => c.HandlesNodeType(scenario.SelectedNodeType));
+                var handler = scenario.GetNodeTypeHandler(scenario.SelectedNodeType);
                 if (handler != null)
                     renderer.ZoomToBounds(handler.GetObjectBounds(node, index), 500);
             }
@@ -218,7 +221,7 @@ namespace Reclaimer.Controls
                 scenario.SelectedItemIndex = scenario.Palettes[paletteKey].Placements.IndexOf(element.DataContext as ObjectPlacement);
             else
             {
-                var handler = scenario.ComponentManagers.FirstOrDefault(c => c.HandlesNodeType(scenario.SelectedNodeType));
+                var handler = scenario.GetNodeTypeHandler(scenario.SelectedNodeType);
                 if (handler != null)
                     scenario.SelectedItemIndex = handler.GetElementIndex(scenario.SelectedNode, element);
             }
@@ -264,8 +267,8 @@ namespace Reclaimer.Controls
             modelGroup.Children.AddRange(scenario.ComponentManagers.SelectMany(c => c.GetSceneElements()));
 
             renderer.ScaleToContent();
-            var elements = scenario.ComponentManagers.OfType<Components.TerrainComponentManager>().First().BspHolder.Elements.WhereNotNull();
 
+            var elements = scenario.GetComponent<TerrainComponentManager>().BspElements;
             if (elements.Any())
             {
                 var bounds = elements.GetTotalBounds();
@@ -320,7 +323,7 @@ namespace Reclaimer.Controls
             SetState((e.OriginalSource as FrameworkElement).DataContext as TreeItemModel, true);
             isWorking = false;
 
-            scenario.ComponentManagers.OfType<Components.TriggerVolumeComponentManager>().First().RefreshTriggerVolumes(scenario.SelectedItemIndex);
+            scenario.GetComponent<TriggerVolumeComponentManager>().RefreshTriggerVolumes(scenario.SelectedItemIndex);
         }
 
         private void SetState(TreeItemModel item, bool updateRender)

@@ -34,5 +34,7 @@ namespace Reclaimer.Models.Ai
             if (fieldId == FieldId.Name)
                 Name = ((Plugins.MetaViewer.Halo3.StringValue)meta).Value;
         }
+
+        string IMetaUpdateReceiver.GetDisplayName() => Name;
     }
 }

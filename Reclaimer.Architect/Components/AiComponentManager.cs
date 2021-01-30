@@ -235,6 +235,39 @@ namespace Reclaimer.Components
             else throw new ArgumentException();
         }
 
+        public override IEnumerable<ScenarioListItem> GetListItems(SceneNodeModel treeNode)
+        {
+            var zoneTag = treeNode.Parent.Tag as AiZone;
+            var encTag = treeNode.Parent.Tag as AiEncounter;
+            var squadTag = treeNode.Parent.Tag as AiSquad;
+
+            if (treeNode.NodeType == NodeType.AiSquadGroups)
+                return scenario.SquadHierarchy.SquadGroups.Select(group => new ScenarioListItem(group.Name, group));
+            else if (treeNode.NodeType == NodeType.AiZones)
+                return scenario.SquadHierarchy.Zones.Select(zone => new ScenarioListItem(zone.Name, zone));
+            else if (treeNode.NodeType == NodeType.AiZoneAreas)
+                return zoneTag.Areas.Select(area => new ScenarioListItem(area.GetDisplayName(), area));
+            else if (treeNode.NodeType == NodeType.AiFiringPositions)
+                return zoneTag.FiringPositions.Select(fpos => new ScenarioListItem(fpos.GetDisplayName(), fpos));
+            else if (treeNode.NodeType == NodeType.AiSquads)
+                return zoneTag.Squads.Select(squad => new ScenarioListItem(squad.Name, squad));
+            else if (treeNode.NodeType == NodeType.AiEncounters)
+                return squadTag.Encounters.Select(enc => new ScenarioListItem(enc.Name, enc));
+            else if (treeNode.NodeType == NodeType.AiStartingLocations
+                || treeNode.NodeType == NodeType.AiGroupStartingLocations
+                || treeNode.NodeType == NodeType.AiSoloStartingLocations)
+            {
+                var locations = treeNode.NodeType == NodeType.AiStartingLocations
+                    ? encTag.StartingLocations
+                    : treeNode.NodeType == NodeType.AiGroupStartingLocations
+                        ? squadTag.GroupStartLocations
+                        : squadTag.SoloStartLocations;
+
+                return locations.Select(loc => new ScenarioListItem(loc.GetDisplayName(), loc));
+            }
+            else return Enumerable.Empty<ScenarioListItem>();
+        }
+
         internal override BlockPropertiesLocator GetPropertiesLocator(SceneNodeModel treeNode, int itemIndex)
         {
             XmlNode rootNode;

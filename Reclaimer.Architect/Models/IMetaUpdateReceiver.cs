@@ -10,5 +10,6 @@ namespace Reclaimer.Models
     internal interface IMetaUpdateReceiver
     {
         void UpdateFromMetaValue(MetaValueBase meta, string fieldId);
+        string GetDisplayName();
     }
 }

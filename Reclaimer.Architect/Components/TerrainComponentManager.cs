@@ -16,8 +16,10 @@ namespace Reclaimer.Components
     {
         private const string NullTagName = "<null>";
 
-        public ObjectHolder BspHolder { get; }
-        public ObjectHolder SkyHolder { get; }
+        private readonly ObjectHolder BspHolder;
+        private readonly ObjectHolder SkyHolder;
+
+        public IEnumerable<Helix.Element3D> BspElements => BspHolder.Elements.WhereNotNull();
 
         public TerrainComponentManager(ScenarioModel scenario)
             : base(scenario)

@@ -121,42 +121,21 @@ namespace Reclaimer.Controls
             }
             else
             {
-                if (nodeType == NodeType.Mission)
+                var handler = scenario.GetNodeTypeHandler(nodeType);
+                var details = handler?.GetPropertiesLocator(node, itemIndex);
+                if (details == null)
                 {
-                    rootNode = scenario.Sections[Section.Mission].Node;
-                    baseAddress = scenario.RootAddress;
                     CurrentItem = null;
-                    LoadData();
+                    return;
                 }
-                else if (nodeType == NodeType.StartProfiles && itemIndex >= 0)
-                {
-                    var section = scenario.Sections[Section.StartProfiles];
 
-                    rootNode = section.Node;
-                    baseAddress = section.TagBlock.Pointer.Address
-                        + itemIndex * section.BlockSize;
+                rootNode = details.RootNode;
+                baseAddress = details.BaseAddress;
+                if (details.AdditionalNodes != null)
+                    altNodes.AddRange(details.AdditionalNodes);
+                CurrentItem = details.TargetObject;
 
-                    CurrentItem = scenario.Items[itemIndex];
-                    LoadData();
-                }
-                else
-                {
-                    var handler = scenario.ComponentManagers.FirstOrDefault(c => c.HandlesNodeType(nodeType));
-                    var details = handler?.GetPropertiesLocator(node, itemIndex);
-                    if (details == null)
-                    {
-                        CurrentItem = null;
-                        return;
-                    }
-
-                    rootNode = details.RootNode;
-                    baseAddress = details.BaseAddress;
-                    if (details.AdditionalNodes != null)
-                        altNodes.AddRange(details.AdditionalNodes);
-                    CurrentItem = details.TargetObject;
-
-                    LoadData();
-                }
+                LoadData();
             }
 
             Visibility = Visibility.Visible;
