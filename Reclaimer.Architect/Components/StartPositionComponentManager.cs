@@ -72,7 +72,7 @@ namespace Reclaimer.Components
             if (itemIndex < 0)
                 return null;
 
-            var section = scenario.Sections[Section.StartProfiles];
+            var section = scenario.Sections[Section.StartPositions];
             return new BlockPropertiesLocator
             {
                 RootNode = section.Node,
