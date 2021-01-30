@@ -254,6 +254,15 @@ namespace Reclaimer.Controls
                 modelGroup.Children.Add(holder.GroupElement);
             }
 
+            sceneManager.PaletteHolders[PaletteType.Decal].GroupElement.IsRendering = false;
+
+            TreeViewItems.AddRange(scenario.ComponentManagers.SelectMany(c => c.GetSceneNodes()));
+
+            foreach (var c in scenario.ComponentManagers)
+                c.OnSelectedTreeNodeChanged(scenario.SelectedNode);
+
+            modelGroup.Children.AddRange(scenario.ComponentManagers.SelectMany(c => c.GetSceneElements()));
+
             renderer.ScaleToContent();
             var elements = scenario.ComponentManagers.OfType<Components.TerrainComponentManager>().First().BspHolder.Elements.WhereNotNull();
 
@@ -263,14 +272,6 @@ namespace Reclaimer.Controls
                 renderer.CameraSpeed = Math.Ceiling(bounds.Size.Length());
                 renderer.ZoomToBounds(bounds);
             }
-
-            sceneManager.PaletteHolders[PaletteType.Decal].GroupElement.IsRendering = false;
-
-            modelGroup.Children.AddRange(scenario.ComponentManagers.SelectMany(c => c.GetSceneElements()));
-            TreeViewItems.AddRange(scenario.ComponentManagers.SelectMany(c => c.GetSceneNodes()));
-
-            foreach (var c in scenario.ComponentManagers)
-                c.OnSelectedTreeNodeChanged(scenario.SelectedNode);
 
             #region Generate Tree Nodes
 
