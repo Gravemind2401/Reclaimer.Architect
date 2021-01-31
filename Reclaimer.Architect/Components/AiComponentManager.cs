@@ -176,7 +176,7 @@ namespace Reclaimer.Components
 
         public override void OnSelectedTreeNodeChanged(SceneNodeModel newNode)
         {
-            var nodeType = newNode?.NodeType;
+            var nodeType = newNode?.NodeType ?? NodeType.None;
             var nodeTag = newNode?.Tag;
 
             foreach (var pair in FiringPositionGroups)

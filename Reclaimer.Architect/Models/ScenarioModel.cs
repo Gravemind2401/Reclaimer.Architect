@@ -163,6 +163,7 @@ namespace Reclaimer.Models
 
             ComponentManagers = new List<ComponentManager>();
             ComponentManagers.Add(new MissionComponentManager(this));
+            ComponentManagers.Add(new PaletteComponentManager(this));
             ComponentManagers.Add(new TerrainComponentManager(this));
             ComponentManagers.Add(new StartPositionComponentManager(this));
             ComponentManagers.Add(new TriggerVolumeComponentManager(this));
@@ -636,38 +637,11 @@ namespace Reclaimer.Models
             if (SelectedNodeType == NodeType.None)
                 return;
 
-            var paletteKey = PaletteType.FromNodeType(SelectedNodeType);
-            if (paletteKey != null)
-            {
-                foreach (var placement in Palettes[paletteKey].Placements)
-                    Items.Add(new ScenarioListItem(placement.GetDisplayName(), placement));
-            }
-            else
-            {
-                var handler = GetNodeTypeHandler(SelectedNodeType);
-                if (handler != null)
-                    Items.AddRange(handler.GetListItems(selectedNode));
-            }
+            var handler = GetNodeTypeHandler(SelectedNodeType);
+            if (handler != null)
+                Items.AddRange(handler.GetListItems(selectedNode));
 
             HierarchyView.ShowCurrentSelection();
-        }
-
-        private void DisplayStartProfiles()
-        {
-            var section = Sections[Section.StartProfiles];
-            var nameOffset = OffsetById(section.Node, FieldId.Name);
-
-            using (var reader = CreateReader())
-            {
-                for (int i = 0; i < section.TagBlock.Count; i++)
-                {
-                    var baseAddress = section.TagBlock.Pointer.Address + section.BlockSize * i;
-                    reader.Seek(baseAddress + nameOffset, SeekOrigin.Begin);
-
-                    var name = reader.ReadNullTerminatedString();
-                    Items.Add(new ScenarioListItem(name));
-                }
-            }
         }
 
         private void OnSelectedNodeChanged()

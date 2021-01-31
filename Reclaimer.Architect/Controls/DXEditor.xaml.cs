@@ -101,7 +101,7 @@ namespace Reclaimer.Controls
         }
         #endregion
 
-        private readonly SceneManager sceneManager;
+        private readonly ModelFactory factory = new ModelFactory();
         private readonly Helix.GroupModel3D modelGroup = new Helix.GroupModel3D();
 
         private bool isReady;
@@ -115,7 +115,6 @@ namespace Reclaimer.Controls
             InitializeComponent();
             TabModel = new TabModel(this, TabItemType.Document);
             TreeViewItems = new ObservableCollection<TreeItemModel>();
-            sceneManager = new SceneManager();
 
             DataContext = this;
 
@@ -145,16 +144,10 @@ namespace Reclaimer.Controls
         {
             if (node == null || !isReady) return;
 
-            sceneManager.PaletteHolders[PaletteType.Decal].GroupElement.IsRendering = node.NodeType == NodeType.Decals;
-
             foreach (var c in scenario.ComponentManagers)
                 c.OnSelectedTreeNodeChanged(node);
 
-            //if not a palette this will disable hit testing on all palettes
-            var paletteKey = PaletteType.FromNodeType(node.NodeType);
-            foreach (var palette in sceneManager.PaletteHolders.Values)
-                palette.GroupElement.IsHitTestVisible = palette.Name == paletteKey;
-
+            //remove selection highlighter if it is no longer visible
             var selection = renderer.GetSelectedElement();
             if (selection != null && (selection.IsRendering == false || selection.EnumerateAncestors().Any(e => e.IsRendering == false)))
                 renderer.SetSelectedElement(null);
@@ -167,48 +160,29 @@ namespace Reclaimer.Controls
             if (itemIndex < 0)
                 return;
 
-            var paletteKey = PaletteType.FromNodeType(node.NodeType);
-            if (paletteKey != null)
-            {
-                var selected = sceneManager.PaletteHolders[paletteKey];
-                renderer.SetSelectedElement(selected.Elements[itemIndex]);
-            }
-            else
-            {
-                var handler = scenario.GetNodeTypeHandler(scenario.SelectedNodeType);
-                renderer.SetSelectedElement(handler?.GetElement(node, itemIndex));
-            }
+            var handler = scenario.GetNodeTypeHandler(scenario.SelectedNodeType);
+            renderer.SetSelectedElement(handler?.GetElement(node, itemIndex));
         }
 
         public void NavigateToObject(SceneNodeModel node, int index)
         {
             if (node == null || !isReady) return;
 
-            var paletteKey = PaletteType.FromNodeType(node.NodeType);
-            if (paletteKey != null)
-            {
-                var obj = sceneManager.PaletteHolders[paletteKey].Elements[index] as IMeshNode;
-                if (obj != null)
-                    renderer.ZoomToBounds(obj.GetNodeBounds(), 500);
-            }
-            else
-            {
-                var handler = scenario.GetNodeTypeHandler(scenario.SelectedNodeType);
-                if (handler != null)
-                    renderer.ZoomToBounds(handler.GetObjectBounds(node, index), 500);
-            }
+            var handler = scenario.GetNodeTypeHandler(scenario.SelectedNodeType);
+            if (handler != null)
+                renderer.ZoomToBounds(handler.GetObjectBounds(node, index), 500);
         }
 
         public void RefreshPalette(string paletteKey, int index)
         {
             renderer.SetSelectedElement(null);
-            sceneManager.RefreshPalette(paletteKey, index);
+            scenario.GetComponent<PaletteComponentManager>().RefreshPalette(factory, paletteKey, index);
         }
 
         public void RefreshObject(string paletteKey, ObjectPlacement placement, string fieldId)
         {
             renderer.SetSelectedElement(null);
-            sceneManager.RefreshObject(paletteKey, placement, fieldId);
+            scenario.GetComponent<PaletteComponentManager>().RefreshObject(factory, paletteKey, placement, fieldId);
         }
 
         public void OnElementSelected(Helix.Element3D element)
@@ -216,15 +190,9 @@ namespace Reclaimer.Controls
             if (element?.DataContext == null)
                 return;
 
-            var paletteKey = PaletteType.FromNodeType(scenario.SelectedNodeType);
-            if (paletteKey != null)
-                scenario.SelectedItemIndex = scenario.Palettes[paletteKey].Placements.IndexOf(element.DataContext as ObjectPlacement);
-            else
-            {
-                var handler = scenario.GetNodeTypeHandler(scenario.SelectedNodeType);
-                if (handler != null)
-                    scenario.SelectedItemIndex = handler.GetElementIndex(scenario.SelectedNode, element);
-            }
+            var handler = scenario.GetNodeTypeHandler(scenario.SelectedNodeType);
+            if (handler != null)
+                scenario.SelectedItemIndex = handler.GetElementIndex(scenario.SelectedNode, element);
         }
 
         public void LoadScenario()
@@ -234,7 +202,7 @@ namespace Reclaimer.Controls
 
             Task.Run(async () =>
             {
-                await Task.WhenAll(sceneManager.ReadScenario(scenario));
+                await Task.WhenAll(scenario.ComponentManagers.Select(c=> c.InitializeResourcesAsync(factory)));
 
                 Dispatcher.Invoke(() =>
                 {
@@ -249,22 +217,14 @@ namespace Reclaimer.Controls
 
         private void PostLoadScenario()
         {
-            sceneManager.RenderScenario();
-
-            foreach (var holder in sceneManager.PaletteHolders.Values)
-            {
-                holder.GroupElement.IsHitTestVisible = false;
-                modelGroup.Children.Add(holder.GroupElement);
-            }
-
-            sceneManager.PaletteHolders[PaletteType.Decal].GroupElement.IsRendering = false;
+            foreach (var c in scenario.ComponentManagers)
+                c.InitializeElements(factory);
 
             TreeViewItems.AddRange(scenario.ComponentManagers.SelectMany(c => c.GetSceneNodes()));
+            modelGroup.Children.AddRange(scenario.ComponentManagers.SelectMany(c => c.GetSceneElements()));
 
             foreach (var c in scenario.ComponentManagers)
                 c.OnSelectedTreeNodeChanged(scenario.SelectedNode);
-
-            modelGroup.Children.AddRange(scenario.ComponentManagers.SelectMany(c => c.GetSceneElements()));
 
             renderer.ScaleToContent();
 
@@ -275,28 +235,6 @@ namespace Reclaimer.Controls
                 renderer.CameraSpeed = Math.Ceiling(bounds.Size.Length());
                 renderer.ZoomToBounds(bounds);
             }
-
-            #region Generate Tree Nodes
-
-            foreach (var holder in sceneManager.PaletteHolders.Values)
-            {
-                if (holder.Name == PaletteType.Decal)
-                    continue;
-
-                var paletteNode = new TreeItemModel { Header = holder.Name, IsChecked = true };
-
-                for (int i = 0; i < holder.Elements.Count; i++)
-                {
-                    var info = holder.GetInfoForIndex(i);
-
-                    var permNode = info.TreeItem = new TreeItemModel { Header = info.Placement.GetDisplayName(), IsChecked = true, Tag = info.Element };
-                    paletteNode.Items.Add(permNode);
-                }
-
-                if (paletteNode.HasItems)
-                    TreeViewItems.Add(paletteNode);
-            }
-            #endregion
 
             modelGroup.Visibility = Visibility.Visible;
         }
@@ -453,7 +391,11 @@ namespace Reclaimer.Controls
         {
             TreeViewItems.Clear();
             modelGroup.Children.Clear();
-            sceneManager.Dispose();
+
+            foreach (var c in scenario.ComponentManagers)
+                c.DisposeSceneElements();
+
+            factory.Dispose();
             renderer.Dispose();
             GC.Collect();
         }

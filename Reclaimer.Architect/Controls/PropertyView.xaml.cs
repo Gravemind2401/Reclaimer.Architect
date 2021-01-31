@@ -105,38 +105,22 @@ namespace Reclaimer.Controls
             rootNode = null;
             altNodes.Clear();
 
-            var nodeType = node.NodeType;
-            var paletteKey = PaletteType.FromNodeType(nodeType);
-            if (paletteKey != null && itemIndex >= 0)
+            var nodeType = node?.NodeType ?? NodeType.None;
+            var handler = scenario.GetNodeTypeHandler(nodeType);
+            var details = handler?.GetPropertiesLocator(node, itemIndex);
+            if (details == null)
             {
-                var palette = scenario.Palettes[paletteKey];
-                rootNode = palette.PlacementsNode;
-                baseAddress = palette.PlacementBlockRef.TagBlock.Pointer.Address
-                    + itemIndex * palette.PlacementBlockRef.BlockSize;
-
-                altNodes.Add(Tuple.Create(palette.PaletteNode, scenario.RootAddress));
-
-                CurrentItem = palette.Placements[itemIndex];
-                LoadData();
+                CurrentItem = null;
+                return;
             }
-            else
-            {
-                var handler = scenario.GetNodeTypeHandler(nodeType);
-                var details = handler?.GetPropertiesLocator(node, itemIndex);
-                if (details == null)
-                {
-                    CurrentItem = null;
-                    return;
-                }
 
-                rootNode = details.RootNode;
-                baseAddress = details.BaseAddress;
-                if (details.AdditionalNodes != null)
-                    altNodes.AddRange(details.AdditionalNodes);
-                CurrentItem = details.TargetObject;
+            rootNode = details.RootNode;
+            baseAddress = details.BaseAddress;
+            if (details.AdditionalNodes != null)
+                altNodes.AddRange(details.AdditionalNodes);
+            CurrentItem = details.TargetObject;
 
-                LoadData();
-            }
+            LoadData();
 
             Visibility = Visibility.Visible;
         }

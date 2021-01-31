@@ -49,6 +49,7 @@ namespace Reclaimer.Components
         public virtual void OnSelectedTreeNodeChanged(SceneNodeModel newNode) { }
 
         //only called if HandlesNodeType, can return null if item is not geometry
+        //use to select the returned element when user clicks on an item in the listbox
         public virtual Helix.Element3D GetElement(SceneNodeModel treeNode, int itemIndex)
         {
             return null;

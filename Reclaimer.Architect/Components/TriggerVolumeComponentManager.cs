@@ -19,14 +19,15 @@ namespace Reclaimer.Components
 {
     public class TriggerVolumeComponentManager : ComponentManager
     {
+        private readonly TreeItemModel sceneNode;
         private readonly ObservableCollection<BoxManipulator3D> TriggerVolumes;
 
         private Helix.GroupElement3D TriggerVolumeGroup;
-        private TreeItemModel sceneNode;
 
         public TriggerVolumeComponentManager(ScenarioModel scenario)
             : base(scenario)
         {
+            sceneNode = new TreeItemModel { Header = "trigger volumes", IsChecked = true };
             TriggerVolumes = new ObservableCollection<BoxManipulator3D>();
         }
 
@@ -59,7 +60,8 @@ namespace Reclaimer.Components
 
         public override IEnumerable<TreeItemModel> GetSceneNodes()
         {
-            sceneNode = new TreeItemModel { Header = "trigger volumes", IsChecked = true };
+            sceneNode.Items.Clear();
+
             foreach (var tv in TriggerVolumes)
             {
                 var permNode = new TreeItemModel { Header = (tv.DataContext as TriggerVolume).Name, IsChecked = true, Tag = tv };
@@ -156,7 +158,7 @@ namespace Reclaimer.Components
             TriggerVolumes.Clear();
 
             TriggerVolumeGroup = null;
-            sceneNode = null;
+            sceneNode.Items.Clear();
         }
     }
 }

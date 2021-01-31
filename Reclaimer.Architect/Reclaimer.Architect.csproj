@@ -128,6 +128,7 @@
     <Compile Include="Blam\HaloReach\object.cs" />
     <Compile Include="Components\ComponentManager.cs" />
     <Compile Include="Components\MissionComponentManager.cs" />
+    <Compile Include="Components\PaletteComponentManager.cs" />
     <Compile Include="Components\StartPositionComponentManager.cs" />
     <Compile Include="Components\TerrainComponentManager.cs" />
     <Compile Include="Components\TriggerVolumeComponentManager.cs" />
@@ -178,7 +179,6 @@
     <Compile Include="Geometry\ObjectHolder.cs" />
     <Compile Include="Geometry\BspManager.cs" />
     <Compile Include="Components\AiComponentManager.cs" />
-    <Compile Include="Geometry\SceneManager.cs" />
     <Compile Include="Models\Ai\AiFiringPosition.cs" />
     <Compile Include="Models\Ai\AiNamedBlock.cs" />
     <Compile Include="Models\Ai\AiArea.cs" />
