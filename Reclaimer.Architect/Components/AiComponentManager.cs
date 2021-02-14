@@ -72,7 +72,7 @@ namespace Reclaimer.Components
 
         public override void InitializeElements(ModelFactory factory)
         {
-            foreach (var zone in scenario.SquadHierarchy.Zones)
+            foreach (var zone in scenario.SquadHierarchy.EnumerateZones())
             {
                 #region Firing Positions
                 var fposGroup = new Helix.GroupModel3D();

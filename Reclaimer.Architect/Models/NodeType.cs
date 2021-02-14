@@ -36,6 +36,7 @@ namespace Reclaimer.Models
         // AI
         AiSquadGroups,
         AiZones,
+        AiDefaultZoneItem,
         AiZoneItem,
         AiFiringPositions,
         AiZoneAreas,

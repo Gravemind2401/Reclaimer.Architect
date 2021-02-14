@@ -23,6 +23,19 @@
   <node header="AI">
     <node header="Squad Groups" type="AiSquadGroups" />
     <node header="Zones" type="AiZones">
+      <placeholder header="#zone" type="AiDefaultZoneItem">
+        <node header="Squads" type="AiSquads">
+          <placeholder header="#squad" type="AiSquadItem">
+            <node header="Encounters" type="AiEncounters" maxGame="Halo3ODST">
+              <placeholder header="#encounter" type="AiEncounterItem">
+                <node header="Starting Locations" type="AiStartingLocations" />
+              </placeholder>
+            </node>
+            <node header="Spawn Formations" type="AiGroupStartingLocations" minGame="Halo3ODST" />
+            <node header="Spawn Points" type="AiSoloStartingLocations" minGame="Halo3ODST" />
+          </placeholder>
+        </node>
+      </placeholder>
       <placeholder header="#zone" type="AiZoneItem">
         <node header="Firing Positions" type="AiFiringPositions" />
         <node header="Areas" type="AiZoneAreas" />

@@ -14,6 +14,7 @@ namespace Reclaimer.Models.Ai
         internal Dictionary<string, XmlNode> AiNodes { get; }
         public ObservableCollection<AiNamedBlock> SquadGroups { get; }
         public ObservableCollection<AiZone> Zones { get; }
+        public AiZone DefaultZone { get; }
 
         public AiSquadHierarchy(ScenarioModel scenario)
         {
@@ -23,7 +24,10 @@ namespace Reclaimer.Models.Ai
 
             SquadGroups = new ObservableCollection<AiNamedBlock>();
             Zones = new ObservableCollection<AiZone>();
+            DefaultZone = new AiZone(null, -1) { Name = "<none>" };
         }
+
+        public IEnumerable<AiZone> EnumerateZones() => Enumerable.Repeat(DefaultZone, 1).Concat(Zones);
     }
 
     public class AiZone : AiNamedBlock
