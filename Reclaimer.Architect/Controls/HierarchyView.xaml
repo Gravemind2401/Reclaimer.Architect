@@ -43,11 +43,13 @@
                     <ContentControl Template="{StaticResource ic_ExpandAll_16x}" />
                 </Button>
                 <Separator />
-                <Button Click="btnAddItem_Click" IsEnabled="False"
+                <Button x:Name="btnAddItem" IsEnabled="False"
+                        Click="btnAddItem_Click"
                         ToolTip="Add Object">
                     <ContentControl Template="{StaticResource ic_Add_16x}" />
                 </Button>
-                <Button Click="btnDeleteItem_Click" IsEnabled="False"
+                <Button x:Name="btnDeleteItem" IsEnabled="False"
+                        Click="btnDeleteItem_Click"
                         ToolTip="Delete Object">
                     <ContentControl Template="{StaticResource ic_Remove_color_16x}" />
                 </Button>

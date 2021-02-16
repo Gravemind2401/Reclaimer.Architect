@@ -55,6 +55,9 @@ namespace Reclaimer.Controls
         private void tv_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             scenario.SelectedNode = tv.SelectedItem as SceneNodeModel;
+            var nodeType = scenario.SelectedNodeType;
+            btnAddItem.IsEnabled = btnDeleteItem.IsEnabled
+                = scenario.GetNodeTypeHandler(nodeType)?.CanAddRemoveNodeType(nodeType) ?? false;
         }
 
         private void ListItemMouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -85,12 +88,18 @@ namespace Reclaimer.Controls
 
         private void btnAddItem_Click(object sender, RoutedEventArgs e)
         {
-
+            var treeNode = scenario.SelectedNode;
+            var handler = scenario.GetNodeTypeHandler(treeNode.NodeType);
+            if (handler.AddObject(treeNode, scenario.SelectedItemIndex))
+                scenario.RefreshItemList();
         }
 
         private void btnDeleteItem_Click(object sender, RoutedEventArgs e)
         {
-
+            var treeNode = scenario.SelectedNode;
+            var handler = scenario.GetNodeTypeHandler(treeNode.NodeType);
+            if (handler.RemoveObject(treeNode, scenario.SelectedItemIndex))
+                scenario.RefreshItemList();
         }
 
         private void btnEditPalette_Click(object sender, RoutedEventArgs e)

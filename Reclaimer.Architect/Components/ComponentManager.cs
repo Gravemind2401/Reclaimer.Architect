@@ -79,6 +79,21 @@ namespace Reclaimer.Components
             throw new NotImplementedException();
         }
 
+        //true if the add/remove buttons should be enabled for this node type
+        public virtual bool CanAddRemoveNodeType(NodeType nodeType) => false;
+
+        //only called if CanAddRemoveNodeType when add button is clicked
+        public virtual bool AddObject(SceneNodeModel treeNode, int itemIndex)
+        {
+            throw new NotImplementedException();
+        }
+
+        //only called if CanAddRemoveNodeType when remove button is clicked
+        public virtual bool RemoveObject(SceneNodeModel treeNode, int itemIndex)
+        {
+            throw new NotImplementedException();
+        }
+
         public virtual void DisposeSceneElements() { }
     }
 }

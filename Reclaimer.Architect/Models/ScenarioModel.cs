@@ -1,23 +1,20 @@
-﻿using System;
+﻿using Adjutant.Blam.Common;
+using Adjutant.Blam.Common.Gen3;
+using Adjutant.Spatial;
+using Prism.Mvvm;
+using Reclaimer.Components;
+using Reclaimer.Models.Ai;
+using Reclaimer.Plugins.MetaViewer;
+using Reclaimer.Resources;
+using Reclaimer.Utilities.IO;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.IO.Endian;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
-using Reclaimer.Utilities;
-using System.Collections.ObjectModel;
-using Prism.Mvvm;
-using Adjutant.Blam.Common;
-using Reclaimer.Plugins.MetaViewer;
-using Adjutant.Spatial;
-using System.Windows.Controls;
-using System.IO.Endian;
-using System.Runtime.CompilerServices;
-using System.IO;
-using Reclaimer.Resources;
-using Adjutant.Blam.Common.Gen3;
-using Reclaimer.Models.Ai;
-using Reclaimer.Components;
 
 namespace Reclaimer.Models
 {
@@ -657,6 +654,15 @@ namespace Reclaimer.Models
             HierarchyView.ShowCurrentSelection();
             PropertyView?.ShowProperties(SelectedNode, SelectedItemIndex);
             RenderView?.SelectObject(SelectedNode, SelectedItemIndex);
+        }
+
+        //reload items list and keep selection if possible
+        public void RefreshItemList()
+        {
+            var index = SelectedItemIndex;
+            DisplayItems();
+            if (index < Items.Count)
+                SelectedItemIndex = index;
         }
 
         public EndianReader CreateReader()
