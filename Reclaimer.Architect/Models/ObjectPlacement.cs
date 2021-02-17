@@ -15,19 +15,24 @@ namespace Reclaimer.Models
     {
         internal readonly string PaletteKey;
 
-        private int paletteIndex;
-        public int PaletteIndex
+        private short paletteIndex;
+        public short PaletteIndex
         {
             get { return paletteIndex; }
             set
             {
+                var oldValue = paletteIndex;
                 if (SetProperty(ref paletteIndex, value, FieldId.PaletteIndex))
+                {
                     Parent.RenderView?.RefreshObject(PaletteKey, this, FieldId.PaletteIndex);
+                    if (oldValue == -1) //reselect because theres actually something to select now
+                        Parent.RenderView.SelectObject(Parent.SelectedNode, Parent.SelectedItemIndex);
+                }
             }
         }
 
-        private int nameIndex;
-        public int NameIndex
+        private short nameIndex;
+        public short NameIndex
         {
             get { return nameIndex; }
             set { SetProperty(ref nameIndex, value, FieldId.NameIndex); }
@@ -115,7 +120,7 @@ namespace Reclaimer.Models
                     break;
                 case FieldId.PaletteIndex:
                     var blockIndex = meta as BlockIndexValue;
-                    PaletteIndex = int.Parse(blockIndex.Value.ToString());
+                    PaletteIndex = short.Parse(blockIndex.Value.ToString());
                     break;
             }
         }
