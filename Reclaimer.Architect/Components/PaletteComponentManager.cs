@@ -85,8 +85,8 @@ namespace Reclaimer.Components
                 {
                     var info = holder.GetInfoForIndex(i);
 
-                    var permNode = info.TreeItem = new TreeItemModel { Header = info.Placement.GetDisplayName(), IsChecked = true, Tag = info.Element };
-                    paletteNode.Items.Add(permNode);
+                    var itemNode = info.TreeItem = new TreeItemModel { Header = info.Placement.GetDisplayName(), IsChecked = true, Tag = info.Element };
+                    paletteNode.Items.Add(itemNode);
                 }
 
                 if (paletteNode.HasItems)
@@ -117,6 +117,8 @@ namespace Reclaimer.Components
         public override SharpDX.BoundingBox GetObjectBounds(SceneNodeModel treeNode, int itemIndex)
         {
             var element = GetElement(treeNode, itemIndex);
+            if (element == null)
+                return default(SharpDX.BoundingBox);
             return (element as IMeshNode)?.GetNodeBounds() ?? element.GetTotalBounds();
         }
 

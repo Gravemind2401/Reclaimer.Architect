@@ -215,7 +215,7 @@ namespace Reclaimer.Components
 
         public override SharpDX.BoundingBox GetObjectBounds(SceneNodeModel treeNode, int itemIndex)
         {
-            return GetElement(treeNode, itemIndex).GetTotalBounds();
+            return GetElement(treeNode, itemIndex)?.GetTotalBounds() ?? default(SharpDX.BoundingBox);
         }
 
         public override int GetElementIndex(SceneNodeModel treeNode, Helix.Element3D element)
