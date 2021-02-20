@@ -1,6 +1,7 @@
 ﻿using Adjutant.Blam.Common;
 using Adjutant.Blam.Common.Gen3;
 using Adjutant.Utilities;
+using Reclaimer.Blam.Common;
 using Reclaimer.Plugins.MetaViewer;
 using System;
 using System.Collections.Generic;
@@ -13,8 +14,12 @@ using System.Xml;
 
 namespace Reclaimer.Utilities.IO
 {
-    public class InMemoryMetadataStream : Stream
+    public sealed class InMemoryMetadataStream : Stream, IMetadataStream
     {
+        private readonly MemoryTracker tracker = new MemoryTracker();
+        private readonly CacheSegmenter segmenter;
+        private readonly bool isInitialised;
+
         private InMemoryBlockCollection currentBlock;
 
         private IIndexItem SourceItem { get; }
@@ -66,6 +71,12 @@ namespace Reclaimer.Utilities.IO
 
         public InMemoryMetadataStream(IIndexItem item, XmlDocument doc)
         {
+            var gen3Cache = item.CacheFile as IGen3CacheFile;
+            if (gen3Cache == null)
+                throw new ArgumentException("Cache must implement IGen3CacheFile.");
+
+            segmenter = new CacheSegmenter(gen3Cache);
+
             SourceItem = item;
             AllBlocks = new List<InMemoryBlockCollection>();
 
@@ -77,15 +88,16 @@ namespace Reclaimer.Utilities.IO
 
                 reader.Seek(item.MetaPointer.Address, SeekOrigin.Begin);
                 RootBlock = ReadBlocks(reader, doc.DocumentElement, null, 0);
-                //var largest = AllBlocks.OrderByDescending(b => b.TotalSize).ToList();
             }
 
             currentBlock = AllBlocks.FirstOrDefault(b => b.ContainsVirtualAddress(position));
+
+            isInitialised = true;
         }
 
         private InMemoryBlockCollection ReadBlocks(EndianReader reader, XmlNode node, InMemoryBlockCollection parent, int parentBlockIndex)
         {
-            var result = new InMemoryBlockCollection(SourceItem, reader, node, parent, parentBlockIndex);
+            var result = new InMemoryBlockCollection(this, reader, node, parent, parentBlockIndex);
 
             var lastBlock = AllBlocks.LastOrDefault();
             var nextAddress = (lastBlock?.VirtualAddress + lastBlock?.AllocatedSize) ?? 0;
@@ -120,7 +132,8 @@ namespace Reclaimer.Utilities.IO
             using (var fs = new FileStream(SourceItem.CacheFile.FileName, FileMode.Open, FileAccess.Write))
             using (var writer = new EndianWriter(fs, SourceItem.CacheFile.ByteOrder))
             {
-                foreach (var block in AllBlocks)
+                //save largest first: if they get reallocated then smaller blocks might be able to take their place
+                foreach (var block in AllBlocks.OrderByDescending(b => b.VirtualSize))
                     block.Commit(writer);
             }
         }
@@ -192,6 +205,53 @@ namespace Reclaimer.Utilities.IO
                 Position += write;
             }
         }
+        #endregion
+
+        #region IMetadataStream
+
+        bool IMetadataStream.IsInitialised => isInitialised;
+        IIndexItem IMetadataStream.SourceTag => SourceItem;
+        ICacheFile IMetadataStream.SourceCache => SourceItem.CacheFile;
+        ByteOrder IMetadataStream.ByteOrder => SourceItem.CacheFile.ByteOrder;
+        IAddressTranslator IMetadataStream.AddressTranslator => SourceItem.CacheFile.DefaultAddressTranslator;
+        IPointerExpander IMetadataStream.PointerExpander => (SourceItem.CacheFile as IMccCacheFile)?.PointerExpander;
+
+        void IMetadataStream.ResizeTagBlock(ref TagBlock block, int entrySize, int newCount)
+        {
+            var sourceAddress = (int)block.Pointer.Address;
+            var sourceSize = entrySize * block.Count;
+            var newSize = entrySize * newCount;
+
+            if (newCount < block.Count)
+            {
+                block = new TagBlock(newCount, block.Pointer);
+                tracker.Release(sourceAddress + newSize, sourceSize - newSize);
+                return;
+            }
+
+            var translator = SourceItem.CacheFile.DefaultAddressTranslator;
+            var expander = (SourceItem.CacheFile as IMccCacheFile)?.PointerExpander;
+
+            int newAddress;
+            if (!tracker.Find(newSize, out newAddress))
+            {
+                //if there isnt space then make some
+                int freeStart, freeCount;
+                segmenter.AddMetadata(newSize, out freeStart, out freeCount);
+                tracker.Insert(freeStart, freeCount);
+                if (!tracker.Find(newSize, out newAddress)) //should always return true
+                    throw new InvalidDataException("Could not find free space after expanding map!");
+            }
+
+            var newPointer = translator.GetPointer(newAddress);
+            if (expander != null)
+                newPointer = expander.Contract(newPointer);
+
+            block = new TagBlock(newCount, new Pointer((int)newPointer, block.Pointer));
+            tracker.Allocate(newAddress, newSize);
+            tracker.Release(sourceAddress, sourceSize);
+        }
+
         #endregion
     }
 }

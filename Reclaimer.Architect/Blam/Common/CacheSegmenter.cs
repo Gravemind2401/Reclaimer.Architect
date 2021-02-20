@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Adjutant.Blam.Common.Gen3;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -9,10 +10,44 @@ using System.Threading.Tasks;
 
 namespace Reclaimer.Blam.Common
 {
+    //Debug,
+    //Resource,
+    //Tag,
+    //Localization
+
+    //p = pages size
+    //x = 44367872 (section size + p, new virt size)
+    //y = 917504 (section 0 size) old>(MetaArea.Offset - tagSection.VirtualAddress)
+    //a = 6666518528 (new vba)
+    //b = 4250599424 (new section offset 0) old>(StringArea.Offset - debugSection.VirtualAddress)
+    //c = 4294049792 (x - y + b)
+
+    //file size + p
+    //tag buffer offset - y
+    //virtual size + p
+    //string table index offset + x
+    //string table data offset + x
+    //file table offset + x
+    //file table index offset + x
+    //virtual base address - p
+    //partition 0 addr + a
+    //partition 0 size + p
+    //offset masks 0 + b
+    //offset masks 2 + y
+    //sections 0 addr + x
+    //sections 2 addr + c
+    //sections 2 size + p
+
+    //old
+    //string offset 348889088 (string index ptr)
+    //debug vaddr 393256960 (file size - virt size)
+    //meta offset 349806592 (tag address)
+    //tags vaddr 348889088 (section 0 address)
+
     //based on https://github.com/XboxChaos/Assembly/blob/dev/src/Blamite/IO/FileSegmenter.cs
     public class CacheSegmenter
     {
-        private readonly Adjutant.Blam.MccHalo3.CacheFile cache;
+        private readonly IGen3CacheFile cache;
         private readonly List<Segment> segments = new List<Segment>();
 
         private readonly Segment resourceSegment;
@@ -28,17 +63,17 @@ namespace Reclaimer.Blam.Common
         private readonly SegmentGroup stringsGroup = new SegmentGroup();
         private readonly SegmentGroup localesGroup = new SegmentGroup();
 
-        public CacheSegmenter(Adjutant.Blam.MccHalo3.CacheFile cache)
+        public CacheSegmenter(IGen3CacheFile cache)
         {
             this.cache = cache;
 
-            var debugTranslator = new Adjutant.Blam.Common.Gen3.SectionAddressTranslator(cache, 0);
-            var resourceTranslator = new Adjutant.Blam.Common.Gen3.SectionAddressTranslator(cache, 1);
-            var metadataTranslator = new Adjutant.Blam.Common.Gen3.SectionAddressTranslator(cache, 2);
-            var localeTranslator = new Adjutant.Blam.Common.Gen3.SectionAddressTranslator(cache, 3);
+            var debugTranslator = new SectionAddressTranslator(cache, 0);
+            var resourceTranslator = new SectionAddressTranslator(cache, 1);
+            var metadataTranslator = new SectionAddressTranslator(cache, 2);
+            var localeTranslator = new SectionAddressTranslator(cache, 3);
 
             //header
-            segments.Add(new Segment(0, 12288, 1));
+            segments.Add(new Segment(0, 12288, 1)); //needs to be a variable
 
             //eof
             segments.Add(new Segment((int)this.cache.Header.FileSize, 0, 1));
@@ -59,7 +94,7 @@ namespace Reclaimer.Blam.Common
 
             origin = (int)debugTranslator.GetAddress(this.cache.Header.StringTablePointer.Value);
             size = this.cache.Header.StringTableSize;
-            segments.Add(stringsGroup.Add(stringSegment1 = new Segment(origin, size, 1)));
+            segments.Add(stringsGroup.Add(stringSegment1 = new Segment(origin, size, 1)));  //align 16 when aes?
 
             //tag names
             origin = (int)debugTranslator.GetAddress(this.cache.Header.FileTableIndexPointer.Value);
@@ -78,8 +113,10 @@ namespace Reclaimer.Blam.Common
 
                 origin = (int)localeTranslator.GetAddress(def.StringsOffset);
                 size = def.StringsSize;
-                segments.Add(localesGroup.Add(new Segment(origin, size, 1))); //align 16 with aes
+                segments.Add(localesGroup.Add(new Segment(origin, size, 1))); //align 16 when aes
             }
+
+            //mcc reach has string table stuff here
 
             segments.Sort((a, b) => a.Offset.CompareTo(b.Offset));
 
@@ -87,16 +124,23 @@ namespace Reclaimer.Blam.Common
                 segments[i].NextSegment = segments[i + 1];
         }
 
-        public void AddMetadata(int count)
+        public void AddMetadata(int length, out int insertedAt, out int insertedCount)
         {
-            metadataSegment.Size += count;
+            using (var fs = new FileStream(cache.FileName, FileMode.Open, FileAccess.Write))
+                AddMetadata(fs, length, out insertedAt, out insertedCount);
+        }
+
+        public void AddMetadata(FileStream fileStream, int length, out int insertedAt, out int insertedCount)
+        {
+            length = metadataSegment.Expand(length);
 
             cache.Header.FileSize = eofSegment.Offset;
 
-            var debugTranslator = new Adjutant.Blam.Common.Gen3.SectionAddressTranslator(cache, 0);
+            var debugTranslator = new SectionAddressTranslator(cache, 0);
+            //var metadataTranslator = new SectionAddressTranslator(cache, 2);
 
             var remaining = metadataSegment.AvailableSize - cache.Header.PartitionTable.Skip(1).Sum(p => (int)p.Size);
-            var pointer = cache.MetadataTranslator.GetPointer(metadataSegment.Offset) - count;
+            var pointer = cache.DefaultAddressTranslator.GetPointer(metadataSegment.Offset) - length; //DefaultAddressTranslator should always be the MetadataTranslator
             cache.Header.PartitionTable[0].Size = (ulong)remaining;
             cache.Header.PartitionTable[0].Address = (ulong)pointer;
 
@@ -142,11 +186,13 @@ namespace Reclaimer.Blam.Common
             pointer = debugTranslator.GetPointer(stringSegment3.Offset);
             cache.Header.FileTablePointer = new Adjutant.Utilities.Pointer((int)pointer, cache.Header.FileTablePointer);
 
-            using (var fs = new FileStream(cache.FileName, FileMode.Open))
-            using (var writer = new EndianWriter(fs, cache.ByteOrder, new UTF8Encoding(), true))
+            using (var writer = new EndianWriter(fileStream, cache.ByteOrder, new UTF8Encoding(), true))
             {
+                insertedAt = metadataSegment.Offset;
+                insertedCount = length;
+
                 writer.Seek(metadataSegment.Offset, SeekOrigin.Begin);
-                writer.Insert(0, count);
+                writer.Insert(0, length);
             }
         }
 
@@ -188,6 +234,13 @@ namespace Reclaimer.Blam.Common
                 this.size = size;
                 OffsetAlignment = 1;
                 SizeAlignment = sizeAlignment;
+            }
+
+            public int Expand(int minIncrease)
+            {
+                var increase = Align(minIncrease, OffsetAlignment);
+                Size += increase;
+                return increase;
             }
 
             private int Align(int value, int blockSize)

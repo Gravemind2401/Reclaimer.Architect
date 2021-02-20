@@ -17,11 +17,11 @@ namespace Reclaimer.Utilities.IO
     //'entry' refers to the individual chunks within a block (there are [count] entries in a block)
     internal class InMemoryBlockCollection : IBlockEditor
     {
-        private readonly ByteOrder byteOrder;
-        private readonly IAddressTranslator translator;
-        private readonly IPointerExpander expander;
+        private readonly IMetadataStream stream;
 
+        private bool hasChanged;
         private byte[] data;
+        private TagBlock blockRef;
 
         public XmlNode XmlNode { get; }
         public InMemoryBlockCollection ParentBlock { get; }
@@ -29,7 +29,7 @@ namespace Reclaimer.Utilities.IO
         public int OffsetInParent { get; } //the offset (in the parent entry) of the pointer to this block
         public int ParentEntryIndex { get; } //the index of the parent entry
         public string Name { get; }
-        public TagBlock BlockRef { get; } //the blockref in the parent entry that points here
+        public TagBlock BlockRef => blockRef; //the blockref in the parent entry that points here
         public int EntrySize { get; }
 
         public int VirtualAddress { get; private set; }
@@ -42,11 +42,9 @@ namespace Reclaimer.Utilities.IO
 
         public int VirtualSize => EntrySize * EntryCount;
 
-        public InMemoryBlockCollection(IIndexItem sourceItem, EndianReader reader, XmlNode node, InMemoryBlockCollection parent, int parentBlockIndex)
+        public InMemoryBlockCollection(IMetadataStream stream, EndianReader reader, XmlNode node, InMemoryBlockCollection parent, int parentBlockIndex)
         {
-            byteOrder = sourceItem.CacheFile.ByteOrder;
-            translator = sourceItem.CacheFile.DefaultAddressTranslator;
-            expander = (sourceItem.CacheFile as IMccCacheFile)?.PointerExpander;
+            this.stream = stream;
 
             XmlNode = node;
             ParentBlock = parent;
@@ -56,9 +54,9 @@ namespace Reclaimer.Utilities.IO
 
             if (parent == null) //tag root
             {
-                OffsetInParent = (int)sourceItem.MetaPointer.Address;
-                Name = sourceItem.FileName();
-                BlockRef = null;
+                OffsetInParent = (int)stream.SourceTag.MetaPointer.Address;
+                Name = stream.SourceTag.FileName();
+                blockRef = null;
                 EntryCount = 1;
                 EntrySize = node.GetIntAttribute("baseSize") ?? 0;
                 data = reader.ReadBytes(VirtualSize);
@@ -67,7 +65,7 @@ namespace Reclaimer.Utilities.IO
             {
                 OffsetInParent = node.GetIntAttribute("offset") ?? 0;
                 Name = node.GetStringAttribute("name");
-                BlockRef = reader.ReadObject<TagBlock>();
+                blockRef = reader.ReadObject<TagBlock>();
                 EntryCount = BlockRef.Count;
                 EntrySize = node.GetIntAttribute("elementSize", "entrySize", "size") ?? 0;
 
@@ -119,6 +117,7 @@ namespace Reclaimer.Utilities.IO
         {
             count = Math.Min(count, AllocatedSize - position);
             Array.Copy(buffer, offset, data, position, count);
+            OnChanged();
             return count;
         }
 
@@ -184,18 +183,19 @@ namespace Reclaimer.Utilities.IO
 
             EntryCount = newCount;
             UpdateSourcePointer();
+            OnChanged();
         }
 
         public void UpdateSourcePointer()
         {
-            var newPointer = translator.GetPointer(VirtualAddress);
-            if (expander != null)
-                newPointer = expander.Contract(newPointer);
+            var newPointer = stream.AddressTranslator.GetPointer(VirtualAddress);
+            if (stream.PointerExpander != null)
+                newPointer = stream.PointerExpander.Contract(newPointer);
 
             var countBytes = BitConverter.GetBytes(EntryCount);
             var pointerBytes = BitConverter.GetBytes((int)newPointer);
 
-            if (byteOrder == ByteOrder.BigEndian)
+            if (stream.ByteOrder == ByteOrder.BigEndian)
             {
                 Array.Reverse(countBytes);
                 Array.Reverse(pointerBytes);
@@ -209,13 +209,19 @@ namespace Reclaimer.Utilities.IO
 
         public void Commit(EndianWriter writer)
         {
-            if (EntryCount == 0)
+            if (!hasChanged)
                 return;
+
+            if (BlockRef != null && EntryCount != BlockRef.Count)
+                stream.ResizeTagBlock(ref blockRef, EntrySize, EntryCount);
 
             var rootAddress = BlockRef?.Pointer.Address ?? OffsetInParent;
 
-            writer.Seek(rootAddress, SeekOrigin.Begin);
-            writer.Write(data);
+            if (EntryCount > 0)
+            {
+                writer.Seek(rootAddress, SeekOrigin.Begin);
+                writer.Write(data);
+            }
 
             //restore original pointers
             foreach (var child in ChildBlocks)
@@ -223,6 +229,16 @@ namespace Reclaimer.Utilities.IO
                 writer.Seek(rootAddress + EntrySize * child.ParentEntryIndex + child.OffsetInParent + 4, SeekOrigin.Begin);
                 writer.Write(child.BlockRef.Pointer.Value);
             }
+
+            hasChanged = false;
+        }
+
+        //bindings cause this to get hit as soon as you select an object
+        //but its better than overwriting every block in the whole tag
+        private void OnChanged()
+        {
+            if (!hasChanged && stream.IsInitialised)
+                hasChanged = true;
         }
 
         public override string ToString() => Name;

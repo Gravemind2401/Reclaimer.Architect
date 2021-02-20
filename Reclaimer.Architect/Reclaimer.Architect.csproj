@@ -211,11 +211,13 @@
     <Compile Include="Resources\AiSection.cs" />
     <Compile Include="Resources\FieldId.cs" />
     <Compile Include="Resources\Section.cs" />
+    <Compile Include="Utilities\IO\IMetadataStream.cs" />
     <Compile Include="Utilities\IO\InMemoryBlockCollection.cs" />
     <Compile Include="Utilities\IO\IBlockEditor.cs" />
+    <Compile Include="Utilities\IO\MemoryTracker.cs" />
     <Compile Include="Utilities\QuaternionTransformConverter.cs" />
     <Compile Include="Utilities\TranslationTransformConverter.cs" />
-    <Compile Include="Utilities\IO\InMemoryMetadata.cs" />
+    <Compile Include="Utilities\IO\InMemoryMetadataStream.cs" />
     <Compile Include="Utilities\IsPaletteNodeConverter.cs" />
     <Compile Include="Utilities\SharpDXVectorConverter.cs" />
     <Compile Include="Utilities\Extensions.cs" />
