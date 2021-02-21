@@ -125,6 +125,19 @@ namespace Reclaimer.Utilities.IO
             return result;
         }
 
+        //resizing the meta means existing virtual pointers are now pointing
+        //to the wrong locations. not only are there now bad pointers in the
+        //stream data but there are also pointers outside the stream that other
+        //objects are using and we cant track or update those. rather than trying
+        //to update all the pointers, this is a big hack to move all the data
+        //into the positions that the pointers are now expecting it to be.
+        private void ShiftAllocations(int offset)
+        {
+            //tag root must always start at 0
+            foreach (var block in AllBlocks.Skip(1).Reverse())
+                block.Allocate(block.VirtualAddress + offset, block.AllocatedSize);
+        }
+
         public IBlockEditor GetBlockEditor(long address) => AllBlocks.FirstOrDefault(b => b.ContainsVirtualAddress(address));
 
         public void Commit()
@@ -241,6 +254,7 @@ namespace Reclaimer.Utilities.IO
                 //if there isnt space then make some
                 int freeStart, freeCount;
                 segmenter.AddMetadata(writer, newSize, out freeStart, out freeCount);
+                ShiftAllocations(freeCount);
                 tracker.Insert(freeStart, freeCount);
                 if (!tracker.Find(newSize, out newAddress)) //should always return true
                     throw new InvalidDataException("Could not find free space after expanding map!");

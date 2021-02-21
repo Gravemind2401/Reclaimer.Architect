@@ -33,7 +33,7 @@ namespace Reclaimer.Utilities.IO
 
         public int ParentEntryIndex { get; } //the index of the parent entry
         public string Name { get; }
-        public TagBlock BlockRef => blockRef; //the blockref in the parent entry that points here
+        public TagBlock BlockRef => blockRef; //the (physical) blockref in the parent entry that points here
         public int EntrySize { get; }
 
         public int VirtualAddress { get; private set; }
@@ -88,9 +88,6 @@ namespace Reclaimer.Utilities.IO
 
             VirtualAddress = address;
             AllocatedSize = size;
-
-            if (ParentBlock == null)
-                return;
 
             UpdateSourcePointer();
         }
@@ -193,6 +190,9 @@ namespace Reclaimer.Utilities.IO
         //points to the correct address if this block has moved or changed size
         public void UpdateSourcePointer()
         {
+            if (ParentBlock == null)
+                return;
+
             var newPointer = stream.AddressTranslator.GetPointer(VirtualAddress);
             if (stream.PointerExpander != null)
                 newPointer = stream.PointerExpander.Contract(newPointer);
