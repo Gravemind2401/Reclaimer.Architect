@@ -124,12 +124,12 @@ namespace Reclaimer.Utilities.IO
 
             return result;
         }
-        
+
         public IBlockEditor GetBlockEditor(long address) => AllBlocks.FirstOrDefault(b => b.ContainsVirtualAddress(address));
 
         public void Commit()
         {
-            using (var fs = new FileStream(SourceItem.CacheFile.FileName, FileMode.Open, FileAccess.Write))
+            using (var fs = new FileStream(SourceItem.CacheFile.FileName, FileMode.Open, FileAccess.ReadWrite))
             using (var writer = new EndianWriter(fs, SourceItem.CacheFile.ByteOrder))
             {
                 //save largest first: if they get reallocated then smaller blocks might be able to take their place
@@ -216,8 +216,11 @@ namespace Reclaimer.Utilities.IO
         IAddressTranslator IMetadataStream.AddressTranslator => SourceItem.CacheFile.DefaultAddressTranslator;
         IPointerExpander IMetadataStream.PointerExpander => (SourceItem.CacheFile as IMccCacheFile)?.PointerExpander;
 
-        void IMetadataStream.ResizeTagBlock(ref TagBlock block, int entrySize, int newCount)
+        void IMetadataStream.ResizeTagBlock(EndianWriter writer, ref TagBlock block, int entrySize, int newCount)
         {
+            if (newCount == block.Count)
+                return;
+
             var sourceAddress = (int)block.Pointer.Address;
             var sourceSize = entrySize * block.Count;
             var newSize = entrySize * newCount;
@@ -229,19 +232,22 @@ namespace Reclaimer.Utilities.IO
                 return;
             }
 
-            var translator = SourceItem.CacheFile.DefaultAddressTranslator;
-            var expander = (SourceItem.CacheFile as IMccCacheFile)?.PointerExpander;
+            //release before find, in case the release creates a bigger contiguous chunk
+            tracker.Release(sourceAddress, sourceSize);
 
             int newAddress;
             if (!tracker.Find(newSize, out newAddress))
             {
                 //if there isnt space then make some
                 int freeStart, freeCount;
-                segmenter.AddMetadata(newSize, out freeStart, out freeCount);
+                segmenter.AddMetadata(writer, newSize, out freeStart, out freeCount);
                 tracker.Insert(freeStart, freeCount);
                 if (!tracker.Find(newSize, out newAddress)) //should always return true
                     throw new InvalidDataException("Could not find free space after expanding map!");
             }
+
+            var translator = SourceItem.CacheFile.DefaultAddressTranslator;
+            var expander = (SourceItem.CacheFile as IMccCacheFile)?.PointerExpander;
 
             var newPointer = translator.GetPointer(newAddress);
             if (expander != null)
@@ -249,7 +255,6 @@ namespace Reclaimer.Utilities.IO
 
             block = new TagBlock(newCount, new Pointer((int)newPointer, block.Pointer));
             tracker.Allocate(newAddress, newSize);
-            tracker.Release(sourceAddress, sourceSize);
         }
 
         #endregion

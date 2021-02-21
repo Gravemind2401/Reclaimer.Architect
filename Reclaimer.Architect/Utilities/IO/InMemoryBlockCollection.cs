@@ -26,7 +26,11 @@ namespace Reclaimer.Utilities.IO
         public XmlNode XmlNode { get; }
         public InMemoryBlockCollection ParentBlock { get; }
         public List<InMemoryBlockCollection> ChildBlocks { get; } //all blocks from all pointers from all entries in this block
-        public int OffsetInParent { get; } //the offset (in the parent entry) of the pointer to this block
+
+        //the offset (in the parent entry) of the pointer to this block
+        private readonly int? offsetInParent; //null for tag root
+        public int OffsetInParent => offsetInParent ?? (int)stream.SourceTag.MetaPointer.Address;
+
         public int ParentEntryIndex { get; } //the index of the parent entry
         public string Name { get; }
         public TagBlock BlockRef => blockRef; //the blockref in the parent entry that points here
@@ -54,7 +58,6 @@ namespace Reclaimer.Utilities.IO
 
             if (parent == null) //tag root
             {
-                OffsetInParent = (int)stream.SourceTag.MetaPointer.Address;
                 Name = stream.SourceTag.FileName();
                 blockRef = null;
                 EntryCount = 1;
@@ -63,7 +66,7 @@ namespace Reclaimer.Utilities.IO
             }
             else
             {
-                OffsetInParent = node.GetIntAttribute("offset") ?? 0;
+                offsetInParent = node.GetIntAttribute("offset") ?? 0;
                 Name = node.GetStringAttribute("name");
                 blockRef = reader.ReadObject<TagBlock>();
                 EntryCount = BlockRef.Count;
@@ -186,6 +189,8 @@ namespace Reclaimer.Utilities.IO
             OnChanged();
         }
 
+        //update the virtual pointer in the parent block to make sure it still
+        //points to the correct address if this block has moved or changed size
         public void UpdateSourcePointer()
         {
             var newPointer = stream.AddressTranslator.GetPointer(VirtualAddress);
@@ -201,10 +206,10 @@ namespace Reclaimer.Utilities.IO
                 Array.Reverse(pointerBytes);
             }
 
-            var pointerAddress = ParentBlock.EntrySize * ParentEntryIndex + OffsetInParent;
+            var refOffset = ParentBlock.EntrySize * ParentEntryIndex + OffsetInParent;
 
-            ParentBlock.Write(pointerAddress, countBytes);
-            ParentBlock.Write(pointerAddress + 4, pointerBytes);
+            ParentBlock.Write(refOffset, countBytes);
+            ParentBlock.Write(refOffset + 4, pointerBytes);
         }
 
         public void Commit(EndianWriter writer)
@@ -213,17 +218,26 @@ namespace Reclaimer.Utilities.IO
                 return;
 
             if (BlockRef != null && EntryCount != BlockRef.Count)
-                stream.ResizeTagBlock(ref blockRef, EntrySize, EntryCount);
+            {
+                stream.ResizeTagBlock(writer, ref blockRef, EntrySize, EntryCount);
+
+                //we dont know if our parent has already been written (or even will be)
+                //just to be sure, we need to go back and update it with the new reference
+                var refOffset = ParentBlock.EntrySize * ParentEntryIndex + OffsetInParent;
+                writer.Seek(ParentBlock.PhysicalAddress + refOffset, SeekOrigin.Begin);
+                BlockRef.Write(writer, null);
+            }
 
             var rootAddress = BlockRef?.Pointer.Address ?? OffsetInParent;
 
             if (EntryCount > 0)
             {
                 writer.Seek(rootAddress, SeekOrigin.Begin);
-                writer.Write(data);
+                writer.Write(data); //this writes our virtual pointers to disk (fix them below)
             }
 
-            //restore original pointers
+            //the block references in our data array currently use virtual pointers
+            //this restores the original pointers that got overwritten above
             foreach (var child in ChildBlocks)
             {
                 writer.Seek(rootAddress + EntrySize * child.ParentEntryIndex + child.OffsetInParent + 4, SeekOrigin.Begin);

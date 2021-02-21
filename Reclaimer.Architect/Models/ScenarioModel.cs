@@ -675,7 +675,7 @@ namespace Reclaimer.Models
             return reader;
         }
 
-        public EndianWriter CreateWriter() => new EndianWriter(MetadataStream, ScenarioTag.CacheFile.ByteOrder, new UTF8Encoding(), true);
+        public EndianWriter CreateWriter() => ScenarioTag.CacheFile.CreateWriter(MetadataStream, true);
     }
 
     public class PaletteDefinition

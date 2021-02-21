@@ -36,8 +36,10 @@ namespace Reclaimer.Utilities.IO
 
         public bool Find(int size, out int start)
         {
-            //assign from the end down since this is intended for tag data use
-            var span = freeSpace.LastOrDefault(s => s.Size >= size);
+            //try to fill the smallest gap available
+            var span = freeSpace
+                .OrderBy(s => s.Size)
+                .FirstOrDefault(s => s.Size >= size);
             start = span?.End - size ?? 0;
             return span != null;
         }

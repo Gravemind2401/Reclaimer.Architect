@@ -1,4 +1,6 @@
-﻿using Adjutant.Blam.Common.Gen3;
+﻿using Adjutant.Blam.Common;
+using Adjutant.Blam.Common.Gen3;
+using Adjutant.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -73,39 +75,39 @@ namespace Reclaimer.Blam.Common
             var localeTranslator = new SectionAddressTranslator(cache, 3);
 
             //header
-            segments.Add(new Segment(0, 12288, 1)); //needs to be a variable
+            segments.Add(new Segment(0, cache.GetHeaderSize(), 1));
 
             //eof
-            segments.Add(new Segment((int)this.cache.Header.FileSize, 0, 1));
+            segments.Add(new Segment((int)cache.Header.FileSize, 0, 1));
 
             //sections
             var origin = (int)resourceTranslator.GetAddress(resourceTranslator.VirtualAddress);
-            var size = (int)this.cache.Header.SectionTable[1].Size;
+            var size = (int)cache.Header.SectionTable[1].Size;
             segments.Add(resourceSegment = new Segment(origin, size, 0x1000));
 
             origin = (int)metadataTranslator.GetAddress(metadataTranslator.VirtualAddress);
-            size = this.cache.Header.VirtualSize;
+            size = cache.Header.VirtualSize;
             segments.Add(metadataSegment = new Segment(origin, size, 0x10000));
 
             //strings
-            origin = (int)debugTranslator.GetAddress(this.cache.Header.StringTableIndexPointer.Value);
-            size = this.cache.Header.StringCount * 4;
+            origin = (int)debugTranslator.GetAddress(cache.Header.StringTableIndexPointer.Value);
+            size = cache.Header.StringCount * 4;
             segments.Add(stringsGroup.Add(stringSegment0 = new Segment(origin, size, 4)));
 
-            origin = (int)debugTranslator.GetAddress(this.cache.Header.StringTablePointer.Value);
-            size = this.cache.Header.StringTableSize;
-            segments.Add(stringsGroup.Add(stringSegment1 = new Segment(origin, size, 1)));  //align 16 when aes?
+            origin = (int)debugTranslator.GetAddress(cache.Header.StringTablePointer.Value);
+            size = cache.Header.StringTableSize;
+            segments.Add(stringsGroup.Add(stringSegment1 = new Segment(origin, size, cache.UsesStringEncryption ? 16 : 1)));
 
             //tag names
-            origin = (int)debugTranslator.GetAddress(this.cache.Header.FileTableIndexPointer.Value);
-            size = this.cache.Header.FileCount * 4;
+            origin = (int)debugTranslator.GetAddress(cache.Header.FileTableIndexPointer.Value);
+            size = cache.Header.FileCount * 4;
             segments.Add(stringsGroup.Add(stringSegment2 = new Segment(origin, size, 4)));
 
-            origin = (int)debugTranslator.GetAddress(this.cache.Header.FileTablePointer.Value);
-            size = this.cache.Header.FileTableSize;
+            origin = (int)debugTranslator.GetAddress(cache.Header.FileTablePointer.Value);
+            size = cache.Header.FileTableSize;
             segments.Add(stringsGroup.Add(stringSegment3 = new Segment(origin, size, 1)));
 
-            foreach (var def in this.cache.LocaleIndex.Languages)
+            foreach (var def in cache.LocaleIndex.Languages)
             {
                 origin = (int)localeTranslator.GetAddress(def.IndicesOffset);
                 size = def.StringCount * 8;
@@ -113,7 +115,7 @@ namespace Reclaimer.Blam.Common
 
                 origin = (int)localeTranslator.GetAddress(def.StringsOffset);
                 size = def.StringsSize;
-                segments.Add(localesGroup.Add(new Segment(origin, size, 1))); //align 16 when aes
+                segments.Add(localesGroup.Add(new Segment(origin, size, cache.UsesStringEncryption ? 16 : 1)));
             }
 
             //mcc reach has string table stuff here
@@ -124,13 +126,20 @@ namespace Reclaimer.Blam.Common
                 segments[i].NextSegment = segments[i + 1];
         }
 
-        public void AddMetadata(int length, out int insertedAt, out int insertedCount)
+        public void AddMetadata(int length)
         {
-            using (var fs = new FileStream(cache.FileName, FileMode.Open, FileAccess.Write))
-                AddMetadata(fs, length, out insertedAt, out insertedCount);
+            int _;
+            AddMetadata(length, out _, out _);
         }
 
-        public void AddMetadata(FileStream fileStream, int length, out int insertedAt, out int insertedCount)
+        public void AddMetadata(int length, out int insertedAt, out int insertedCount)
+        {
+            using (var fs = new FileStream(cache.FileName, FileMode.Open, FileAccess.ReadWrite))
+            using (var writer = cache.CreateWriter(fs, true))
+                AddMetadata(writer, length, out insertedAt, out insertedCount);
+        }
+
+        public void AddMetadata(EndianWriter writer, int length, out int insertedAt, out int insertedCount)
         {
             length = metadataSegment.Expand(length);
 
@@ -175,25 +184,25 @@ namespace Reclaimer.Blam.Common
             cache.Header.VirtualSize = metadataSegment.Size;
 
             pointer = debugTranslator.GetPointer(stringSegment0.Offset);
-            cache.Header.StringTableIndexPointer = new Adjutant.Utilities.Pointer((int)pointer, cache.Header.StringTableIndexPointer);
+            cache.Header.StringTableIndexPointer = new Pointer((int)pointer, cache.Header.StringTableIndexPointer);
 
             pointer = debugTranslator.GetPointer(stringSegment1.Offset);
-            cache.Header.StringTablePointer = new Adjutant.Utilities.Pointer((int)pointer, cache.Header.StringTablePointer);
+            cache.Header.StringTablePointer = new Pointer((int)pointer, cache.Header.StringTablePointer);
 
             pointer = debugTranslator.GetPointer(stringSegment2.Offset);
-            cache.Header.FileTableIndexPointer = new Adjutant.Utilities.Pointer((int)pointer, cache.Header.FileTableIndexPointer);
+            cache.Header.FileTableIndexPointer = new Pointer((int)pointer, cache.Header.FileTableIndexPointer);
 
             pointer = debugTranslator.GetPointer(stringSegment3.Offset);
-            cache.Header.FileTablePointer = new Adjutant.Utilities.Pointer((int)pointer, cache.Header.FileTablePointer);
+            cache.Header.FileTablePointer = new Pointer((int)pointer, cache.Header.FileTablePointer);
 
-            using (var writer = new EndianWriter(fileStream, cache.ByteOrder, new UTF8Encoding(), true))
-            {
-                insertedAt = metadataSegment.Offset;
-                insertedCount = length;
+            insertedAt = metadataSegment.Offset;
+            insertedCount = length;
 
-                writer.Seek(metadataSegment.Offset, SeekOrigin.Begin);
-                writer.Insert(0, length);
-            }
+            writer.Seek(0, SeekOrigin.Begin);
+            writer.WriteObject(cache.Header);
+
+            writer.Seek(metadataSegment.Offset, SeekOrigin.Begin);
+            writer.Insert(0, length);
         }
 
         private class Segment
@@ -238,7 +247,7 @@ namespace Reclaimer.Blam.Common
 
             public int Expand(int minIncrease)
             {
-                var increase = Align(minIncrease, OffsetAlignment);
+                var increase = Align(minIncrease, SizeAlignment);
                 Size += increase;
                 return increase;
             }
