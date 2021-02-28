@@ -39,7 +39,7 @@ namespace Reclaimer.Components
         {
             foreach (var definition in scenario.Palettes.Values)
             {
-                //not fully implemented yet
+                //not implemented
                 if (definition.Name == PaletteType.LightFixture)
                     continue;
 
@@ -56,6 +56,10 @@ namespace Reclaimer.Components
         {
             foreach (var definition in scenario.Palettes.Values)
             {
+                //not implemented
+                if (definition.Name == PaletteType.LightFixture)
+                    continue;
+
                 var holder = new PaletteHolder(definition);
                 holder.GroupElement = new Helix.GroupModel3D();
                 holder.SetCapacity(holder.Definition.Placements.Count);

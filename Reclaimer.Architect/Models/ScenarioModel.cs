@@ -160,8 +160,8 @@ namespace Reclaimer.Models
 
             ComponentManagers = new List<ComponentManager>();
             ComponentManagers.Add(new MissionComponentManager(this));
-            ComponentManagers.Add(new PaletteComponentManager(this));
             ComponentManagers.Add(new TerrainComponentManager(this));
+            ComponentManagers.Add(new PaletteComponentManager(this));
             ComponentManagers.Add(new StartPositionComponentManager(this));
             ComponentManagers.Add(new TriggerVolumeComponentManager(this));
             ComponentManagers.Add(new AiComponentManager(this));
@@ -180,6 +180,7 @@ namespace Reclaimer.Models
             {
                 case CacheType.Halo3Retail:
                 case CacheType.MccHalo3:
+                case CacheType.MccHalo3U4:
                     prefix = "Halo3";
                     break;
                 case CacheType.Halo3ODST:
