@@ -30,6 +30,10 @@ namespace Reclaimer.Components
 
         public override bool HandlesNodeType(NodeType nodeType) => PaletteType.FromNodeType(nodeType) != null;
 
+#if DEBUG
+        public override bool CanAddRemoveNodeType(NodeType nodeType) => PaletteType.FromNodeType(nodeType) != null;
+#endif
+
         public override Task InitializeResourcesAsync(ModelFactory factory)
         {
             return Task.WhenAll(GetResourceInitializers(factory));
@@ -159,6 +163,48 @@ namespace Reclaimer.Components
             }
 
             return null;
+        }
+
+        public override bool AddObject(SceneNodeModel treeNode, int itemIndex)
+        {
+            var paletteKey = PaletteType.FromNodeType(treeNode.NodeType);
+            var holder = PaletteHolders[paletteKey];
+
+            var blockEditor = scenario.MetadataStream.GetBlockEditor(holder.Definition.PlacementBlockRef.TagBlock.Pointer.Address);
+            blockEditor.Add();
+
+            var placement = new ObjectPlacement(scenario, paletteKey);
+            holder.Definition.Placements.Add(placement);
+            holder.TreeItems.Add(new TreeItemModel { Header = placement.GetDisplayName(), IsChecked = true, Tag = null });
+            holder.SetCapacity(holder.Definition.Placements.Count);
+
+            //setting the palette index causes a refresh which builds an element for the new object
+            //these also need to be set to -1 initially anyway
+            placement.PaletteIndex = placement.NameIndex = -1;
+
+            return true;
+        }
+
+        public override bool RemoveObject(SceneNodeModel treeNode, int itemIndex)
+        {
+            if (itemIndex < 0)
+                return false;
+
+            var paletteKey = PaletteType.FromNodeType(treeNode.NodeType);
+            var holder = PaletteHolders[paletteKey];
+
+            if (itemIndex >= holder.Definition.Placements.Count)
+                return false;
+
+            var blockEditor = scenario.MetadataStream.GetBlockEditor(holder.Definition.PlacementBlockRef.TagBlock.Pointer.Address);
+            blockEditor.Remove(itemIndex);
+
+            holder.Definition.Placements.RemoveAt(itemIndex);
+            holder.TreeItems.RemoveAt(itemIndex);
+            holder.GroupElement.Children.RemoveAt(itemIndex);
+            holder.Elements.RemoveAt(itemIndex);
+
+            return true;
         }
 
         public override void DisposeSceneElements()

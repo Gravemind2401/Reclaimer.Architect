@@ -91,7 +91,10 @@ namespace Reclaimer.Controls
             var treeNode = scenario.SelectedNode;
             var handler = scenario.GetNodeTypeHandler(treeNode.NodeType);
             if (handler.AddObject(treeNode, scenario.SelectedItemIndex))
+            {
                 scenario.RefreshItemList();
+                list.ScrollIntoView(scenario.Items.LastOrDefault());
+            }
         }
 
         private void btnDeleteItem_Click(object sender, RoutedEventArgs e)
