@@ -201,7 +201,7 @@ namespace Reclaimer.Components
 
             holder.Definition.Placements.RemoveAt(itemIndex);
             holder.TreeItems.RemoveAt(itemIndex);
-            holder.GroupElement.Children.RemoveAt(itemIndex);
+            holder.GroupElement.Children.Remove(holder.Elements[itemIndex]);
             holder.Elements.RemoveAt(itemIndex);
 
             return true;
@@ -232,7 +232,9 @@ namespace Reclaimer.Components
             RemovePlacement(holder, index);
 
             var placement = holder.Definition.Placements[index];
-            var tag = placement.PaletteIndex >= 0 ? holder.Definition.Palette[placement.PaletteIndex].Tag : null;
+            var tag = placement.PaletteIndex >= 0 && placement.PaletteIndex < holder.Definition.Palette.Count
+                ? holder.Definition.Palette[placement.PaletteIndex].Tag : null;
+
             if (tag == null)
             {
                 holder.Elements[index] = null;
@@ -263,7 +265,13 @@ namespace Reclaimer.Components
         public void RefreshPalette(ModelFactory factory, string paletteKey, int index)
         {
             var holder = PaletteHolders[paletteKey];
-            factory.LoadTag(holder.Definition.Palette[index].Tag, false); // in case it is new to the palette
+
+            try
+            {
+                factory.LoadTag(holder.Definition.Palette[index].Tag, false); // in case it is new to the palette
+            }
+            catch { }
+
             foreach (var placement in holder.Definition.Placements.Where(p => p.PaletteIndex == index))
                 RefreshObject(factory, paletteKey, placement, FieldId.PaletteIndex);
         }
@@ -307,7 +315,7 @@ namespace Reclaimer.Components
 
             model.DataContext = placement;
             BindingOperations.SetBinding(model, Helix.Element3D.TransformProperty, binding);
-        } 
+        }
         #endregion
     }
 }
