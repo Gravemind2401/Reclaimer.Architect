@@ -120,13 +120,16 @@ namespace Reclaimer.Controls
                 altNodes.AddRange(details.AdditionalNodes);
             CurrentItem = details.TargetObject;
 
-            LoadData();
+            Reload();
 
             Visibility = Visibility.Visible;
         }
 
-        private void LoadData()
+        public void Reload()
         {
+            if (rootNode == null)
+                return;
+
             foreach (var meta in valuesById.Values)
                 meta.PropertyChanged -= Meta_PropertyChanged;
             Metadata.Clear();
@@ -175,7 +178,7 @@ namespace Reclaimer.Controls
 
         private void btnReload_Click(object sender, RoutedEventArgs e)
         {
-            LoadData();
+            Reload();
         }
 
         private void btnCollapseAll_Click(object sender, RoutedEventArgs e)

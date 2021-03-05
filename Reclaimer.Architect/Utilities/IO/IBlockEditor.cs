@@ -13,5 +13,6 @@ namespace Reclaimer.Utilities.IO
         void Insert(int index);
         void Copy(int sourceIndex, int destIndex);
         void Resize(int newCount);
+        int EntryCount { get; }
     }
 }

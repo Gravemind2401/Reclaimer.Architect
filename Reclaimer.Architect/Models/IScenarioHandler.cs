@@ -23,6 +23,7 @@ namespace Reclaimer.Models
         void ShowProperties(SceneNodeModel node, int itemIndex);
         void ClearProperties();
         void SetValue(string id, object value);
+        void Reload();
     }
 
     public interface IScenarioRenderView : IScenarioHandler

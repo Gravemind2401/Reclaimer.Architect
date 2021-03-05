@@ -41,19 +41,7 @@ namespace Reclaimer.Controls
             this.paletteKey = paletteKey;
             context = new MetaContext(scenario.Xml, scenario.ScenarioTag.CacheFile, scenario.ScenarioTag, scenario.MetadataStream);
 
-            var palette = scenario.Palettes[paletteKey];
-            var blockRef = palette.PaletteBlockRef;
-            var blockAddress = blockRef.TagBlock.Pointer.Address;
-            var tagRefNode = palette.PaletteNode.SelectSingleNode($"*[@id='{FieldId.TagReference}']");
-            var tagRefOffset = tagRefNode.GetIntAttribute("offset") ?? 0;
-
-            for (int i = 0; i < blockRef.TagBlock.Count; i++)
-            {
-                var baseAddress = blockAddress + blockRef.BlockSize * i + tagRefOffset;
-                var meta = MetaValueBase.GetMetaValue(tagRefNode, context, baseAddress);
-                meta.PropertyChanged += Meta_PropertyChanged;
-                Metadata.Add(meta);
-            }
+            Reload();
 
             DataContext = this;
         }
@@ -64,36 +52,77 @@ namespace Reclaimer.Controls
             Metadata = new ObservableCollection<MetaValueBase>();
         }
 
+        private void Reload()
+        {
+            var palette = scenario.Palettes[paletteKey];
+            var blockRef = palette.PaletteBlockRef;
+            var blockAddress = blockRef.TagBlock.Pointer.Address;
+            var tagRefNode = palette.PaletteNode.SelectSingleNode($"*[@id='{FieldId.TagReference}']");
+            var tagRefOffset = tagRefNode.GetIntAttribute("offset") ?? 0;
+
+            Metadata.Clear();
+            for (int i = 0; i < blockRef.TagBlock.Count; i++)
+            {
+                var baseAddress = blockAddress + blockRef.BlockSize * i + tagRefOffset;
+                var meta = (TagReferenceValue)MetaValueBase.GetMetaValue(tagRefNode, context, baseAddress);
+
+                if ((meta.SelectedItem?.Context?.Id ?? 0) == 0)
+                    meta.SelectedClass = meta.ClassOptions.FirstOrDefault(ci => ci.Label.ToLower() == paletteKey) ?? meta.ClassOptions.FirstOrDefault();
+
+                meta.PropertyChanged += Meta_PropertyChanged;
+                Metadata.Add(meta);
+            }
+        }
+
         private void Meta_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            var item = (sender as TagReferenceValue).SelectedItem.Context;
-            var tagRef = new TagReference(item.CacheFile, item.ClassId, item.Id);
+            var item = (sender as TagReferenceValue).SelectedItem?.Context;
+            var tagRef = item == null ? TagReference.NullReference : new TagReference(item.CacheFile, item.ClassId, item.Id);
 
             var index = Metadata.IndexOf(sender as MetaValueBase);
             scenario.Palettes[paletteKey].Palette[index] = tagRef;
-            scenario.RenderView.RefreshPalette(paletteKey, index);
+            scenario.RenderView?.RefreshPalette(paletteKey, index);
+            scenario.PropertyView?.Reload();
         }
 
         #region Toolbar Events
 
-        private void btnReload_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
         private void btnAddItem_Click(object sender, RoutedEventArgs e)
         {
+#if DEBUG
+            var palette = scenario.Palettes[paletteKey];
+            var blockRef = palette.PaletteBlockRef;
+            var nextIndex = blockRef.TagBlock.Count;
 
+            var blockEditor = scenario.MetadataStream.GetBlockEditor(blockRef.TagBlock.Pointer.Address);
+            blockEditor.Add();
+
+            blockRef.TagBlock = new TagBlock(blockEditor.EntryCount, blockRef.TagBlock.Pointer);
+            scenario.Palettes[paletteKey].Palette.Add(TagReference.NullReference);
+            scenario.RenderView.RefreshPalette(paletteKey, nextIndex);
+
+            scenario.PropertyView?.Reload();
+            Reload();
+#endif
         }
 
         private void btnDeleteItem_Click(object sender, RoutedEventArgs e)
         {
+#if DEBUG
+            var palette = scenario.Palettes[paletteKey];
+            var blockRef = palette.PaletteBlockRef;
+            var nextIndex = blockRef.TagBlock.Count - 1;
 
-        }
+            var blockEditor = scenario.MetadataStream.GetBlockEditor(blockRef.TagBlock.Pointer.Address);
+            blockEditor.Remove(nextIndex);
 
-        private void btnSave_Click(object sender, RoutedEventArgs e)
-        {
+            blockRef.TagBlock = new TagBlock(blockEditor.EntryCount, blockRef.TagBlock.Pointer);
+            scenario.Palettes[paletteKey].Palette.RemoveAt(nextIndex);
+            scenario.RenderView.RefreshPalette(paletteKey, nextIndex);
 
+            scenario.PropertyView?.Reload();
+            Reload();
+#endif
         }
 
         #endregion

@@ -30,23 +30,11 @@
                         </Style.Triggers>
                     </Style>
                 </ToolBar.Resources>
-
-                <Button Click="btnReload_Click" ToolTip="Reload data">
-                    <ContentControl Template="{StaticResource ic_Refresh_16x}" />
-                </Button>
-                <Separator />
-                <Button Click="btnAddItem_Click" IsEnabled="False"
-                        ToolTip="Add Item">
+                <Button Click="btnAddItem_Click" ToolTip="Add Item">
                     <ContentControl Template="{StaticResource ic_Add_16x}" />
                 </Button>
-                <Button Click="btnDeleteItem_Click" IsEnabled="False"
-                        ToolTip="Delete Item">
+                <Button Click="btnDeleteItem_Click" ToolTip="Delete Item">
                     <ContentControl Template="{StaticResource ic_Remove_color_16x}" />
-                </Button>
-                <Separator />
-                <Button Click="btnSave_Click" IsEnabled="False"
-                        ToolTip="Save Palette">
-                    <ContentControl Template="{StaticResource ic_Save_16x}" />
                 </Button>
             </ToolBar>
         </ToolBarTray>
