@@ -17,6 +17,6 @@ namespace Reclaimer.Utilities.IO
         ByteOrder ByteOrder { get; }
         IAddressTranslator AddressTranslator { get; }
         IPointerExpander PointerExpander { get; }
-        void ResizeTagBlock(EndianWriter writer, ref TagBlock block, int entrySize, int newCount);
+        void ResizeTagBlock(EndianWriterEx writer, ref TagBlock block, int entrySize, int newCount);
     }
 }

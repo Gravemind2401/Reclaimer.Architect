@@ -142,8 +142,7 @@ namespace Reclaimer.Utilities.IO
 
         public void Commit()
         {
-            using (var fs = new FileStream(SourceItem.CacheFile.FileName, FileMode.Open, FileAccess.ReadWrite))
-            using (var writer = new EndianWriter(fs, SourceItem.CacheFile.ByteOrder))
+            using (var writer = SourceItem.CacheFile.CreateWriter())
             {
                 //save largest first: if they get reallocated then smaller blocks might be able to take their place
                 foreach (var block in AllBlocks.OrderByDescending(b => b.VirtualSize))
@@ -229,7 +228,7 @@ namespace Reclaimer.Utilities.IO
         IAddressTranslator IMetadataStream.AddressTranslator => SourceItem.CacheFile.DefaultAddressTranslator;
         IPointerExpander IMetadataStream.PointerExpander => (SourceItem.CacheFile as IMccCacheFile)?.PointerExpander;
 
-        void IMetadataStream.ResizeTagBlock(EndianWriter writer, ref TagBlock block, int entrySize, int newCount)
+        void IMetadataStream.ResizeTagBlock(EndianWriterEx writer, ref TagBlock block, int entrySize, int newCount)
         {
             if (newCount == block.Count)
                 return;

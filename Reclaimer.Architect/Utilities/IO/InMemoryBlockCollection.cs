@@ -212,7 +212,7 @@ namespace Reclaimer.Utilities.IO
             ParentBlock.Write(refOffset + 4, pointerBytes);
         }
 
-        public void Commit(EndianWriter writer)
+        public void Commit(EndianWriterEx writer)
         {
             if (!hasChanged)
                 return;
