@@ -21,11 +21,8 @@ namespace Reclaimer.Blam.Common
         private readonly Segment resourceSegment;
         private readonly Segment metadataSegment;
 
-        private readonly Segment stringSegment0;
-        private readonly Segment stringSegment1;
-        private readonly Segment stringSegment2;
-        private readonly Segment stringSegment3;
-        private readonly Segment stringSegment4;
+        private readonly Segment[] stringSegments = new Segment[5];
+        private readonly Dictionary<int, Segment[]> localeSegments = new Dictionary<int, Segment[]>();
 
         private Segment eofSegment => segments.Last();
 
@@ -62,38 +59,46 @@ namespace Reclaimer.Blam.Common
             //strings
             origin = (int)debugTranslator.GetAddress(cache.Header.StringTableIndexPointer.Value);
             size = cache.Header.StringCount * 4;
-            segments.Add(stringsGroup.Add(stringSegment0 = new Segment(origin, size, 4)));
+            segments.Add(stringsGroup.Add(stringSegments[0] = new Segment(origin, size, 4)));
 
             origin = (int)debugTranslator.GetAddress(cache.Header.StringTablePointer.Value);
             size = cache.Header.StringTableSize;
-            segments.Add(stringsGroup.Add(stringSegment1 = new Segment(origin, size, cache.UsesStringEncryption ? 16 : 1)));
+            segments.Add(stringsGroup.Add(stringSegments[1] = new Segment(origin, size, cache.UsesStringEncryption ? 16 : 1)));
 
             //tag names
             origin = (int)debugTranslator.GetAddress(cache.Header.FileTableIndexPointer.Value);
             size = cache.Header.FileCount * 4;
-            segments.Add(stringsGroup.Add(stringSegment2 = new Segment(origin, size, 4)));
+            segments.Add(stringsGroup.Add(stringSegments[2] = new Segment(origin, size, 4)));
 
             origin = (int)debugTranslator.GetAddress(cache.Header.FileTablePointer.Value);
             size = cache.Header.FileTableSize;
-            segments.Add(stringsGroup.Add(stringSegment3 = new Segment(origin, size, 1)));
+            segments.Add(stringsGroup.Add(stringSegments[3] = new Segment(origin, size, 1)));
 
             //only exists in mcc reach (U3+)
             if (cache.Header.StringNamespaceTablePointer.Value != 0)
             {
                 origin = (int)debugTranslator.GetAddress(cache.Header.StringNamespaceTablePointer.Value);
                 size = cache.Header.StringNamespaceCount * 4;
-                segments.Add(stringSegment4 = stringsGroup.Add(new Segment(origin, size, 4)));
+                segments.Add(stringSegments[4] = stringsGroup.Add(new Segment(origin, size, 4)));
             }
 
-            foreach (var def in cache.LocaleIndex.Languages.Where(def => def.StringCount > 0))
+            for (int i = 0; i < cache.LocaleIndex.Languages.Count; i++)
             {
+                var def = cache.LocaleIndex.Languages[i];
+                if (def.StringCount <= 0)
+                    continue;
+
+                var segs = new Segment[2];
+
                 origin = (int)localeTranslator.GetAddress(def.IndicesOffset);
                 size = def.StringCount * 8;
-                segments.Add(localesGroup.Add(new Segment(origin, size, 8)));
+                segments.Add(segs[0] = localesGroup.Add(new Segment(origin, size, 8)));
 
                 origin = (int)localeTranslator.GetAddress(def.StringsOffset);
                 size = def.StringsSize;
-                segments.Add(localesGroup.Add(new Segment(origin, size, cache.UsesStringEncryption ? 16 : 1)));
+                segments.Add(segs[1] = localesGroup.Add(new Segment(origin, size, cache.UsesStringEncryption ? 16 : 1)));
+
+                localeSegments.Add(i, segs);
             }
 
             segments.Sort((a, b) => a.Offset.CompareTo(b.Offset));
@@ -122,6 +127,7 @@ namespace Reclaimer.Blam.Common
 
             var debugTranslator = new SectionAddressTranslator(cache, 0);
             //var metadataTranslator = new SectionAddressTranslator(cache, 2);
+            var localeTranslator = new SectionAddressTranslator(cache, 3);
 
             var remaining = metadataSegment.AvailableSize - cache.Header.PartitionTable.Skip(1).Sum(p => (int)p.Size);
             var pointer = cache.DefaultAddressTranslator.GetPointer(metadataSegment.Offset) - length; //DefaultAddressTranslator should always be the MetadataTranslator
@@ -158,22 +164,31 @@ namespace Reclaimer.Blam.Common
             //index header address
             cache.Header.VirtualSize = metadataSegment.AvailableSize;
 
-            pointer = debugTranslator.GetPointer(stringSegment0.Offset);
+            pointer = debugTranslator.GetPointer(stringSegments[0].Offset);
             cache.Header.StringTableIndexPointer = new Pointer((int)pointer, cache.Header.StringTableIndexPointer);
 
-            pointer = debugTranslator.GetPointer(stringSegment1.Offset);
+            pointer = debugTranslator.GetPointer(stringSegments[1].Offset);
             cache.Header.StringTablePointer = new Pointer((int)pointer, cache.Header.StringTablePointer);
 
-            pointer = debugTranslator.GetPointer(stringSegment2.Offset);
+            pointer = debugTranslator.GetPointer(stringSegments[2].Offset);
             cache.Header.FileTableIndexPointer = new Pointer((int)pointer, cache.Header.FileTableIndexPointer);
 
-            pointer = debugTranslator.GetPointer(stringSegment3.Offset);
+            pointer = debugTranslator.GetPointer(stringSegments[3].Offset);
             cache.Header.FileTablePointer = new Pointer((int)pointer, cache.Header.FileTablePointer);
 
             if (cache.Header.StringNamespaceTablePointer.Value != 0)
             {
-                pointer = debugTranslator.GetPointer(stringSegment4.Offset);
+                pointer = debugTranslator.GetPointer(stringSegments[4].Offset);
                 cache.Header.StringNamespaceTablePointer = new Pointer((int)pointer, cache.Header.StringNamespaceTablePointer);
+            }
+
+            foreach (var pair in localeSegments)
+            {
+                var def = cache.LocaleIndex.Languages[pair.Key];
+                var segs = pair.Value;
+
+                def.IndicesOffset = (int)localeTranslator.GetPointer(segs[0].Offset);
+                def.StringsOffset = (int)localeTranslator.GetPointer(segs[1].Offset);
             }
 
             insertedAt = metadataSegment.Offset;
@@ -184,6 +199,10 @@ namespace Reclaimer.Blam.Common
 
             writer.Seek(metadataSegment.Offset, SeekOrigin.Begin);
             writer.Insert(0, length);
+
+            var globalsTag = cache.TagIndex.GetGlobalTag("matg");
+            writer.Seek(globalsTag.MetaPointer.Address, SeekOrigin.Begin);
+            writer.WriteObject(cache.LocaleIndex);
         }
 
         private class Segment

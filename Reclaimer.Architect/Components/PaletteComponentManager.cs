@@ -30,9 +30,7 @@ namespace Reclaimer.Components
 
         public override bool HandlesNodeType(NodeType nodeType) => PaletteType.FromNodeType(nodeType) != null;
 
-#if DEBUG
         public override bool CanAddRemoveNodeType(NodeType nodeType) => PaletteType.FromNodeType(nodeType) != null;
-#endif
 
         public override Task InitializeResourcesAsync(ModelFactory factory)
         {

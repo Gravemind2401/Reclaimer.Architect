@@ -89,7 +89,6 @@ namespace Reclaimer.Controls
 
         private void btnAddItem_Click(object sender, RoutedEventArgs e)
         {
-#if DEBUG
             var palette = scenario.Palettes[paletteKey];
             var blockRef = palette.PaletteBlockRef;
             var nextIndex = blockRef.TagBlock.Count;
@@ -103,12 +102,10 @@ namespace Reclaimer.Controls
 
             scenario.PropertyView?.Reload();
             Reload();
-#endif
         }
 
         private void btnDeleteItem_Click(object sender, RoutedEventArgs e)
         {
-#if DEBUG
             var palette = scenario.Palettes[paletteKey];
             var blockRef = palette.PaletteBlockRef;
             var nextIndex = blockRef.TagBlock.Count - 1;
@@ -122,7 +119,6 @@ namespace Reclaimer.Controls
 
             scenario.PropertyView?.Reload();
             Reload();
-#endif
         }
 
         #endregion
