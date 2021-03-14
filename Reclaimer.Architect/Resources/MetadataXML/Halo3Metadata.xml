@@ -41,13 +41,26 @@
   <tagblock name="BSP Atlas" offset="0x60" elementSize="0xC"/>
   <tagblock name="Object Names" offset="0xB0" elementSize="0x24"/>
   <tagblock name="Scenery" offset="0xBC" elementSize="0xB4">
+    <blockIndex16 name="Palette Index" offset="0x0" value="-1" />
+    <int16 name="Name Index" offset="0x2" defaultValue="-1" />
+    <flags32 name="Placement Flags" offset="0x4" defaultValue="8" />
+    <float32 name="Scale" offset="0x20" defaultValue="1" />
     <tagblock name="Node Positioning" offset="0x24" elementSize="0x1C">
       <tagblock name="Node Flags" offset="0x4" elementSize="0x1"/>
       <tagblock name="Orientations" offset="0x10" elementSize="0x2"/>
       <tagblock name="Node Flags [Readable]" offset="0x4" elementSize="0x4"/>
       <tagblock name="Orientations [Readable]" offset="0x10" elementSize="0x8"/>
     </tagblock>
+    <int32 name="Unique ID" offset="0x38" defaultValue="-1" />
+    <int16 name="Origin BSP Index" offset="0x3C" defaultValue="-1" />
+    <enum8 name="Type" offset="0x3E" defaultValue="6" />
+    <enum8 name="Source" offset="0x3F" defaultValue="1" />
+    <int16 name="Editor Folder Index" offset="0x42" defaultValue="-1" />
+    <int16 name="Parent Name Index" offset="0x46" defaultValue="-1" />
+    <flags16 name="Allowed Zonesets" offset="0x50" defaultValue="0" />
     <tagblock name="Pathfinding References" offset="0x70" elementSize="0x4"/>
+    <enum16 name="Team" offset="0x86" defaultValue="8" />
+    <int16 name="Attached Name Index" offset="0x96" defaultValue="-1" />
   </tagblock>
   <tagblock name="Scenery Palette" offset="0xC8" elementSize="0x30"/>
   <tagblock name="Bipeds" offset="0xD4" elementSize="0x74">

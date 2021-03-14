@@ -18,6 +18,7 @@ namespace Reclaimer.Utilities.IO
     internal class InMemoryBlockCollection : IBlockEditor
     {
         private readonly IMetadataStream stream;
+        private readonly Dictionary<int, byte[]> defaultValues;
 
         private bool hasChanged;
         private byte[] data;
@@ -49,6 +50,7 @@ namespace Reclaimer.Utilities.IO
         public InMemoryBlockCollection(IMetadataStream stream, EndianReader reader, XmlNode node, InMemoryBlockCollection parent, int parentBlockIndex)
         {
             this.stream = stream;
+            defaultValues = new Dictionary<int, byte[]>();
 
             XmlNode = node;
             ParentBlock = parent;
@@ -78,6 +80,59 @@ namespace Reclaimer.Utilities.IO
                     data = reader.ReadBytes(VirtualSize);
                 }
                 else data = Array.Empty<byte>();
+            }
+
+            foreach (var element in node.SelectNodes("*[@offset][@defaultValue]").OfType<XmlNode>())
+            {
+                var offset = element.GetIntAttribute("offset").Value;
+                var defaultValue = element.GetStringAttribute("defaultValue");
+
+                Func<string, int> getFlagValue = (val) => val.Split('|').Select(s => 1 << int.Parse(s)).Sum();
+
+                byte[] bytes;
+                switch (element.Name.ToLower())
+                {
+                    case "int8":
+                    case "enum8":
+                    case "blockindex8":
+                        bytes = new[] { defaultValue == "-1" ? byte.MaxValue : byte.Parse(defaultValue) };
+                        break;
+                    case "int16":
+                    case "blockindex16":
+                        bytes = BitConverter.GetBytes(short.Parse(defaultValue));
+                        break;
+                    case "uint16":
+                    case "enum16":
+                        bytes = BitConverter.GetBytes(ushort.Parse(defaultValue));
+                        break;
+                    case "int32":
+                    case "blockindex32":
+                        bytes = BitConverter.GetBytes(int.Parse(defaultValue));
+                        break;
+                    case "uint32":
+                    case "enum32":
+                        bytes = BitConverter.GetBytes(uint.Parse(defaultValue));
+                        break;
+                    case "float32":
+                        bytes = BitConverter.GetBytes(float.Parse(defaultValue));
+                        break;
+                    case "flags8":
+                        bytes = BitConverter.GetBytes((byte)getFlagValue(defaultValue));
+                        break;
+                    case "flags16":
+                        bytes = BitConverter.GetBytes((ushort)getFlagValue(defaultValue));
+                        break;
+                    case "flags32":
+                        bytes = BitConverter.GetBytes((uint)getFlagValue(defaultValue));
+                        break;
+                    default:
+                        continue;
+                }
+
+                if (stream.ByteOrder == ByteOrder.BigEndian)
+                    Array.Reverse(bytes);
+
+                defaultValues.Add(offset, bytes);
             }
         }
 
@@ -180,6 +235,13 @@ namespace Reclaimer.Utilities.IO
                 Array.Resize(ref data, newSize);
             else if (newCount > EntryCount) //if expanding into leftover data, zero it out
                 Array.Clear(data, VirtualSize, newSize - currentSize);
+
+            //if adding new blocks, prefill the default values
+            for (int i = EntryCount; i < newCount; i++)
+            {
+                foreach (var pair in defaultValues)
+                    Write(i * EntrySize + pair.Key, pair.Value);
+            }
 
             EntryCount = newCount;
             UpdateSourcePointer();
