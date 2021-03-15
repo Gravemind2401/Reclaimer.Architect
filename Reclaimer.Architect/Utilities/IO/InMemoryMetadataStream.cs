@@ -16,6 +16,8 @@ namespace Reclaimer.Utilities.IO
 {
     public sealed class InMemoryMetadataStream : Stream, IMetadataStream
     {
+        private const int PageSize = 1 << 16;
+
         private readonly MemoryTracker tracker = new MemoryTracker();
         private readonly CacheSegmenter segmenter;
         private readonly bool isInitialised;
@@ -101,9 +103,9 @@ namespace Reclaimer.Utilities.IO
 
             var lastBlock = AllBlocks.LastOrDefault();
             var nextAddress = (lastBlock?.VirtualAddress + lastBlock?.AllocatedSize) ?? 0;
-            var nextSize = 0;
+            var nextSize = PageSize;
             while (nextSize < result.VirtualSize)
-                nextSize += 1 << 16;
+                nextSize += PageSize;
 
             result.Allocate(nextAddress, nextSize);
             AllBlocks.Add(result);
@@ -138,7 +140,8 @@ namespace Reclaimer.Utilities.IO
                 block.Allocate(block.VirtualAddress + offset, block.AllocatedSize);
         }
 
-        public IBlockEditor GetBlockEditor(long address) => AllBlocks.FirstOrDefault(b => b.ContainsVirtualAddress(address));
+        //if the block has no entries it will have zero virtual size, but if it has the right address we still want to return it so entries can be added
+        public IBlockEditor GetBlockEditor(long address) => AllBlocks.FirstOrDefault(b => b.VirtualAddress == address || b.ContainsVirtualAddress(address));
 
         public void Commit()
         {
