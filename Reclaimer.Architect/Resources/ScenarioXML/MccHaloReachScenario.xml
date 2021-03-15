@@ -2811,7 +2811,7 @@
       <vector4 name="Rotation" offset="0x4" visible="true" id="qrotation" />
       <point3 name="Position" offset="0x14" visible="true" id="position" />
       <float32 name="Scale X" offset="0x20" visible="true" id="scale" />
-      <float32 name="Scale Y" offset="0x20" visible="true" />
+      <float32 name="Scale Y" offset="0x24" visible="true" />
     </tagblock>
   </section>
   <section name="startpositions" offset="0x288" elementSize="0x1C">

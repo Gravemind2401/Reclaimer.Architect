@@ -41,72 +41,133 @@
   <tagblock name="BSP Atlas" offset="0x60" elementSize="0xC"/>
   <tagblock name="Object Names" offset="0xB0" elementSize="0x24"/>
   <tagblock name="Scenery" offset="0xBC" elementSize="0xB4">
-    <blockIndex16 name="Palette Index" offset="0x0" value="-1" />
-    <int16 name="Name Index" offset="0x2" defaultValue="-1" />
-    <flags32 name="Placement Flags" offset="0x4" defaultValue="8" />
-    <float32 name="Scale" offset="0x20" defaultValue="1" />
+    <blockIndex16 name="Palette Index" offset="0x0" value="-1"/>
+    <int16 name="Name Index" offset="0x2" defaultValue="-1"/>
+    <flags32 name="Placement Flags" offset="0x4" defaultValue="8"/>
+    <float32 name="Scale" offset="0x20" defaultValue="1"/>
     <tagblock name="Node Positioning" offset="0x24" elementSize="0x1C">
       <tagblock name="Node Flags" offset="0x4" elementSize="0x1"/>
       <tagblock name="Orientations" offset="0x10" elementSize="0x2"/>
       <tagblock name="Node Flags [Readable]" offset="0x4" elementSize="0x4"/>
       <tagblock name="Orientations [Readable]" offset="0x10" elementSize="0x8"/>
     </tagblock>
-    <int32 name="Unique ID" offset="0x38" defaultValue="-1" />
-    <int16 name="Origin BSP Index" offset="0x3C" defaultValue="-1" />
-    <enum8 name="Type" offset="0x3E" defaultValue="6" />
-    <enum8 name="Source" offset="0x3F" defaultValue="1" />
-    <int16 name="Editor Folder Index" offset="0x42" defaultValue="-1" />
-    <int16 name="Parent Name Index" offset="0x46" defaultValue="-1" />
-    <flags16 name="Allowed Zonesets" offset="0x50" defaultValue="0" />
+    <int32 name="Unique ID" offset="0x38" defaultValue="-1"/>
+    <int16 name="Origin BSP Index" offset="0x3C" defaultValue="-1"/>
+    <enum8 name="Type" offset="0x3E" defaultValue="6"/>
+    <enum8 name="Source" offset="0x3F" defaultValue="1"/>
+    <int16 name="Editor Folder Index" offset="0x42" defaultValue="-1"/>
+    <int16 name="Parent Name Index" offset="0x46" defaultValue="-1"/>
+    <flags16 name="Allowed Zonesets" offset="0x50" defaultValue="0"/>
     <tagblock name="Pathfinding References" offset="0x70" elementSize="0x4"/>
-    <enum16 name="Team" offset="0x86" defaultValue="8" />
-    <int16 name="Attached Name Index" offset="0x96" defaultValue="-1" />
+    <enum16 name="Team" offset="0x86" defaultValue="8"/>
+    <int16 name="Attached Name Index" offset="0x96" defaultValue="-1"/>
   </tagblock>
   <tagblock name="Scenery Palette" offset="0xC8" elementSize="0x30"/>
   <tagblock name="Bipeds" offset="0xD4" elementSize="0x74">
+    <blockIndex16 name="Palette Index" offset="0x0" value="-1"/>
+    <int16 name="Name Index" offset="0x2" defaultValue="-1"/>
+    <flags32 name="Placement Flags" offset="0x4" defaultValue="8"/>
+    <float32 name="Scale" offset="0x20" defaultValue="1"/>
     <tagblock name="Node Positioning" offset="0x24" elementSize="0x1C">
       <tagblock name="Node Flags" offset="0x4" elementSize="0x1"/>
       <tagblock name="Orientations" offset="0x10" elementSize="0x2"/>
       <tagblock name="Node Flags [Readable]" offset="0x4" elementSize="0x4"/>
       <tagblock name="Orientations [Readable]" offset="0x10" elementSize="0x8"/>
     </tagblock>
+    <int32 name="Unique ID" offset="0x38" defaultValue="-1"/>
+    <int16 name="Origin BSP Index" offset="0x3C" defaultValue="-1"/>
+    <enum8 name="Type" offset="0x3E" defaultValue="0"/>
+    <enum8 name="Source" offset="0x3F" defaultValue="1"/>
+    <int16 name="Editor Folder Index" offset="0x42" defaultValue="-1"/>
+    <int16 name="Parent Name Index" offset="0x46" defaultValue="-1"/>
+    <flags16 name="Allowed Zonesets" offset="0x50" defaultValue="0"/>
   </tagblock>
   <tagblock name="Biped Palette" offset="0xE0" elementSize="0x30"/>
   <tagblock name="Vehicles" offset="0xEC" elementSize="0xA8">
+    <blockIndex16 name="Palette Index" offset="0x0" value="-1"/>
+    <int16 name="Name Index" offset="0x2" defaultValue="-1"/>
+    <flags32 name="Placement Flags" offset="0x4" defaultValue="8"/>
+    <float32 name="Scale" offset="0x20" defaultValue="1"/>
     <tagblock name="Node Positioning" offset="0x24" elementSize="0x1C">
       <tagblock name="Node Flags" offset="0x4" elementSize="0x1"/>
       <tagblock name="Orientations" offset="0x10" elementSize="0x2"/>
       <tagblock name="Node Flags [Readable]" offset="0x4" elementSize="0x4"/>
       <tagblock name="Orientations [Readable]" offset="0x10" elementSize="0x8"/>
     </tagblock>
+    <int32 name="Unique ID" offset="0x38" defaultValue="-1"/>
+    <int16 name="Origin BSP Index" offset="0x3C" defaultValue="-1"/>
+    <enum8 name="Type" offset="0x3E" defaultValue="1"/>
+    <enum8 name="Source" offset="0x3F" defaultValue="1"/>
+    <int16 name="Editor Folder Index" offset="0x42" defaultValue="-1"/>
+    <int16 name="Parent Name Index" offset="0x46" defaultValue="-1"/>
+    <flags16 name="Allowed Zonesets" offset="0x50" defaultValue="0"/>
+    <enum16 name="Team" offset="0x7A" defaultValue="8"/>
+    <int16 name="Attached Name Index" offset="0x8A" defaultValue="-1"/>
   </tagblock>
   <tagblock name="Vehicle Palette" offset="0xF8" elementSize="0x30"/>
   <tagblock name="Equipment" offset="0x104" elementSize="0x8C">
+    <blockIndex16 name="Palette Index" offset="0x0" value="-1"/>
+    <int16 name="Name Index" offset="0x2" defaultValue="-1"/>
+    <flags32 name="Placement Flags" offset="0x4" defaultValue="8"/>
+    <float32 name="Scale" offset="0x20" defaultValue="1"/>
     <tagblock name="Node Positioning" offset="0x24" elementSize="0x1C">
       <tagblock name="Node Flags" offset="0x4" elementSize="0x1"/>
       <tagblock name="Orientations" offset="0x10" elementSize="0x2"/>
       <tagblock name="Node Flags [Readable]" offset="0x4" elementSize="0x4"/>
       <tagblock name="Orientations [Readable]" offset="0x10" elementSize="0x8"/>
     </tagblock>
+    <int32 name="Unique ID" offset="0x38" defaultValue="-1"/>
+    <int16 name="Origin BSP Index" offset="0x3C" defaultValue="-1"/>
+    <enum8 name="Type" offset="0x3E" defaultValue="3"/>
+    <enum8 name="Source" offset="0x3F" defaultValue="1"/>
+    <int16 name="Editor Folder Index" offset="0x42" defaultValue="-1"/>
+    <int16 name="Parent Name Index" offset="0x46" defaultValue="-1"/>
+    <flags16 name="Allowed Zonesets" offset="0x50" defaultValue="0"/>
+    <enum16 name="Team" offset="0x5E" defaultValue="8"/>
+    <int16 name="Attached Name Index" offset="0x6E" defaultValue="-1"/>
   </tagblock>
   <tagblock name="Equipment Palette" offset="0x110" elementSize="0x30"/>
   <tagblock name="Weapons" offset="0x11C" elementSize="0xA8">
+    <blockIndex16 name="Palette Index" offset="0x0" value="-1"/>
+    <int16 name="Name Index" offset="0x2" defaultValue="-1"/>
+    <flags32 name="Placement Flags" offset="0x4" defaultValue="8"/>
+    <float32 name="Scale" offset="0x20" defaultValue="1"/>
     <tagblock name="Node Positioning" offset="0x24" elementSize="0x1C">
       <tagblock name="Node Flags" offset="0x4" elementSize="0x1"/>
       <tagblock name="Orientations" offset="0x10" elementSize="0x2"/>
       <tagblock name="Node Flags [Readable]" offset="0x4" elementSize="0x4"/>
       <tagblock name="Orientations [Readable]" offset="0x10" elementSize="0x8"/>
     </tagblock>
+    <int32 name="Unique ID" offset="0x38" defaultValue="-1"/>
+    <int16 name="Origin BSP Index" offset="0x3C" defaultValue="-1"/>
+    <enum8 name="Type" offset="0x3E" defaultValue="2"/>
+    <enum8 name="Source" offset="0x3F" defaultValue="1"/>
+    <int16 name="Editor Folder Index" offset="0x42" defaultValue="-1"/>
+    <int16 name="Parent Name Index" offset="0x46" defaultValue="-1"/>
+    <flags16 name="Allowed Zonesets" offset="0x50" defaultValue="0"/>
+    <enum16 name="Team" offset="0x7A" defaultValue="8"/>
+    <int16 name="Attached Name Index" offset="0x8A" defaultValue="-1"/>
   </tagblock>
   <tagblock name="Weapon Palette" offset="0x128" elementSize="0x30"/>
   <tagblock name="Device Groups" offset="0x134" elementSize="0x28"/>
   <tagblock name="Machines" offset="0x140" elementSize="0x70">
+    <blockIndex16 name="Palette Index" offset="0x0" value="-1"/>
+    <int16 name="Name Index" offset="0x2" defaultValue="-1"/>
+    <flags32 name="Placement Flags" offset="0x4" defaultValue="8"/>
+    <float32 name="Scale" offset="0x20" defaultValue="1"/>
     <tagblock name="Node Positioning" offset="0x24" elementSize="0x1C">
       <tagblock name="Node Flags" offset="0x4" elementSize="0x1"/>
       <tagblock name="Orientations" offset="0x10" elementSize="0x2"/>
       <tagblock name="Node Flags [Readable]" offset="0x4" elementSize="0x4"/>
       <tagblock name="Orientations [Readable]" offset="0x10" elementSize="0x8"/>
     </tagblock>
+    <int32 name="Unique ID" offset="0x38" defaultValue="-1"/>
+    <int16 name="Origin BSP Index" offset="0x3C" defaultValue="-1"/>
+    <enum8 name="Type" offset="0x3E" defaultValue="7"/>
+    <enum8 name="Source" offset="0x3F" defaultValue="1"/>
+    <int16 name="Editor Folder Index" offset="0x42" defaultValue="-1"/>
+    <int16 name="Parent Name Index" offset="0x46" defaultValue="-1"/>
+    <flags16 name="Allowed Zonesets" offset="0x50" defaultValue="0"/>
     <tagblock name="Pathfinding References" offset="0x60" elementSize="0x4"/>
   </tagblock>
   <tagblock name="Machine Palette" offset="0x14C" elementSize="0x30"/>
@@ -120,12 +181,23 @@
   </tagblock>
   <tagblock name="Terminal Palette" offset="0x164" elementSize="0x30"/>
   <tagblock name="Controls" offset="0x170" elementSize="0x64">
+    <blockIndex16 name="Palette Index" offset="0x0" value="-1"/>
+    <int16 name="Name Index" offset="0x2" defaultValue="-1"/>
+    <flags32 name="Placement Flags" offset="0x4" defaultValue="8"/>
+    <float32 name="Scale" offset="0x20" defaultValue="1"/>
     <tagblock name="Node Positioning" offset="0x24" elementSize="0x1C">
       <tagblock name="Node Flags" offset="0x4" elementSize="0x1"/>
       <tagblock name="Orientations" offset="0x10" elementSize="0x2"/>
       <tagblock name="Node Flags [Readable]" offset="0x4" elementSize="0x4"/>
       <tagblock name="Orientations [Readable]" offset="0x10" elementSize="0x8"/>
     </tagblock>
+    <int32 name="Unique ID" offset="0x38" defaultValue="-1"/>
+    <int16 name="Origin BSP Index" offset="0x3C" defaultValue="-1"/>
+    <enum8 name="Type" offset="0x3E" defaultValue="8"/>
+    <enum8 name="Source" offset="0x3F" defaultValue="1"/>
+    <int16 name="Editor Folder Index" offset="0x42" defaultValue="-1"/>
+    <int16 name="Parent Name Index" offset="0x46" defaultValue="-1"/>
+    <flags16 name="Allowed Zonesets" offset="0x50" defaultValue="0"/>
   </tagblock>
   <tagblock name="Control Palette" offset="0x17C" elementSize="0x30"/>
   <tagblock name="Sound Scenery" offset="0x188" elementSize="0x70">
@@ -175,14 +247,20 @@
   <tagblock name="Soft Ceilings" offset="0x23C" elementSize="0xC"/>
   <tagblock name="Player Starting Profile" offset="0x248" elementSize="0x54"/>
   <tagblock name="Player Starting Locations" offset="0x254" elementSize="0x18"/>
-  <tagblock name="Trigger Volumes" offset="0x260" elementSize="0x44"/>
+  <tagblock name="Trigger Volumes" offset="0x260" elementSize="0x44">
+    <int16 name="Kill Volume" offset="0x40" defaultValue="-1"/>
+    <int16 name="Editor Folder Index" offset="0x42" defaultValue="-1"/>
+  </tagblock>
   <tagblock name="Zoneset Switch Trigger Volumes" offset="0x278" elementSize="0x8"/>
   <tagblock name="Multiplayer Constants Override" offset="0x284" elementSize="0x14"/>
   <tagblock name="Unknown" offset="0x290" elementSize="0x14"/>
   <tagblock name="Unknown" offset="0x29C" elementSize="0x14"/>
   <tagblock name="Unknown" offset="0x2A8" elementSize="0x14"/>
   <tagblock name="Unknown" offset="0x2B4" elementSize="0x14"/>
-  <tagblock name="Decals" offset="0x350" elementSize="0x24"/>
+  <tagblock name="Decals" offset="0x350" elementSize="0x24">
+    <blockIndex16 name="Palette Index" offset="0x0" value="-1"/>
+    <float32 name="Scale" offset="0x20" defaultValue="1"/>
+  </tagblock>
   <tagblock name="Decal Palette" offset="0x35C" elementSize="0x10"/>
   <tagblock name="Style Palette" offset="0x374" elementSize="0x10"/>
   <tagblock name="Squad Groups" offset="0x380" elementSize="0x28"/>
@@ -264,13 +342,26 @@
     <tagblock name="Static Initial Spawn Zones" offset="0x60" elementSize="0x30"/>
   </tagblock>
   <tagblock name="Crates" offset="0x5E8" elementSize="0xB0">
+    <blockIndex16 name="Palette Index" offset="0x0" value="-1"/>
+    <int16 name="Name Index" offset="0x2" defaultValue="-1"/>
+    <flags32 name="Placement Flags" offset="0x4" defaultValue="8"/>
+    <float32 name="Scale" offset="0x20" defaultValue="1"/>
     <tagblock name="Node Positioning" offset="0x24" elementSize="0x1C">
       <tagblock name="Node Flags" offset="0x4" elementSize="0x1"/>
       <tagblock name="Orientations" offset="0x10" elementSize="0x2"/>
       <tagblock name="Node Flags [Readable]" offset="0x4" elementSize="0x4"/>
       <tagblock name="Orientations [Readable]" offset="0x10" elementSize="0x8"/>
     </tagblock>
+    <int32 name="Unique ID" offset="0x38" defaultValue="-1"/>
+    <int16 name="Origin BSP Index" offset="0x3C" defaultValue="-1"/>
+    <enum8 name="Type" offset="0x3E" defaultValue="10"/>
+    <enum8 name="Source" offset="0x3F" defaultValue="1"/>
+    <int16 name="Editor Folder Index" offset="0x42" defaultValue="-1"/>
+    <int16 name="Parent Name Index" offset="0x46" defaultValue="-1"/>
+    <flags16 name="Allowed Zonesets" offset="0x50" defaultValue="0"/>
     <tagblock name="Unknown" offset="0x70" elementSize="0x4"/>
+    <enum16 name="Team" offset="0x82" defaultValue="8"/>
+    <int16 name="Attached Name Index" offset="0x92" defaultValue="-1"/>
   </tagblock>
   <tagblock name="Crate Palette" offset="0x5F4" elementSize="0x30"/>
   <tagblock name="Flock Palette" offset="0x600" elementSize="0x10"/>
