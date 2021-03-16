@@ -53,7 +53,6 @@
   <tagblock name="Scenery" offset="0x110" elementSize="0xDC">
     <blockIndex16 name="Palette Index" offset="0x0" value="-1"/>
     <int16 name="Name Index" offset="0x2" defaultValue="-1"/>
-    <flags32 name="Placement Flags" offset="0x4" defaultValue="8"/>
     <float32 name="Scale" offset="0x20" defaultValue="1"/>
     <tagblock name="Node Positioning" offset="0x24" elementSize="0x1C">
       <tagblock name="Node Flags" offset="0x4" elementSize="0x1"/>
@@ -76,7 +75,6 @@
   <tagblock name="Bipeds" offset="0x128" elementSize="0x78">
     <blockIndex16 name="Palette Index" offset="0x0" value="-1"/>
     <int16 name="Name Index" offset="0x2" defaultValue="-1"/>
-    <flags32 name="Placement Flags" offset="0x4" defaultValue="8"/>
     <float32 name="Scale" offset="0x20" defaultValue="1"/>
     <tagblock name="Node Positioning" offset="0x24" elementSize="0x1C">
       <tagblock name="Node Flags" offset="0x4" elementSize="0x1"/>
@@ -96,7 +94,6 @@
   <tagblock name="Vehicles" offset="0x140" elementSize="0xD0">
     <blockIndex16 name="Palette Index" offset="0x0" value="-1"/>
     <int16 name="Name Index" offset="0x2" defaultValue="-1"/>
-    <flags32 name="Placement Flags" offset="0x4" defaultValue="8"/>
     <float32 name="Scale" offset="0x20" defaultValue="1"/>
     <tagblock name="Node Positioning" offset="0x24" elementSize="0x1C">
       <tagblock name="Node Flags" offset="0x4" elementSize="0x1"/>
@@ -118,7 +115,6 @@
   <tagblock name="Equipment" offset="0x158" elementSize="0xB4">
     <blockIndex16 name="Palette Index" offset="0x0" value="-1"/>
     <int16 name="Name Index" offset="0x2" defaultValue="-1"/>
-    <flags32 name="Placement Flags" offset="0x4" defaultValue="8"/>
     <float32 name="Scale" offset="0x20" defaultValue="1"/>
     <tagblock name="Node Positioning" offset="0x24" elementSize="0x1C">
       <tagblock name="Node Flags" offset="0x4" elementSize="0x1"/>
@@ -140,7 +136,6 @@
   <tagblock name="Weapons" offset="0x170" elementSize="0xD0">
     <blockIndex16 name="Palette Index" offset="0x0" value="-1"/>
     <int16 name="Name Index" offset="0x2" defaultValue="-1"/>
-    <flags32 name="Placement Flags" offset="0x4" defaultValue="8"/>
     <float32 name="Scale" offset="0x20" defaultValue="1"/>
     <tagblock name="Node Positioning" offset="0x24" elementSize="0x1C">
       <tagblock name="Node Flags" offset="0x4" elementSize="0x1"/>
@@ -163,7 +158,6 @@
   <tagblock name="Machines" offset="0x194" elementSize="0xE4">
     <blockIndex16 name="Palette Index" offset="0x0" value="-1"/>
     <int16 name="Name Index" offset="0x2" defaultValue="-1"/>
-    <flags32 name="Placement Flags" offset="0x4" defaultValue="8"/>
     <float32 name="Scale" offset="0x20" defaultValue="1"/>
     <tagblock name="Node Positioning" offset="0x24" elementSize="0x1C">
       <tagblock name="Node Flags" offset="0x4" elementSize="0x1"/>
@@ -195,7 +189,6 @@
   <tagblock name="Controls" offset="0x1C4" elementSize="0xDC">
     <blockIndex16 name="Palette Index" offset="0x0" value="-1"/>
     <int16 name="Name Index" offset="0x2" defaultValue="-1"/>
-    <flags32 name="Placement Flags" offset="0x4" defaultValue="8"/>
     <float32 name="Scale" offset="0x20" defaultValue="1"/>
     <tagblock name="Node Positioning" offset="0x24" elementSize="0x1C">
       <tagblock name="Node Flags" offset="0x4" elementSize="0x1"/>
@@ -401,7 +394,6 @@
   <tagblock name="Crates" offset="0x620" elementSize="0xD8">
     <blockIndex16 name="Palette Index" offset="0x0" value="-1"/>
     <int16 name="Name Index" offset="0x2" defaultValue="-1"/>
-    <flags32 name="Placement Flags" offset="0x4" defaultValue="8"/>
     <float32 name="Scale" offset="0x20" defaultValue="1"/>
     <tagblock name="Node Positioning" offset="0x24" elementSize="0x1C">
       <tagblock name="Node Flags" offset="0x4" elementSize="0x1"/>
