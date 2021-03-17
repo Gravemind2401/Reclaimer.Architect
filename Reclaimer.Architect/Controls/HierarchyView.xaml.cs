@@ -1,4 +1,5 @@
 ﻿using Adjutant.Blam.Common;
+using Reclaimer.Components;
 using Reclaimer.Models;
 using Reclaimer.Plugins;
 using Reclaimer.Resources;
@@ -56,8 +57,10 @@ namespace Reclaimer.Controls
         {
             scenario.SelectedNode = tv.SelectedItem as SceneNodeModel;
             var nodeType = scenario.SelectedNodeType;
-            btnAddItem.IsEnabled = btnDeleteItem.IsEnabled
-                = scenario.GetNodeTypeHandler(nodeType)?.CanAddRemoveNodeType(nodeType) ?? false;
+            var handler = scenario.GetNodeTypeHandler(nodeType);
+            btnAddItem.IsEnabled = handler?.SupportsObjectOperation(ObjectOperation.Add, nodeType) ?? false;
+            btnDeleteItem.IsEnabled = handler?.SupportsObjectOperation(ObjectOperation.Remove, nodeType) ?? false;
+            btnCopyItem.IsEnabled = handler?.SupportsObjectOperation(ObjectOperation.Copy, nodeType) ?? false;
         }
 
         private void ListItemMouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -90,7 +93,7 @@ namespace Reclaimer.Controls
         {
             var treeNode = scenario.SelectedNode;
             var handler = scenario.GetNodeTypeHandler(treeNode.NodeType);
-            if (handler.AddObject(treeNode, scenario.SelectedItemIndex))
+            if (handler.ExecuteObjectOperation(treeNode, ObjectOperation.Add, scenario.SelectedItemIndex))
             {
                 scenario.RefreshItemList();
                 list.ScrollIntoView(scenario.Items.LastOrDefault());
@@ -101,7 +104,15 @@ namespace Reclaimer.Controls
         {
             var treeNode = scenario.SelectedNode;
             var handler = scenario.GetNodeTypeHandler(treeNode.NodeType);
-            if (handler.RemoveObject(treeNode, scenario.SelectedItemIndex))
+            if (handler.ExecuteObjectOperation(treeNode, ObjectOperation.Remove, scenario.SelectedItemIndex))
+                scenario.RefreshItemList();
+        }
+
+        private void btnCopyItem_Click(object sender, RoutedEventArgs e)
+        {
+            var treeNode = scenario.SelectedNode;
+            var handler = scenario.GetNodeTypeHandler(treeNode.NodeType);
+            if (handler.ExecuteObjectOperation(treeNode, ObjectOperation.Copy, scenario.SelectedItemIndex))
                 scenario.RefreshItemList();
         }
 

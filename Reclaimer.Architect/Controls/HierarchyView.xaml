@@ -53,6 +53,11 @@
                         ToolTip="Delete Object">
                     <ContentControl Template="{StaticResource ic_Remove_color_16x}" />
                 </Button>
+                <Button x:Name="btnCopyItem" IsEnabled="False"
+                        Click="btnCopyItem_Click"
+                        ToolTip="Duplicate Object">
+                    <ContentControl Template="{StaticResource ic_Copy_16x}" />
+                </Button>
                 <Separator />
                 <Button Click="btnEditPalette_Click" ToolTip="Edit Palette"
                         IsEnabled="{Binding SelectedNodeType, Converter={StaticResource isPaletteNodeConverter}}">

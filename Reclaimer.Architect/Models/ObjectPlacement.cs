@@ -124,5 +124,16 @@ namespace Reclaimer.Models
                     break;
             }
         }
+
+        public void CopyFrom(ObjectPlacement other)
+        {
+            Variant = other.Variant;
+            Scale = other.Scale;
+            QRotation = other.QRotation;
+            Rotation = other.Rotation;
+            Position = other.Position;
+            NameIndex = other.NameIndex;
+            PaletteIndex = other.PaletteIndex;
+        }
     }
 }

@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 using Numerics = System.Numerics;
 using Media3D = System.Windows.Media.Media3D;
 using Helix = HelixToolkit.Wpf.SharpDX;
+using Reclaimer.Utilities.IO;
+using Reclaimer.Models;
+using Adjutant.Blam.Common;
 
 namespace Reclaimer.Utilities
 {
@@ -296,6 +299,11 @@ namespace Reclaimer.Utilities
         public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T> enumerable)
         {
             return enumerable.Where(i => i != null);
+        }
+
+        public static void UpdateBlockReference(this IBlockEditor blockEditor, BlockReference blockRef)
+        {
+            blockRef.TagBlock = new TagBlock(blockEditor.EntryCount, blockRef.TagBlock.Pointer);
         }
     }
 }

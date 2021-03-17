@@ -30,7 +30,7 @@ namespace Reclaimer.Components
 
         public override bool HandlesNodeType(NodeType nodeType) => PaletteType.FromNodeType(nodeType) != null;
 
-        public override bool CanAddRemoveNodeType(NodeType nodeType) => PaletteType.FromNodeType(nodeType) != null;
+        public override bool SupportsObjectOperation(ObjectOperation operation, NodeType nodeType) => PaletteType.FromNodeType(nodeType) != null;
 
         public override Task InitializeResourcesAsync(ModelFactory factory)
         {
@@ -163,44 +163,50 @@ namespace Reclaimer.Components
             return null;
         }
 
-        public override bool AddObject(SceneNodeModel treeNode, int itemIndex)
+        public override bool ExecuteObjectOperation(SceneNodeModel treeNode, ObjectOperation operation, int itemIndex)
         {
             var paletteKey = PaletteType.FromNodeType(treeNode.NodeType);
             var holder = PaletteHolders[paletteKey];
 
             var blockEditor = scenario.MetadataStream.GetBlockEditor(holder.Definition.PlacementBlockRef.TagBlock.Pointer.Address);
-            blockEditor.Add();
 
-            var placement = new ObjectPlacement(scenario, paletteKey);
-            holder.Definition.Placements.Add(placement);
-            holder.TreeItems.Add(new TreeItemModel { Header = placement.GetDisplayName(), IsChecked = true, Tag = null });
-            holder.SetCapacity(holder.Definition.Placements.Count);
+            switch (operation)
+            {
+                case ObjectOperation.Add:
+                    blockEditor.Add();
+                    blockEditor.UpdateBlockReference(holder.Definition.PlacementBlockRef);
 
-            //setting the palette index causes a refresh which builds an element for the new object
-            //these also need to be set to -1 initially anyway
-            placement.PaletteIndex = placement.NameIndex = -1;
+                    var placement = holder.InsertPlacement(blockEditor.EntryCount, scenario, paletteKey);
 
-            return true;
-        }
+                    //setting the palette index causes a refresh which builds an element for the new object
+                    //these also need to be set to -1 initially anyway
+                    placement.PaletteIndex = placement.NameIndex = -1;
+                    break;
 
-        public override bool RemoveObject(SceneNodeModel treeNode, int itemIndex)
-        {
-            if (itemIndex < 0)
-                return false;
+                case ObjectOperation.Remove:
+                    if (itemIndex < 0 || itemIndex >= holder.Definition.Placements.Count)
+                        return false;
 
-            var paletteKey = PaletteType.FromNodeType(treeNode.NodeType);
-            var holder = PaletteHolders[paletteKey];
+                    blockEditor.Remove(itemIndex);
+                    blockEditor.UpdateBlockReference(holder.Definition.PlacementBlockRef);
+                    holder.RemovePlacement(itemIndex);
+                    break;
 
-            if (itemIndex >= holder.Definition.Placements.Count)
-                return false;
+                case ObjectOperation.Copy:
+                    if (itemIndex < 0 || itemIndex >= holder.Definition.Placements.Count)
+                        return false;
 
-            var blockEditor = scenario.MetadataStream.GetBlockEditor(holder.Definition.PlacementBlockRef.TagBlock.Pointer.Address);
-            blockEditor.Remove(itemIndex);
+                    var destIndex = itemIndex + 1;
+                    blockEditor.Copy(itemIndex, destIndex);
+                    blockEditor.UpdateBlockReference(holder.Definition.PlacementBlockRef);
 
-            holder.Definition.Placements.RemoveAt(itemIndex);
-            holder.TreeItems.RemoveAt(itemIndex);
-            holder.GroupElement.Children.Remove(holder.Elements[itemIndex]);
-            holder.Elements.RemoveAt(itemIndex);
+                    placement = holder.InsertPlacement(destIndex, scenario, paletteKey);
+                    placement.CopyFrom(holder.Definition.Placements[itemIndex]);
+                    break;
+
+                default:
+                    return false;
+            }
 
             return true;
         }
@@ -278,6 +284,8 @@ namespace Reclaimer.Components
         {
             var holder = PaletteHolders[paletteKey];
             var index = holder.Definition.Placements.IndexOf(placement);
+            if (index < 0)
+                return;
 
             if (fieldId == FieldId.Variant)
                 (holder.Elements[index] as ObjectModel3D)?.SetVariant(placement.Variant);

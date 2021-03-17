@@ -60,6 +60,24 @@ namespace Reclaimer.Geometry
             TreeItems.Resize(newSize);
         }
 
+        public ObjectPlacement InsertPlacement(int index, ScenarioModel scenario, string paletteKey)
+        {
+            var placement = new ObjectPlacement(scenario, paletteKey);
+            Definition.Placements.Insert(index, placement);
+            TreeItems.Insert(index, new TreeItemModel { Header = placement.GetDisplayName(), IsChecked = true, Tag = null });
+            Elements.Insert(index, null);
+
+            return placement;
+        }
+
+        public void RemovePlacement(int index)
+        {
+            Definition.Placements.RemoveAt(index);
+            TreeItems.RemoveAt(index);
+            GroupElement.Children.Remove(Elements[index]);
+            Elements.RemoveAt(index);
+        }
+
         public override void Dispose()
         {
             base.Dispose();

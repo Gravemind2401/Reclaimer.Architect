@@ -3,6 +3,7 @@ using Reclaimer.Models;
 using Reclaimer.Plugins.MetaViewer;
 using Reclaimer.Plugins.MetaViewer.Halo3;
 using Reclaimer.Resources;
+using Reclaimer.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -95,8 +96,8 @@ namespace Reclaimer.Controls
 
             var blockEditor = scenario.MetadataStream.GetBlockEditor(blockRef.TagBlock.Pointer.Address);
             blockEditor.Add();
+            blockEditor.UpdateBlockReference(blockRef);
 
-            blockRef.TagBlock = new TagBlock(blockEditor.EntryCount, blockRef.TagBlock.Pointer);
             scenario.Palettes[paletteKey].Palette.Add(TagReference.NullReference);
             scenario.RenderView.RefreshPalette(paletteKey, nextIndex);
 
@@ -112,8 +113,8 @@ namespace Reclaimer.Controls
 
             var blockEditor = scenario.MetadataStream.GetBlockEditor(blockRef.TagBlock.Pointer.Address);
             blockEditor.Remove(nextIndex);
+            blockEditor.UpdateBlockReference(blockRef);
 
-            blockRef.TagBlock = new TagBlock(blockEditor.EntryCount, blockRef.TagBlock.Pointer);
             scenario.Palettes[paletteKey].Palette.RemoveAt(nextIndex);
             scenario.RenderView.RefreshPalette(paletteKey, nextIndex);
 

@@ -213,10 +213,10 @@ namespace Reclaimer.Utilities.IO
 
         public void Copy(int sourceIndex, int destIndex)
         {
-            if (sourceIndex >= EntryCount)
+            if (sourceIndex < 0 || sourceIndex >= EntryCount)
                 throw new ArgumentOutOfRangeException(nameof(sourceIndex));
 
-            if (destIndex >= EntryCount)
+            if (destIndex < 0 || destIndex > EntryCount)
                 throw new ArgumentOutOfRangeException(nameof(destIndex));
 
             var sourceData = Read(sourceIndex * EntrySize, EntrySize);
