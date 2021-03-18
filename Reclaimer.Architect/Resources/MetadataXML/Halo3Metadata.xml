@@ -241,6 +241,12 @@
   <tagblock name="Player Starting Profile" offset="0x248" elementSize="0x54"/>
   <tagblock name="Player Starting Locations" offset="0x254" elementSize="0x18"/>
   <tagblock name="Trigger Volumes" offset="0x260" elementSize="0x44">
+    <int16 name="Object Name" offset="0x4" defaultValue="-1" />
+    <float32 name="Forward Vector X" offset="0xC" defaultValue="1" />
+    <float32 name="Up Vector Z" offset="0x20" defaultValue="1" />
+    <float32 name="Size X" offset="0x30" defaultValue="1" />
+    <float32 name="Size Y" offset="0x34" defaultValue="1" />
+    <float32 name="Size Z" offset="0x38" defaultValue="1" />
     <int16 name="Kill Volume" offset="0x40" defaultValue="-1"/>
     <int16 name="Editor Folder Index" offset="0x42" defaultValue="-1"/>
   </tagblock>

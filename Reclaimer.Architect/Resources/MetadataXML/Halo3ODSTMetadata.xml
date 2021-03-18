@@ -252,6 +252,12 @@
     <int16 name="Editor Folder Index" offset="0x18" defaultValue="-1"/>
   </tagblock>
   <tagblock name="Trigger Volumes" offset="0x2A0" elementSize="0x7C">
+    <int16 name="Object Name" offset="0x4" defaultValue="-1" />
+    <float32 name="Forward Vector X" offset="0x10" defaultValue="1" />
+    <float32 name="Up Vector Z" offset="0x24" defaultValue="1" />
+    <float32 name="Size X" offset="0x34" defaultValue="1" />
+    <float32 name="Size Y" offset="0x38" defaultValue="1" />
+    <float32 name="Size Z" offset="0x3C" defaultValue="1" />
     <tagblock name="Unknown" offset="0x44" elementSize="0x14"/>
     <tagblock name="Unknown" offset="0x50" elementSize="0x50"/>
     <int16 name="Kill Volume" offset="0x78" defaultValue="-1"/>
