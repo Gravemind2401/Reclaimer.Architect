@@ -29,16 +29,13 @@ namespace Reclaimer.Components
 
         public override bool HandlesNodeType(NodeType nodeType) => nodeType == NodeType.StartPositions;
 
+        public override bool SupportsObjectOperation(ObjectOperation operation, NodeType nodeType) => nodeType == NodeType.StartPositions;
+
         public override void InitializeElements(ModelFactory factory)
         {
             StartPositionGroup = new Helix.GroupModel3D();
             foreach (var pos in scenario.StartingPositions)
-            {
-                var element = new StartPositionMarker3D();
-                BindStartPosition(pos, element);
-                StartPositions.Add(element);
-                StartPositionGroup.Children.Add(element);
-            }
+                AddStartPositionElement(pos);
         }
 
         public override IEnumerable<Helix.Element3D> GetSceneElements()
@@ -85,6 +82,64 @@ namespace Reclaimer.Components
                     + itemIndex * section.BlockSize,
                 TargetObject = scenario.Items[itemIndex]
             };
+        }
+
+        public override bool ExecuteObjectOperation(SceneNodeModel treeNode, ObjectOperation operation, int itemIndex)
+        {
+            var blockRef = scenario.Sections[Section.StartPositions];
+            var blockEditor = scenario.MetadataStream.GetBlockEditor(blockRef.TagBlock.Pointer.Address);
+
+            switch (operation)
+            {
+                case ObjectOperation.Add:
+                    blockEditor.Add();
+                    var pos = new StartPosition(scenario);
+                    scenario.StartingPositions.Add(pos);
+                    AddStartPositionElement(pos);
+                    break;
+
+                case ObjectOperation.Remove:
+                    if (itemIndex < 0 || itemIndex >= blockRef.TagBlock.Count)
+                        return false;
+
+                    blockEditor.Remove(itemIndex);
+                    scenario.StartingPositions.RemoveAt(itemIndex);
+                    RemoveStartPositionElement(itemIndex);
+                    break;
+
+                case ObjectOperation.Copy:
+                    if (itemIndex < 0 || itemIndex >= blockRef.TagBlock.Count)
+                        return false;
+
+                    var destIndex = itemIndex + 1;
+                    blockEditor.Copy(itemIndex, destIndex);
+                    pos = new StartPosition(scenario);
+                    scenario.StartingPositions.Insert(destIndex, pos);
+                    InsertStartPositionElement(pos, destIndex);
+                    pos.CopyFrom(scenario.StartingPositions[itemIndex]);
+                    break;
+            }
+
+            blockEditor.UpdateBlockReference(blockRef);
+            return true;
+        }
+
+        private void AddStartPositionElement(StartPosition pos) => InsertStartPositionElement(pos, StartPositions.Count);
+
+        private void InsertStartPositionElement(StartPosition pos, int index)
+        {
+            var element = new StartPositionMarker3D();
+            BindStartPosition(pos, element);
+            StartPositions.Insert(index, element);
+            StartPositionGroup.Children.Add(element);
+        }
+
+        private void RemoveStartPositionElement(int index)
+        {
+            var element = StartPositions[index];
+            StartPositions.Remove(element);
+            StartPositionGroup.Children.Remove(element);
+            element.Dispose();
         }
 
         private void BindStartPosition(StartPosition pos, Helix.Element3D model)

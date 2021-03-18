@@ -301,7 +301,7 @@ namespace Reclaimer.Utilities
             return enumerable.Where(i => i != null);
         }
 
-        public static void UpdateBlockReference(this IBlockEditor blockEditor, BlockReference blockRef)
+        public static void UpdateBlockReference(this IBlockEditor blockEditor, IBlockReference blockRef)
         {
             blockRef.TagBlock = new TagBlock(blockEditor.EntryCount, blockRef.TagBlock.Pointer);
         }

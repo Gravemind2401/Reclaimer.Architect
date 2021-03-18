@@ -1,12 +1,13 @@
 ﻿using Reclaimer.Models;
 using Reclaimer.Resources;
+using Reclaimer.Utilities;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using System.IO;
 
 namespace Reclaimer.Components
 {
@@ -27,6 +28,8 @@ namespace Reclaimer.Components
 
         public override bool HandlesNodeType(NodeType nodeType) => HandledNodeTypes.Any(t => t == nodeType);
 
+        public override bool SupportsObjectOperation(ObjectOperation operation, NodeType nodeType) => nodeType == NodeType.StartProfiles;
+
         public override IEnumerable<ScenarioListItem> GetListItems(SceneNodeModel treeNode)
         {
             if (treeNode.NodeType == NodeType.StartProfiles)
@@ -44,6 +47,9 @@ namespace Reclaimer.Components
                         reader.Seek(baseAddress + nameOffset, SeekOrigin.Begin);
 
                         var name = reader.ReadNullTerminatedString();
+                        if (string.IsNullOrEmpty(name))
+                            name = "<none>";
+
                         items.Add(new ScenarioListItem(name));
                     }
                 }
@@ -84,6 +90,36 @@ namespace Reclaimer.Components
                 BaseAddress = baseAddress,
                 TargetObject = target
             };
+        }
+
+        public override bool ExecuteObjectOperation(SceneNodeModel treeNode, ObjectOperation operation, int itemIndex)
+        {
+            var blockRef = scenario.Sections[Section.StartProfiles];
+            var blockEditor = scenario.MetadataStream.GetBlockEditor(blockRef.TagBlock.Pointer.Address);
+
+            switch (operation)
+            {
+                case ObjectOperation.Add:
+                    blockEditor.Add();
+                    break;
+
+                case ObjectOperation.Remove:
+                    if (itemIndex < 0 || itemIndex >= blockRef.TagBlock.Count)
+                        return false;
+
+                    blockEditor.Remove(itemIndex);
+                    break;
+
+                case ObjectOperation.Copy:
+                    if (itemIndex < 0 || itemIndex >= blockRef.TagBlock.Count)
+                        return false;
+
+                    blockEditor.Copy(itemIndex, itemIndex + 1);
+                    break;
+            }
+
+            blockEditor.UpdateBlockReference(blockRef);
+            return true;
         }
     }
 }

@@ -52,5 +52,11 @@ namespace Reclaimer.Models
                     break;
             }
         }
+
+        public void CopyFrom(StartPosition other)
+        {
+            Orientation = other.Orientation;
+            Position = other.Position;
+        }
     }
 }

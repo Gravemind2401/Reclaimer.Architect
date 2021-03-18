@@ -74,8 +74,11 @@ namespace Reclaimer.Geometry
         {
             Definition.Placements.RemoveAt(index);
             TreeItems.RemoveAt(index);
-            GroupElement.Children.Remove(Elements[index]);
-            Elements.RemoveAt(index);
+
+            var element = Elements[index];
+            GroupElement.Children.Remove(element);
+            Elements.Remove(element);
+            element.Dispose();
         }
 
         public override void Dispose()

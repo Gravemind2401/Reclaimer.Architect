@@ -696,7 +696,13 @@ namespace Reclaimer.Models
         }
     }
 
-    public class BlockReference
+    public interface IBlockReference
+    {
+        int BlockSize { get; set; }
+        TagBlock TagBlock { get; set; }
+    }
+
+    public class BlockReference : IBlockReference
     {
         public BlockReference()
         { }
@@ -715,7 +721,7 @@ namespace Reclaimer.Models
         public TagBlock TagBlock { get; set; }
     }
 
-    public class ScenarioSection
+    public class ScenarioSection : IBlockReference
     {
         public XmlNode Node { get; set; }
         public string Name { get; set; }
