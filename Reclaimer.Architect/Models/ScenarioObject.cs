@@ -40,11 +40,15 @@ namespace Reclaimer.Models
             if (isBusy || !base.SetProperty(ref storage, value, propertyName))
                 return false;
 
+            var fieldAddress = GetFieldAddress(fieldId);
+            if (fieldAddress < 0)
+                return false;
+
             isBusy = true;
 
             using (var writer = Parent.CreateWriter())
             {
-                writer.Seek(GetFieldAddress(fieldId), SeekOrigin.Begin);
+                writer.Seek(fieldAddress, SeekOrigin.Begin);
 
                 if (typeof(T) == typeof(StringId))
                     writer.Write(((StringId)(object)value).Id);

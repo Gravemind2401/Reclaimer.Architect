@@ -81,9 +81,9 @@ namespace Reclaimer.Models
             var palette = Parent.Palettes[PaletteKey];
             var block = palette.PlacementBlockRef;
             var index = palette.Placements.IndexOf(this);
-            var fieldOffset = palette.PlacementsNode.SelectSingleNode($"*[@id='{fieldId}']").GetIntAttribute("offset") ?? 0;
+            var fieldOffset = palette.PlacementsNode.SelectSingleNode($"*[@id='{fieldId}']")?.GetIntAttribute("offset") ?? -1;
 
-            return block.TagBlock.Pointer.Address + block.BlockSize * index + fieldOffset;
+            return fieldOffset < 0 ? fieldOffset : block.TagBlock.Pointer.Address + block.BlockSize * index + fieldOffset;
         }
 
         public override string GetDisplayName()
