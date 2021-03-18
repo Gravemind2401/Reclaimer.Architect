@@ -1,14 +1,11 @@
 ﻿using Adjutant.Blam.Common;
 using Adjutant.Spatial;
-using Prism.Mvvm;
 using Reclaimer.Plugins.MetaViewer;
 using Reclaimer.Plugins.MetaViewer.Halo3;
 using Reclaimer.Resources;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -60,7 +57,7 @@ namespace Reclaimer.Models
             return section.TagBlock.Pointer.Address + section.BlockSize * index + fieldOffset;
         }
 
-        public override string GetDisplayName() => Name;
+        public override string GetDisplayName() => string.IsNullOrEmpty(Name) ? "<none>" : Name;
 
         public override void UpdateFromMetaValue(MetaValueBase meta, string fieldId)
         {
@@ -82,6 +79,15 @@ namespace Reclaimer.Models
                     Size = vector;
                     break;
             }
+        }
+
+        public void CopyFrom(TriggerVolume other)
+        {
+            Name = other.Name;
+            Position = other.Position;
+            ForwardVector = other.ForwardVector;
+            UpVector = other.UpVector;
+            Size = other.Size;
         }
     }
 }

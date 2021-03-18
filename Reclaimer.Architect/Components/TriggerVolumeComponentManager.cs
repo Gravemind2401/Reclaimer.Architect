@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 
 using Helix = HelixToolkit.Wpf.SharpDX;
-using System.Windows.Controls;
 
 namespace Reclaimer.Components
 {
@@ -33,23 +32,13 @@ namespace Reclaimer.Components
 
         public override bool HandlesNodeType(NodeType nodeType) => nodeType == NodeType.TriggerVolumes;
 
+        public override bool SupportsObjectOperation(ObjectOperation operation, NodeType nodeType) => nodeType == NodeType.TriggerVolumes;
+
         public override void InitializeElements(ModelFactory factory)
         {
             TriggerVolumeGroup = new Helix.GroupModel3D();
             foreach (var vol in scenario.TriggerVolumes)
-            {
-                var box = new BoxManipulator3D
-                {
-                    DiffuseColor = TriggerVolume.DefaultColour,
-                    Position = ((IRealVector3D)vol.Position).ToVector3(),
-                    Size = ((IRealVector3D)vol.Size).ToVector3()
-                };
-
-                BindTriggerVolume(vol, box);
-
-                TriggerVolumes.Add(box);
-                TriggerVolumeGroup.Children.Add(box);
-            }
+                AddTriggerVolumeElement(vol);
         }
 
         public override IEnumerable<Helix.Element3D> GetSceneElements()
@@ -126,8 +115,81 @@ namespace Reclaimer.Components
                 RootNode = section.Node,
                 BaseAddress = section.TagBlock.Pointer.Address
                     + itemIndex * section.BlockSize,
-                TargetObject = scenario.Items[itemIndex]
+                TargetObject = scenario.TriggerVolumes[itemIndex]
             };
+        }
+
+        public override bool ExecuteObjectOperation(SceneNodeModel treeNode, ObjectOperation operation, int itemIndex)
+        {
+            var blockRef = scenario.Sections[Section.TriggerVolumes];
+            var blockEditor = scenario.MetadataStream.GetBlockEditor(blockRef.TagBlock.Pointer.Address);
+
+            switch (operation)
+            {
+                case ObjectOperation.Add:
+                    blockEditor.Add();
+
+                    var vol = new TriggerVolume(scenario)
+                    {   
+                        //really should be reading these from the stream...
+                        ForwardVector = new RealVector3D(1, 0, 0),
+                        UpVector = new RealVector3D(0, 0, 1),
+                        Size = new RealVector3D(1, 1, 1)
+                    };
+
+                    scenario.TriggerVolumes.Add(vol);
+                    AddTriggerVolumeElement(vol);
+                    break;
+
+                case ObjectOperation.Remove:
+                    if (itemIndex < 0 || itemIndex >= blockRef.TagBlock.Count)
+                        return false;
+
+                    blockEditor.Remove(itemIndex);
+                    scenario.TriggerVolumes.RemoveAt(itemIndex);
+                    RemoveTriggerVolumeElement(itemIndex);
+                    break;
+
+                case ObjectOperation.Copy:
+                    if (itemIndex < 0 || itemIndex >= blockRef.TagBlock.Count)
+                        return false;
+
+                    var destIndex = itemIndex + 1;
+                    blockEditor.Copy(itemIndex, destIndex);
+                    vol = new TriggerVolume(scenario);
+                    scenario.TriggerVolumes.Insert(destIndex, vol);
+                    InsertTriggerVolumeElement(vol, destIndex);
+                    vol.CopyFrom(scenario.TriggerVolumes[itemIndex]);
+                    break;
+            }
+
+            blockEditor.UpdateBlockReference(blockRef);
+            return true;
+        }
+
+        private void AddTriggerVolumeElement(TriggerVolume vol) => InsertTriggerVolumeElement(vol, TriggerVolumes.Count);
+
+        private void InsertTriggerVolumeElement(TriggerVolume vol, int index)
+        {
+            var box = new BoxManipulator3D
+            {
+                DiffuseColor = TriggerVolume.DefaultColour,
+                Position = ((IRealVector3D)vol.Position).ToVector3(),
+                Size = ((IRealVector3D)vol.Size).ToVector3()
+            };
+
+            BindTriggerVolume(vol, box);
+
+            TriggerVolumes.Insert(index, box);
+            TriggerVolumeGroup.Children.Add(box);
+        }
+
+        private void RemoveTriggerVolumeElement(int index)
+        {
+            var element = TriggerVolumes[index];
+            TriggerVolumes.Remove(element);
+            TriggerVolumeGroup.Children.Remove(element);
+            element.Dispose();
         }
 
         private void BindTriggerVolume(TriggerVolume vol, BoxManipulator3D box)
