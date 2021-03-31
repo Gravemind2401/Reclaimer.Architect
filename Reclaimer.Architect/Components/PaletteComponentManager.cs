@@ -176,7 +176,7 @@ namespace Reclaimer.Components
                     blockEditor.Add();
                     blockEditor.UpdateBlockReference(holder.Definition.PlacementBlockRef);
 
-                    var placement = holder.InsertPlacement(blockEditor.EntryCount, scenario, paletteKey);
+                    var placement = holder.InsertPlacement(blockEditor.EntryCount - 1, scenario, paletteKey);
 
                     //setting the palette index causes a refresh which builds an element for the new object
                     //these also need to be set to -1 initially anyway
