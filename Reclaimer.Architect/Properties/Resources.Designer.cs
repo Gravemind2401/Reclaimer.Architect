@@ -62,17 +62,13 @@ namespace Reclaimer.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+        ///&lt;!--derived from https://github.com/XboxChaos/Assembly/blob/dev/src/Assembly/Plugins/Halo3/scnr.xml--&gt;
         ///&lt;plugin game=&quot;Halo3&quot; baseSize=&quot;0x7B8&quot;&gt;
-        ///  &lt;tagblock offset=&quot;0x14&quot; elementSize=&quot;0x6C&quot;/&gt;
-        ///  &lt;tagblock offset=&quot;0x30&quot; elementSize=&quot;0x14&quot;/&gt;
-        ///  &lt;tagblock offset=&quot;0x3C&quot; elementSize=&quot;0x2C&quot;&gt;
-        ///    &lt;tagblock offset=&quot;0x8&quot; elementSize=&quot;0x4&quot;/&gt;
-        ///    &lt;tagblock offset=&quot;0x14&quot; elementSize=&quot;0x54&quot;&gt;
-        ///      &lt;tagblock offset=&quot;0x0&quot; elementSize=&quot;0xC&quot;&gt;
-        ///        &lt;tagblock offset=&quot;0x0&quot; elementSize=&quot;0xC&quot;&gt;
-        ///          &lt;tagblock offset=&quot;0x0&quot; elementSize=&quot;0x4&quot;/&gt;
-        ///        &lt;/tagblock&gt;
-        ///      &lt;/tagblock&gt; [rest of string was truncated]&quot;;.
+        ///  &lt;tagblock name=&quot;Structure BSPs&quot; offset=&quot;0x14&quot; elementSize=&quot;0x6C&quot;/&gt;
+        ///  &lt;tagblock name=&quot;Sky References&quot; offset=&quot;0x30&quot; elementSize=&quot;0x14&quot;/&gt;
+        ///  &lt;tagblock name=&quot;BSP Groups&quot; offset=&quot;0x3C&quot; elementSize=&quot;0x2C&quot;&gt;
+        ///    &lt;tagblock name=&quot;BSP Checksums&quot; offset=&quot;0x8&quot; elementSize=&quot;0x4&quot;/&gt;
+        ///    &lt;tagblock name=&quot;BSPs&quot; offset=&quot;0x14&quot; elementSize=&quot;0 [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Halo3Metadata {
             get {
@@ -82,17 +78,13 @@ namespace Reclaimer.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+        ///&lt;!--derived from https://github.com/XboxChaos/Assembly/blob/dev/src/Assembly/Plugins/ODST/scnr.xml--&gt;
         ///&lt;plugin game=&quot;ODST&quot; baseSize=&quot;0x834&quot;&gt;
-        ///  &lt;tagblock offset=&quot;0x14&quot; elementSize=&quot;0x6C&quot;/&gt;
-        ///  &lt;tagblock offset=&quot;0x4C&quot; elementSize=&quot;0x14&quot;/&gt;
-        ///  &lt;tagblock offset=&quot;0x58&quot; elementSize=&quot;0x2C&quot;&gt;
-        ///    &lt;tagblock offset=&quot;0x8&quot; elementSize=&quot;0x4&quot;/&gt;
-        ///    &lt;tagblock offset=&quot;0x14&quot; elementSize=&quot;0x54&quot;&gt;
-        ///      &lt;tagblock offset=&quot;0x0&quot; elementSize=&quot;0xC&quot;&gt;
-        ///        &lt;tagblock offset=&quot;0x0&quot; elementSize=&quot;0xC&quot;&gt;
-        ///          &lt;tagblock offset=&quot;0x0&quot; elementSize=&quot;0x4&quot;/&gt;
-        ///        &lt;/tagblock&gt;
-        ///      &lt;/tagblock&gt;        /// [rest of string was truncated]&quot;;.
+        ///  &lt;tagblock name=&quot;Structure BSPs&quot; offset=&quot;0x14&quot; elementSize=&quot;0x6C&quot;/&gt;
+        ///  &lt;tagblock name=&quot;Sky References&quot; offset=&quot;0x4C&quot; elementSize=&quot;0x14&quot;/&gt;
+        ///  &lt;tagblock name=&quot;BSP Groups&quot; offset=&quot;0x58&quot; elementSize=&quot;0x2C&quot;&gt;
+        ///    &lt;tagblock name=&quot;BSP Checksums&quot; offset=&quot;0x8&quot; elementSize=&quot;0x4&quot;/&gt;
+        ///    &lt;tagblock name=&quot;BSPs&quot; offset=&quot;0x14&quot; elementSize=&quot;0x5 [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Halo3ODSTMetadata {
             get {
@@ -102,6 +94,7 @@ namespace Reclaimer.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;!--derived from https://github.com/XboxChaos/Assembly/blob/dev/src/Assembly/Plugins/ODST/scnr.xml--&gt;
         ///&lt;scenario&gt;
         ///  &lt;section name=&quot;mission&quot;&gt;
         ///    &lt;enum8 name=&quot;Map Type&quot; offset=&quot;0x0&quot; visible=&quot;true&quot;&gt;
@@ -111,9 +104,7 @@ namespace Reclaimer.Properties {
         ///    &lt;/enum8&gt;
         ///    &lt;enum8 name=&quot;Map Sub Type&quot; offset=&quot;0x1&quot; visible=&quot;true&quot;&gt;
         ///      &lt;option name=&quot;None&quot; value=&quot;0x0&quot; /&gt;
-        ///      &lt;option name=&quot;Hub&quot; value=&quot;0x1&quot; /&gt;
-        ///      &lt;option name=&quot;Level&quot; value=&quot;0x2&quot; /&gt;
-        ///      &lt;option name=&quot;Scene&quot;  [rest of string was truncated]&quot;;.
+        ///      &lt;o [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Halo3ODSTScenario {
             get {
@@ -123,6 +114,7 @@ namespace Reclaimer.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;!--derived from https://github.com/XboxChaos/Assembly/blob/dev/src/Assembly/Plugins/Halo3/scnr.xml--&gt;
         ///&lt;scenario&gt;
         ///  &lt;section name=&quot;mission&quot;&gt;
         ///    &lt;enum16 name=&quot;Map Type&quot; offset=&quot;0x0&quot; visible=&quot;true&quot;&gt;
@@ -132,10 +124,7 @@ namespace Reclaimer.Properties {
         ///    &lt;/enum16&gt;
         ///    &lt;flags16 name=&quot;Flags&quot; offset=&quot;0x2&quot; visible=&quot;true&quot;&gt;
         ///      &lt;bit name=&quot;Bit 0&quot; index=&quot;0&quot; /&gt;
-        ///      &lt;bit name=&quot;Bit 1&quot; index=&quot;1&quot; /&gt;
-        ///      &lt;bit name=&quot;Bit 2&quot; index=&quot;2&quot; /&gt;
-        ///      &lt;bit name=&quot;Bit 3&quot; index=&quot;3&quot; /&gt;
-        ///     [rest of string was truncated]&quot;;.
+        ///      &lt;bit nam [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Halo3Scenario {
             get {
@@ -144,18 +133,49 @@ namespace Reclaimer.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;plugin game=&quot;Reach&quot; baseSize=&quot;0x86C&quot;&gt;
-        ///  &lt;tagblock offset=&quot;0x4C&quot; elementSize=&quot;0xAC&quot;/&gt;
-        ///  &lt;tagblock offset=&quot;0x58&quot; elementSize=&quot;0x20&quot;/&gt;
-        ///  &lt;tagblock offset=&quot;0x84&quot; elementSize=&quot;0x30&quot;/&gt;
-        ///  &lt;tagblock offset=&quot;0x90&quot; elementSize=&quot;0x2C&quot;&gt;
-        ///    &lt;tagblock offset=&quot;0x8&quot; elementSize=&quot;0x4&quot;/&gt;
-        ///    &lt;tagblock offset=&quot;0x14&quot; elementSize=&quot;0x48&quot;&gt;
-        ///      &lt;tagblock offset=&quot;0x0&quot; elementSize=&quot;0xC&quot;&gt;
-        ///        &lt;tagblock offset=&quot;0x0&quot; elementSize=&quot;0xC&quot;&gt;
-        ///          &lt;tagblock offset=&quot;0x0&quot; elementSize=&quot;0x4&quot;/&gt;
-        ///        &lt;/tagblock&gt;
-        ///      &lt;/t [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+        ///&lt;!--derived from https://github.com/XboxChaos/Assembly/blob/dev/src/Assembly/Plugins/Halo4/scnr.xml--&gt;
+        ///&lt;plugin game=&quot;Halo4&quot; baseSize=&quot;0x98C&quot;&gt;
+        ///  &lt;tagblock name=&quot;Structure BSP&quot; offset=&quot;0xA0&quot; elementSize=&quot;0x150&quot;/&gt;
+        ///  &lt;tagblock name=&quot;Structure Designs&quot; offset=&quot;0xAC&quot; elementSize=&quot;0x20&quot;/&gt;
+        ///  &lt;tagblock name=&quot;Skies&quot; offset=&quot;0xD8&quot; elementSize=&quot;0x34&quot;/&gt;
+        ///  &lt;tagblock name=&quot;Zone Set Potentially Visible Sets&quot; offset=&quot;0xE4&quot; elementSize=&quot;0x2C&quot;&gt;
+        ///    &lt;tagblock name=&quot;BSP Checksums&quot; o [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Halo4Metadata {
+            get {
+                return ResourceManager.GetString("Halo4Metadata", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;!--derived from https://github.com/XboxChaos/Assembly/blob/dev/src/Assembly/Plugins/Halo4/scnr.xml--&gt;
+        ///&lt;scenario&gt;
+        ///  &lt;section name=&quot;mission&quot;&gt;
+        ///    &lt;enum16 name=&quot;Map Type&quot; offset=&quot;0xC&quot; visible=&quot;true&quot;&gt;
+        ///      &lt;option name=&quot;Single Player&quot; value=&quot;0x0&quot; /&gt;
+        ///      &lt;option name=&quot;Multiplayer&quot; value=&quot;0x1&quot; /&gt;
+        ///      &lt;option name=&quot;Main Menu&quot; value=&quot;0x2&quot; /&gt;
+        ///    &lt;/enum16&gt;
+        ///    &lt;flags16 name=&quot;Flags&quot; offset=&quot;0xE&quot; visible=&quot;true&quot;&gt;
+        ///      &lt;bit name=&quot;Always Draw Sky&quot; index=&quot;0&quot; tooltip= [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Halo4Scenario {
+            get {
+                return ResourceManager.GetString("Halo4Scenario", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+        ///&lt;!--derived from https://github.com/XboxChaos/Assembly/blob/dev/src/Assembly/Plugins/Reach/scnr.xml--&gt;
+        ///&lt;plugin game=&quot;Reach&quot; baseSize=&quot;0x86C&quot;&gt;
+        ///  &lt;tagblock name=&quot;Structure BSPs&quot; offset=&quot;0x4C&quot; elementSize=&quot;0xAC&quot;/&gt;
+        ///  &lt;tagblock name=&quot;Structure Design&quot; offset=&quot;0x58&quot; elementSize=&quot;0x20&quot;/&gt;
+        ///  &lt;tagblock name=&quot;Sky References&quot; offset=&quot;0x84&quot; elementSize=&quot;0x30&quot;/&gt;
+        ///  &lt;tagblock name=&quot;BSP Groups&quot; offset=&quot;0x90&quot; elementSize=&quot;0x2C&quot;&gt;
+        ///    &lt;tagblock name=&quot;BSP Checksums&quot; offset=&quot;0x8&quot; ele [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string HaloReachMetadata {
             get {
@@ -165,6 +185,7 @@ namespace Reclaimer.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;!--derived from https://github.com/XboxChaos/Assembly/blob/dev/src/Assembly/Plugins/Reach/scnr.xml--&gt;
         ///&lt;scenario&gt;
         ///  &lt;section name=&quot;mission&quot;&gt;
         ///    &lt;enum16 name=&quot;Map Type&quot; offset=&quot;0x0&quot; visible=&quot;true&quot;&gt;
@@ -174,10 +195,7 @@ namespace Reclaimer.Properties {
         ///    &lt;/enum16&gt;
         ///    &lt;flags16 name=&quot;Flags&quot; offset=&quot;0x2&quot; visible=&quot;true&quot;&gt;
         ///      &lt;bit name=&quot;Bit 0&quot; index=&quot;0&quot; /&gt;
-        ///      &lt;bit name=&quot;Bit 1&quot; index=&quot;1&quot; /&gt;
-        ///      &lt;bit name=&quot;Bit 2&quot; index=&quot;2&quot; /&gt;
-        ///      &lt;bit name=&quot;Bit 3&quot; index=&quot;3&quot; /&gt;
-        ///     [rest of string was truncated]&quot;;.
+        ///      &lt;bit nam [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string HaloReachScenario {
             get {
@@ -187,17 +205,13 @@ namespace Reclaimer.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+        ///&lt;!--derived from https://github.com/XboxChaos/Assembly/blob/dev/src/Assembly/Plugins/ODSTMCC/scnr.xml--&gt;
         ///&lt;plugin game=&quot;ODSTMCC&quot; baseSize=&quot;0x840&quot;&gt;
-        ///  &lt;tagblock offset=&quot;0x14&quot; elementSize=&quot;0x6C&quot;/&gt;
-        ///  &lt;tagblock offset=&quot;0x4C&quot; elementSize=&quot;0x14&quot;/&gt;
-        ///  &lt;tagblock offset=&quot;0x58&quot; elementSize=&quot;0x2C&quot;&gt;
-        ///    &lt;tagblock offset=&quot;0x8&quot; elementSize=&quot;0x4&quot;/&gt;
-        ///    &lt;tagblock offset=&quot;0x14&quot; elementSize=&quot;0x54&quot;&gt;
-        ///      &lt;tagblock offset=&quot;0x0&quot; elementSize=&quot;0xC&quot;&gt;
-        ///        &lt;tagblock offset=&quot;0x0&quot; elementSize=&quot;0xC&quot;&gt;
-        ///          &lt;tagblock offset=&quot;0x0&quot; elementSize=&quot;0x4&quot;/&gt;
-        ///        &lt;/tagblock&gt;
-        ///      &lt;/tagbloc [rest of string was truncated]&quot;;.
+        ///  &lt;tagblock name=&quot;Structure BSPs&quot; offset=&quot;0x14&quot; elementSize=&quot;0x6C&quot;/&gt;
+        ///  &lt;tagblock name=&quot;Sky References&quot; offset=&quot;0x4C&quot; elementSize=&quot;0x14&quot;/&gt;
+        ///  &lt;tagblock name=&quot;BSP Groups&quot; offset=&quot;0x58&quot; elementSize=&quot;0x2C&quot;&gt;
+        ///    &lt;tagblock name=&quot;BSP Checksums&quot; offset=&quot;0x8&quot; elementSize=&quot;0x4&quot;/&gt;
+        ///    &lt;tagblock name=&quot;BSPs&quot; offset=&quot;0x14&quot; elementSiz [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string MccHalo3ODSTMetadata {
             get {
@@ -207,6 +221,7 @@ namespace Reclaimer.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;!--derived from https://github.com/XboxChaos/Assembly/blob/dev/src/Assembly/Plugins/ODSTMCC/scnr.xml--&gt;
         ///&lt;scenario&gt;
         ///  &lt;section name=&quot;mission&quot;&gt;
         ///    &lt;enum8 name=&quot;Map Type&quot; offset=&quot;0x0&quot; visible=&quot;true&quot;&gt;
@@ -216,9 +231,7 @@ namespace Reclaimer.Properties {
         ///    &lt;/enum8&gt;
         ///    &lt;enum8 name=&quot;Map Sub Type&quot; offset=&quot;0x1&quot; visible=&quot;true&quot;&gt;
         ///      &lt;option name=&quot;None&quot; value=&quot;0x0&quot; /&gt;
-        ///      &lt;option name=&quot;Hub&quot; value=&quot;0x1&quot; /&gt;
-        ///      &lt;option name=&quot;Level&quot; value=&quot;0x2&quot; /&gt;
-        ///      &lt;option name=&quot;Scene&quot;  [rest of string was truncated]&quot;;.
+        ///      [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string MccHalo3ODSTScenario {
             get {
@@ -227,18 +240,49 @@ namespace Reclaimer.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;plugin game=&quot;ReachMCC&quot; baseSize=&quot;0x884&quot;&gt;
-        ///  &lt;tagblock offset=&quot;0x4C&quot; elementSize=&quot;0xAC&quot;/&gt;
-        ///  &lt;tagblock offset=&quot;0x58&quot; elementSize=&quot;0x20&quot;/&gt;
-        ///  &lt;tagblock offset=&quot;0x84&quot; elementSize=&quot;0x30&quot;/&gt;
-        ///  &lt;tagblock offset=&quot;0x90&quot; elementSize=&quot;0x2C&quot;&gt;
-        ///    &lt;tagblock offset=&quot;0x8&quot; elementSize=&quot;0x4&quot;/&gt;
-        ///    &lt;tagblock offset=&quot;0x14&quot; elementSize=&quot;0x48&quot;&gt;
-        ///      &lt;tagblock offset=&quot;0x0&quot; elementSize=&quot;0xC&quot;&gt;
-        ///        &lt;tagblock offset=&quot;0x0&quot; elementSize=&quot;0xC&quot;&gt;
-        ///          &lt;tagblock offset=&quot;0x0&quot; elementSize=&quot;0x4&quot;/&gt;
-        ///        &lt;/tagblock&gt;
-        ///       [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+        ///&lt;!--derived from https://github.com/XboxChaos/Assembly/blob/dev/src/Assembly/Plugins/Halo4MCC/scnr.xml--&gt;
+        ///&lt;plugin game=&quot;Halo4MCC&quot; baseSize=&quot;0x998&quot;&gt;
+        ///  &lt;tagblock name=&quot;Structure BSP&quot; offset=&quot;0xA0&quot; elementSize=&quot;0x150&quot;/&gt;
+        ///  &lt;tagblock name=&quot;Structure Designs&quot; offset=&quot;0xAC&quot; elementSize=&quot;0x20&quot;/&gt;
+        ///  &lt;tagblock name=&quot;Skies&quot; offset=&quot;0xD8&quot; elementSize=&quot;0x34&quot;/&gt;
+        ///  &lt;tagblock name=&quot;Zone Set Potentially Visible Sets&quot; offset=&quot;0xE4&quot; elementSize=&quot;0x2C&quot;&gt;
+        ///    &lt;tagblock name=&quot;BSP Checks [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string MccHalo4Metadata {
+            get {
+                return ResourceManager.GetString("MccHalo4Metadata", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;!--derived from https://github.com/XboxChaos/Assembly/blob/dev/src/Assembly/Plugins/Halo4MCC/scnr.xml--&gt;
+        ///&lt;scenario&gt;
+        ///  &lt;section name=&quot;mission&quot;&gt;
+        ///    &lt;enum16 name=&quot;Map Type&quot; offset=&quot;0xC&quot; visible=&quot;true&quot;&gt;
+        ///      &lt;option name=&quot;Single Player&quot; value=&quot;0x0&quot; /&gt;
+        ///      &lt;option name=&quot;Multiplayer&quot; value=&quot;0x1&quot; /&gt;
+        ///      &lt;option name=&quot;Main Menu&quot; value=&quot;0x2&quot; /&gt;
+        ///    &lt;/enum16&gt;
+        ///    &lt;flags16 name=&quot;Flags&quot; offset=&quot;0xE&quot; visible=&quot;true&quot;&gt;
+        ///      &lt;bit name=&quot;Always Draw Sky&quot; index=&quot;0&quot; toolt [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string MccHalo4Scenario {
+            get {
+                return ResourceManager.GetString("MccHalo4Scenario", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+        ///&lt;!--derived from https://github.com/XboxChaos/Assembly/blob/dev/src/Assembly/Plugins/ReachMCC/scnr.xml--&gt;
+        ///&lt;plugin game=&quot;ReachMCC&quot; baseSize=&quot;0x884&quot;&gt;
+        ///  &lt;tagblock name=&quot;Structure BSPs&quot; offset=&quot;0x4C&quot; elementSize=&quot;0xAC&quot;/&gt;
+        ///  &lt;tagblock name=&quot;Structure Design&quot; offset=&quot;0x58&quot; elementSize=&quot;0x20&quot;/&gt;
+        ///  &lt;tagblock name=&quot;Sky References&quot; offset=&quot;0x84&quot; elementSize=&quot;0x30&quot;/&gt;
+        ///  &lt;tagblock name=&quot;BSP Groups&quot; offset=&quot;0x90&quot; elementSize=&quot;0x2C&quot;&gt;
+        ///    &lt;tagblock name=&quot;BSP Checksums&quot; offset=&quot;0x [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string MccHaloReachMetadata {
             get {
@@ -248,6 +292,7 @@ namespace Reclaimer.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;!--derived from https://github.com/XboxChaos/Assembly/blob/dev/src/Assembly/Plugins/ReachMCC/scnr.xml--&gt;
         ///&lt;scenario&gt;
         ///  &lt;section name=&quot;mission&quot;&gt;
         ///    &lt;enum16 name=&quot;Map Type&quot; offset=&quot;0x0&quot; visible=&quot;true&quot;&gt;
@@ -257,10 +302,7 @@ namespace Reclaimer.Properties {
         ///    &lt;/enum16&gt;
         ///    &lt;flags16 name=&quot;Flags&quot; offset=&quot;0x2&quot; visible=&quot;true&quot;&gt;
         ///      &lt;bit name=&quot;Bit 0&quot; index=&quot;0&quot; /&gt;
-        ///      &lt;bit name=&quot;Bit 1&quot; index=&quot;1&quot; /&gt;
-        ///      &lt;bit name=&quot;Bit 2&quot; index=&quot;2&quot; /&gt;
-        ///      &lt;bit name=&quot;Bit 3&quot; index=&quot;3&quot; /&gt;
-        ///     [rest of string was truncated]&quot;;.
+        ///      &lt;bit  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string MccHaloReachScenario {
             get {

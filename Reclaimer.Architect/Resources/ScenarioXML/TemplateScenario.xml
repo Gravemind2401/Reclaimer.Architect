@@ -27,6 +27,10 @@
     </tagblock>
     <tagblock palette="crate" srcId="scenario_crate_palette" offset="0x00" elementSize="0x00">
     </tagblock>
+    <tagblock palette="character" srcId="scenario_character_palette" offset="0x00" elementSize="0x00">
+    </tagblock>
+    <tagblock palette="decal" srcId="scenario_decal_palette" offset="0x00" elementSize="0x00">
+    </tagblock>
   </section>
   <section name="placements">
     <tagblock placements="scenery" offset="0x00" elementSize="0x00">
@@ -46,6 +50,8 @@
     <tagblock placements="lightfixture" offset="0x00" elementSize="0x00">
     </tagblock>
     <tagblock placements="crate" offset="0x00" elementSize="0x00">
+    </tagblock>
+    <tagblock placements="decal" offset="0x00" elementSize="0x00">
     </tagblock>
   </section>
   <section name="startpositions" offset="0x00" elementSize="0x00">
@@ -68,6 +74,22 @@
     <tagblock palette="goalobjects" offset="0x00" elementSize="0x00">
     </tagblock>
     <tagblock palette="spawning" offset="0x00" elementSize="0x00">
+    </tagblock>
+  </section>
+  <section name="squads">
+    <tagblock id="squadgroups" srcId="scenario_squad_group" offset="0x00" elementSize="0x00">
+    </tagblock>
+    <tagblock id="zones" srcId="scenario_ai_zone" offset="0x00" elementSize="0x00">
+    </tagblock>
+    <tagblock id="firingpositions" offset="0x00" elementSize="0x00">
+    </tagblock>
+    <tagblock id="areas" srcId="scenario_ai_area" offset="0x00" elementSize="0x00">
+    </tagblock>
+    <tagblock id="squads" offset="0x00" elementSize="0x00">
+    </tagblock>
+    <tagblock id="groupstartlocations" offset="0x00" visible="true" elementSize="0x00" label="0x00">
+    </tagblock>
+    <tagblock id="singlestartlocations" offset="0x00" elementSize="0x00" label="0x00">
     </tagblock>
   </section>
 </scenario>

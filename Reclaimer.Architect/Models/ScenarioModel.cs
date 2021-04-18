@@ -164,7 +164,9 @@ namespace Reclaimer.Models
             ComponentManagers.Add(new PaletteComponentManager(this));
             ComponentManagers.Add(new StartPositionComponentManager(this));
             ComponentManagers.Add(new TriggerVolumeComponentManager(this));
-            ComponentManagers.Add(new AiComponentManager(this));
+
+            if (SquadHierarchy.AiNodes.Count > 0)
+                ComponentManagers.Add(new AiComponentManager(this));
 
             IsBusy = false;
         }
@@ -195,6 +197,12 @@ namespace Reclaimer.Models
                 case CacheType.MccHaloReach:
                 case CacheType.MccHaloReachU3:
                     prefix = "MccHaloReach";
+                    break;
+                case CacheType.Halo4Retail:
+                    prefix = "Halo4";
+                    break;
+                case CacheType.MccHalo4:
+                    prefix = "MccHalo4";
                     break;
                 default: throw new NotSupportedException();
             }
@@ -264,6 +272,9 @@ namespace Reclaimer.Models
 
         private void ReadSquadHierarchy(EndianReader reader)
         {
+            if (SquadHierarchy.AiNodes.Count == 0)
+                return;
+
             var blockNode = SquadHierarchy.AiNodes[AiSection.SquadGroups];
             var blockRef = new BlockReference(blockNode, reader, RootAddress);
 

@@ -124,6 +124,8 @@
     <Compile Include="Blam\Halo3\model.cs" />
     <Compile Include="Blam\Halo3\object.cs" />
     <Compile Include="Blam\Halo3\scenario_structure_bsp.cs" />
+    <Compile Include="Blam\Halo4\model.cs" />
+    <Compile Include="Blam\Halo4\object.cs" />
     <Compile Include="Blam\HaloReach\model.cs" />
     <Compile Include="Blam\HaloReach\object.cs" />
     <Compile Include="Components\ComponentManager.cs" />
@@ -369,6 +371,22 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\MetadataXML\HaloReachMetadata.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\MetadataXML\MccHalo4Metadata.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\MetadataXML\Halo4Metadata.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\ScenarioXML\Halo4Scenario.xml">
+      <SubType>Designer</SubType>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\ScenarioXML\MccHalo4Scenario.xml">
+      <SubType>Designer</SubType>
+    </Resource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

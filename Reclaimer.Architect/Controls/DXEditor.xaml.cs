@@ -52,6 +52,8 @@ namespace Reclaimer.Controls
                 case CacheType.HaloReachRetail:
                 case CacheType.MccHaloReach:
                 case CacheType.MccHaloReachU3:
+                case CacheType.Halo4Retail:
+                case CacheType.MccHalo4:
                     return true;
                 default: return false;
             }

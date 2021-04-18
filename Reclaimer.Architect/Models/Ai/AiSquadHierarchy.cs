@@ -18,9 +18,14 @@ namespace Reclaimer.Models.Ai
 
         public AiSquadHierarchy(ScenarioModel scenario)
         {
-            AiNodes = scenario.Sections[Section.Squads].Node.SelectNodes("./tagblock[@id]")
-                .OfType<XmlNode>()
-                .ToDictionary(n => n.Attributes["id"].Value);
+            if (!scenario.Sections.ContainsKey(Section.Squads))
+                AiNodes = new Dictionary<string, XmlNode>();
+            else
+            {
+                AiNodes = scenario.Sections[Section.Squads].Node.SelectNodes("./tagblock[@id]")
+                    .OfType<XmlNode>()
+                    .ToDictionary(n => n.Attributes["id"].Value);
+            }
 
             SquadGroups = new ObservableCollection<AiNamedBlock>();
             Zones = new ObservableCollection<AiZone>();
