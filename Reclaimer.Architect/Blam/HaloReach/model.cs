@@ -2,6 +2,7 @@
 using Adjutant.Geometry;
 using Adjutant.Spatial;
 using Adjutant.Utilities;
+using Reclaimer.Models;
 using System;
 using System.Collections.Generic;
 using System.IO.Endian;
@@ -28,6 +29,57 @@ namespace Reclaimer.Blam.HaloReach
 
         [Offset(132)]
         public BlockCollection<ModelVariant> Variants { get; set; }
+
+        public ModelConfig ToModelConfig()
+        {
+            var config = new ModelConfig();
+            config.RenderModelTag = RenderModel.Tag;
+
+            foreach (var v in Variants)
+            {
+                var variant = new VariantConfig
+                {
+                    Name = v.Name,
+                    RegionLookup = v.RuntimeModelRegions
+                };
+
+                config.Variants.Add(variant);
+
+                foreach (var r in v.Regions)
+                {
+                    var region = new VariantRegionConfig
+                    {
+                        Name = r.Name,
+                        ParentVariantIndex = r.ParentVariantIndex,
+                        BaseRegionIndex = r.RuntimeRegionIndex
+                    };
+
+                    variant.Regions.Add(region);
+
+                    foreach (var p in r.Permutations)
+                    {
+                        region.Permutations.Add(new VariantPermutationConfig
+                        {
+                            Name = p.Name,
+                            BasePermutationIndex = p.RenderPermutationIndex
+                        });
+                    }
+                }
+
+                foreach (var att in v.Attachments)
+                {
+                    variant.Attachments.Add(new AttachmentConfig
+                    {
+                        ParentMarker = att.ParentMarker,
+                        ChildMarker = att.ChildMarker,
+                        ChildVariant = att.ChildVariant,
+                        ChildTag = att.ChildObject.Tag
+                    });
+                }
+            }
+
+            return config;
+        }
     }
 
     [FixedSize(56)]

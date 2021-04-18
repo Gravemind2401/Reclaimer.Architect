@@ -19,6 +19,7 @@ namespace Reclaimer.Models
 
         public static ModelConfig FromIndexItem(IIndexItem item)
         {
+            ModelConfig result;
             switch (item.CacheFile.CacheType)
             {
                 case CacheType.Halo3Retail:
@@ -26,186 +27,25 @@ namespace Reclaimer.Models
                 case CacheType.MccHalo3U4:
                 case CacheType.Halo3ODST:
                 case CacheType.MccHalo3ODST:
-                    var h3Meta = item.ReadMetadata<Blam.Halo3.model>();
-                    return FromMetadata(item, h3Meta);
+                    result = item.ReadMetadata<Blam.Halo3.model>().ToModelConfig();
+                    break;
 
                 case CacheType.HaloReachRetail:
                 case CacheType.MccHaloReach:
                 case CacheType.MccHaloReachU3:
-                    var reachMeta = item.ReadMetadata<Blam.HaloReach.model>();
-                    return FromMetadata(item, reachMeta);
+                    result = item.ReadMetadata<Blam.HaloReach.model>().ToModelConfig();
+                    break;
 
                 case CacheType.Halo4Retail:
                 case CacheType.MccHalo4:
-                    var h4Meta = item.ReadMetadata<Blam.Halo4.model>();
-                    return FromMetadata(item, h4Meta);
+                    result = item.ReadMetadata<Blam.Halo4.model>().ToModelConfig();
+                    break;
 
                 default: return null;
             }
-        }
 
-        //TODO: make a hlmt interface and unduplicate FromMetadata
-
-        private static ModelConfig FromMetadata(IIndexItem item, Blam.Halo3.model hlmt)
-        {
-            var config = new ModelConfig
-            {
-                ModelTag = item,
-                RenderModelTag = hlmt.RenderModel.Tag
-            };
-
-            foreach (var v in hlmt.Variants)
-            {
-                var variant = new VariantConfig
-                {
-                    Name = v.Name,
-                    RegionLookup = v.RuntimeModelRegions
-                };
-
-                config.Variants.Add(variant);
-
-                foreach (var r in v.Regions)
-                {
-                    var region = new VariantRegionConfig
-                    {
-                        Name = r.Name,
-                        ParentVariantIndex = r.ParentVariantIndex,
-                        BaseRegionIndex = r.RuntimeRegionIndex
-                    };
-
-                    variant.Regions.Add(region);
-
-                    foreach (var p in r.Permutations)
-                    {
-                        region.Permutations.Add(new VariantPermutationConfig
-                        {
-                            Name = p.Name,
-                            BasePermutationIndex = p.RenderPermutationIndex
-                        });
-                    }
-                }
-
-                foreach (var att in v.Attachments)
-                {
-                    variant.Attachments.Add(new AttachmentConfig
-                    {
-                        ParentMarker = att.ParentMarker,
-                        ChildMarker = att.ChildMarker,
-                        ChildVariant = att.ChildVariant,
-                        ChildTag = att.ChildObject.Tag
-                    });
-                }
-            }
-
-            return config;
-        }
-
-        private static ModelConfig FromMetadata(IIndexItem item, Blam.HaloReach.model hlmt)
-        {
-            var config = new ModelConfig
-            {
-                ModelTag = item,
-                RenderModelTag = hlmt.RenderModel.Tag
-            };
-
-            foreach (var v in hlmt.Variants)
-            {
-                var variant = new VariantConfig
-                {
-                    Name = v.Name,
-                    RegionLookup = v.RuntimeModelRegions
-                };
-
-                config.Variants.Add(variant);
-
-                foreach (var r in v.Regions)
-                {
-                    var region = new VariantRegionConfig
-                    {
-                        Name = r.Name,
-                        ParentVariantIndex = r.ParentVariantIndex,
-                        BaseRegionIndex = r.RuntimeRegionIndex
-                    };
-
-                    variant.Regions.Add(region);
-
-                    foreach (var p in r.Permutations)
-                    {
-                        region.Permutations.Add(new VariantPermutationConfig
-                        {
-                            Name = p.Name,
-                            BasePermutationIndex = p.RenderPermutationIndex
-                        });
-                    }
-                }
-
-                foreach (var att in v.Attachments)
-                {
-                    variant.Attachments.Add(new AttachmentConfig
-                    {
-                        ParentMarker = att.ParentMarker,
-                        ChildMarker = att.ChildMarker,
-                        ChildVariant = att.ChildVariant,
-                        ChildTag = att.ChildObject.Tag
-                    });
-                }
-            }
-
-            return config;
-        }
-
-        private static ModelConfig FromMetadata(IIndexItem item, Blam.Halo4.model hlmt)
-        {
-            var config = new ModelConfig
-            {
-                ModelTag = item,
-                RenderModelTag = hlmt.RenderModel.Tag
-            };
-
-            foreach (var v in hlmt.Variants)
-            {
-                var variant = new VariantConfig
-                {
-                    Name = v.Name,
-                    RegionLookup = v.RuntimeModelRegions
-                };
-
-                config.Variants.Add(variant);
-
-                foreach (var r in v.Regions)
-                {
-                    var region = new VariantRegionConfig
-                    {
-                        Name = r.Name,
-                        ParentVariantIndex = r.ParentVariantIndex,
-                        BaseRegionIndex = r.RuntimeRegionIndex
-                    };
-
-                    variant.Regions.Add(region);
-
-                    foreach (var p in r.Permutations)
-                    {
-                        region.Permutations.Add(new VariantPermutationConfig
-                        {
-                            Name = p.Name,
-                            BasePermutationIndex = p.RenderPermutationIndex
-                        });
-                    }
-                }
-
-                foreach (var att in v.Attachments)
-                {
-                    variant.Attachments.Add(new AttachmentConfig
-                    {
-                        ParentMarker = att.ParentMarker,
-                        ChildMarker = att.ChildMarker,
-                        ChildVariant = att.ChildVariant,
-                        ChildTag = att.ChildObject.Tag
-                    });
-                }
-            }
-
-            return config;
+            result.ModelTag = item;
+            return result;
         }
     }
 
