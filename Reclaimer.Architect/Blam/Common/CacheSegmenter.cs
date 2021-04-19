@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Reclaimer.Blam.Common
 {
-    //based on https://github.com/XboxChaos/Assembly/blob/dev/src/Blamite/IO/FileSegmenter.cs
+    //based on logic from https://github.com/XboxChaos/Assembly/blob/dev/src/Blamite/IO/FileSegmenter.cs
     public class CacheSegmenter
     {
         private readonly IGen3CacheFile cache;
@@ -21,7 +21,7 @@ namespace Reclaimer.Blam.Common
         private readonly Segment resourceSegment;
         private readonly Segment metadataSegment;
 
-        private readonly Segment[] stringSegments = new Segment[5];
+        private readonly Segment[] stringSegments = new Segment[6];
         private readonly Dictionary<int, Segment[]> localeSegments = new Dictionary<int, Segment[]>();
 
         private Segment eofSegment => segments.Last();
@@ -31,7 +31,7 @@ namespace Reclaimer.Blam.Common
 
         public CacheSegmenter(IGen3CacheFile cache)
         {
-            if (cache.CacheType < CacheType.Halo3Retail || cache.CacheType >= CacheType.Halo4Beta)
+            if (cache.CacheType < CacheType.Halo3Retail || cache.CacheType >= CacheType.MccHalo2X)
                 throw new NotSupportedException();
 
             this.cache = cache;
@@ -75,11 +75,20 @@ namespace Reclaimer.Blam.Common
             segments.Add(stringsGroup.Add(stringSegments[3] = new Segment(origin, size, 1)));
 
             //only exists in mcc reach (U3+)
-            if (cache.Header.StringNamespaceTablePointer.Value != 0)
+            var mcc3 = cache.Header as IMccGen3Header;
+            if (mcc3?.StringNamespaceCount > 0)
             {
-                origin = (int)debugTranslator.GetAddress(cache.Header.StringNamespaceTablePointer.Value);
-                size = cache.Header.StringNamespaceCount * 4;
+                origin = (int)debugTranslator.GetAddress(mcc3.StringNamespaceTablePointer.Value);
+                size = mcc3.StringNamespaceCount * 4;
                 segments.Add(stringSegments[4] = stringsGroup.Add(new Segment(origin, size, 4)));
+            }
+
+            var gen4 = cache.Header as IGen4Header;
+            if (gen4?.UnknownTableSize > 0)
+            {
+                origin = (int)debugTranslator.GetAddress(gen4.UnknownTablePointer.Value);
+                size = gen4.UnknownTableSize * 16;
+                segments.Add(stringSegments[5] = stringsGroup.Add(new Segment(origin, size, 16)));
             }
 
             for (int i = 0; i < cache.LocaleIndex.Languages.Count; i++)
@@ -176,10 +185,19 @@ namespace Reclaimer.Blam.Common
             pointer = debugTranslator.GetPointer(stringSegments[3].Offset);
             cache.Header.FileTablePointer = new Pointer((int)pointer, cache.Header.FileTablePointer);
 
-            if (cache.Header.StringNamespaceTablePointer.Value != 0)
+            //only exists in mcc reach (U3+)
+            var mcc3 = cache.Header as IMccGen3Header;
+            if (mcc3?.StringNamespaceCount > 0)
             {
                 pointer = debugTranslator.GetPointer(stringSegments[4].Offset);
-                cache.Header.StringNamespaceTablePointer = new Pointer((int)pointer, cache.Header.StringNamespaceTablePointer);
+                mcc3.StringNamespaceTablePointer = new Pointer((int)pointer, mcc3.StringNamespaceTablePointer);
+            }
+
+            var gen4 = cache.Header as IGen4Header;
+            if (gen4?.UnknownTableSize > 0)
+            {
+                pointer = debugTranslator.GetPointer(stringSegments[5].Offset);
+                gen4.UnknownTablePointer = new Pointer((int)pointer, gen4.UnknownTablePointer);
             }
 
             foreach (var pair in localeSegments)
