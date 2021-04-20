@@ -31,7 +31,7 @@ namespace Reclaimer.Blam.Common
 
         public CacheSegmenter(IGen3CacheFile cache)
         {
-            if (cache.CacheType < CacheType.Halo3Retail || cache.CacheType >= CacheType.MccHalo2X)
+            if (cache.CacheType < CacheType.Halo3Retail || cache.Metadata.IsPreRelease)
                 throw new NotSupportedException();
 
             this.cache = cache;

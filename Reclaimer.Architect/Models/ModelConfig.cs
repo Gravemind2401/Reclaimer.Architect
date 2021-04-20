@@ -38,6 +38,7 @@ namespace Reclaimer.Models
 
                 case CacheType.Halo4Retail:
                 case CacheType.MccHalo4:
+                case CacheType.MccHalo2X:
                     result = item.ReadMetadata<Blam.Halo4.model>().ToModelConfig();
                     break;
 

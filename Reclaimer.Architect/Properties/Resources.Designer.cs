@@ -205,6 +205,41 @@ namespace Reclaimer.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+        ///&lt;!--derived from https://github.com/XboxChaos/Assembly/blob/dev/src/Assembly/Plugins/Halo2AMCC/scnr.xml--&gt;
+        ///&lt;plugin game=&quot;Halo2AMCC&quot; baseSize=&quot;0x998&quot;&gt;
+        ///  &lt;tagblock name=&quot;Structure BSP&quot; offset=&quot;0xA0&quot; elementSize=&quot;0x150&quot;/&gt;
+        ///  &lt;tagblock name=&quot;Structure Designs&quot; offset=&quot;0xAC&quot; elementSize=&quot;0x20&quot;/&gt;
+        ///  &lt;tagblock name=&quot;Skies&quot; offset=&quot;0xD8&quot; elementSize=&quot;0x34&quot;/&gt;
+        ///  &lt;tagblock name=&quot;Zone Set Potentially Visible Sets&quot; offset=&quot;0xE4&quot; elementSize=&quot;0x2C&quot;&gt;
+        ///    &lt;tagblock name=&quot;BSP Chec [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string MccHalo2XMetadata {
+            get {
+                return ResourceManager.GetString("MccHalo2XMetadata", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;!--derived from https://github.com/XboxChaos/Assembly/blob/dev/src/Assembly/Plugins/Halo2AMCC/scnr.xml--&gt;
+        ///&lt;scenario&gt;
+        ///  &lt;section name=&quot;mission&quot;&gt;
+        ///    &lt;enum16 name=&quot;Map Type&quot; offset=&quot;0xC&quot; visible=&quot;true&quot;&gt;
+        ///      &lt;option name=&quot;Single Player&quot; value=&quot;0x0&quot; /&gt;
+        ///      &lt;option name=&quot;Multiplayer&quot; value=&quot;0x1&quot; /&gt;
+        ///      &lt;option name=&quot;Main Menu&quot; value=&quot;0x2&quot; /&gt;
+        ///    &lt;/enum16&gt;
+        ///    &lt;flags16 name=&quot;Flags&quot; offset=&quot;0xE&quot; visible=&quot;true&quot;&gt;
+        ///      &lt;bit name=&quot;Always Draw Sky&quot; index=&quot;0&quot; tool [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string MccHalo2XScenario {
+            get {
+                return ResourceManager.GetString("MccHalo2XScenario", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
         ///&lt;!--derived from https://github.com/XboxChaos/Assembly/blob/dev/src/Assembly/Plugins/ODSTMCC/scnr.xml--&gt;
         ///&lt;plugin game=&quot;ODSTMCC&quot; baseSize=&quot;0x840&quot;&gt;
         ///  &lt;tagblock name=&quot;Structure BSPs&quot; offset=&quot;0x14&quot; elementSize=&quot;0x6C&quot;/&gt;

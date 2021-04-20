@@ -142,6 +142,12 @@
   <data name="HaloReachScenario" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\resources\scenarioxml\haloreachscenario.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="MccHalo2XMetadata" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\metadataxml\mcchalo2xmetadata.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="MccHalo2XScenario" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\scenarioxml\mcchalo2xscenario.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
   <data name="MccHalo3ODSTMetadata" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\resources\metadataxml\mcchalo3odstmetadata.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>

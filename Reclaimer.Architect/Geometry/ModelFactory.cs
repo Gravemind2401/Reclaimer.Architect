@@ -50,6 +50,7 @@ namespace Reclaimer.Geometry
                 case CacheType.MccHaloReachU3:
                 case CacheType.Halo4Retail:
                 case CacheType.MccHalo4:
+                case CacheType.MccHalo2X:
                     return true;
                 default: return false;
             }
@@ -233,6 +234,7 @@ namespace Reclaimer.Geometry
 
                 case CacheType.Halo4Retail:
                 case CacheType.MccHalo4:
+                case CacheType.MccHalo2X:
                     var h4Meta = source.ReadMetadata<Blam.Halo4.@object>();
                     defaultVariant = h4Meta.DefaultVariant;
                     return h4Meta.Model.Tag;

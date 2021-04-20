@@ -26,7 +26,7 @@ namespace Reclaimer.Models
                 {
                     Parent.RenderView?.RefreshObject(PaletteKey, this, FieldId.PaletteIndex);
                     if (oldValue == -1) //reselect because theres actually something to select now
-                        Parent.RenderView.SelectObject(Parent.SelectedNode, Parent.SelectedItemIndex);
+                        Parent.RenderView?.SelectObject(Parent.SelectedNode, Parent.SelectedItemIndex);
                 }
             }
         }
@@ -74,6 +74,7 @@ namespace Reclaimer.Models
             : base(parent)
         {
             PaletteKey = paletteKey;
+            paletteIndex = -1;
         }
 
         protected override long GetFieldAddress(string fieldId)

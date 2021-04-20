@@ -204,6 +204,9 @@ namespace Reclaimer.Models
                 case CacheType.MccHalo4:
                     prefix = "MccHalo4";
                     break;
+                case CacheType.MccHalo2X:
+                    prefix = "MccHalo2X";
+                    break;
                 default: throw new NotSupportedException();
             }
 
