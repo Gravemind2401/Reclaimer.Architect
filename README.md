@@ -10,6 +10,7 @@ Architect can open the following tag types:
   - These tags will be opened in a model viewer that has the ability to preview model variants including any attachments the model has. These models cannot be extracted.
 - **scenario**
   - This tag will open the Architect scenario editor. This gives a 3d view of the entire map including all scenery and other objects. The editor is similar to the Sapien tool from Halo Custom Edition where you can view and edit details of what objects are on the map.
+  - **IMPORTANT**: it is highly recommended to back up your map file before editing the scenario
 
 ## Controls
 - Click and hold `R mouse button` anywhere in the viewport to take control of the camera
