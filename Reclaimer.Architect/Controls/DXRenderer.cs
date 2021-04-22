@@ -445,6 +445,9 @@ namespace Reclaimer.Controls
                 ? new Media3D.Vector3D(0, -Math.Sign(center.Y), 0)
                 : new Media3D.Vector3D(-Math.Sign(center.X), 0, 0);
 
+            if (dir.Length == 0)
+                dir = new Media3D.Vector3D(-1, 0, 0);
+
             pcam.LookAt(center, dir * dist, Viewport.ModelUpDirection, animationTime);
         }
 
