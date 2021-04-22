@@ -53,7 +53,7 @@
 
     <DockPanel>
         <ToolBarTray DockPanel.Dock="Top" IsLocked="True">
-            <ToolBar>
+            <ToolBar Margin="3,1">
                 <Button Click="btnCollapseAll_Click"
                         ToolTip="Collapse all">
                     <ContentControl Template="{StaticResource ic_CollapseGroup_16x}" />
@@ -81,7 +81,7 @@
                 </Button>
                 <Button Click="btnExportAll_Click" ToolTip="Export all geometry"
                         Visibility="{Binding IsExportable, Converter={StaticResource visibilityConverter}}">
-                    <ContentControl Template="{StaticResource ic_Save_16x}" />
+                    <ContentControl Template="{StaticResource ic_SaveAll_16x}" />
                 </Button>
             </ToolBar>
         </ToolBarTray>
@@ -170,7 +170,7 @@
         </ToolBarTray>
         <s:SplitPanel x:Name="splitPanel" x:FieldModifier="private" SplitterThickness="3">
             <s:SplitPanel.Resources>
-                <Style TargetType="s:SplitPanelSplitter" BasedOn="{StaticResource {x:Type s:SplitPanelSplitter}}">
+                <Style TargetType="s:SplitPanelSplitter">
                     <Setter Property="Background" Value="LightGray" />
                 </Style>
             </s:SplitPanel.Resources>

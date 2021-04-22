@@ -52,7 +52,7 @@
 
     <DockPanel>
         <ToolBarTray DockPanel.Dock="Top" IsLocked="True">
-            <ToolBar>
+            <ToolBar Margin="3,1">
                 <Button Click="btnCollapseAll_Click"
                         ToolTip="Collapse all">
                     <ContentControl Template="{StaticResource ic_CollapseGroup_16x}" />
@@ -112,8 +112,9 @@
                     </Style>
                 </ToolBar.Resources>
                 <ComboBox ItemsSource="{Binding AvailableLods}"
-                          SelectedIndex="{Binding SelectedLod}" />
-                <Separator />
+                          SelectedIndex="{Binding SelectedLod}"
+                          Visibility="Collapsed" />
+                <Separator Visibility="Collapsed" />
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -187,7 +188,7 @@
         </ToolBarTray>
         <s:SplitPanel x:Name="splitPanel" x:FieldModifier="private" SplitterThickness="3">
             <s:SplitPanel.Resources>
-                <Style TargetType="s:SplitPanelSplitter" BasedOn="{StaticResource {x:Type s:SplitPanelSplitter}}">
+                <Style TargetType="s:SplitPanelSplitter">
                     <Setter Property="Background" Value="LightGray" />
                 </Style>
             </s:SplitPanel.Resources>
