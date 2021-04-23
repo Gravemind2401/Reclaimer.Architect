@@ -18,6 +18,7 @@ Architect can open the following tag types:
   - Move the mouse to rotate the camera
   - Press and hold `WASD` for movement
   - Use `R` and `F` to move the camera up and down
+  - While moving hold `Shift` to move faster and `Ctrl` to move slower
 - Use `mouse scroll` to change the camera speed
 - Viewport FOV can be changed in settings
   - Does not affect any viewports that are already open
