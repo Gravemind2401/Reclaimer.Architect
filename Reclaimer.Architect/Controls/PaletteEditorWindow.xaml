@@ -20,16 +20,7 @@
 
     <DockPanel>
         <ToolBarTray DockPanel.Dock="Top" IsLocked="True">
-            <ToolBar Margin="3,1">
-                <ToolBar.Resources>
-                    <Style x:Key="{x:Static ToolBar.ButtonStyleKey}" TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
-                        <Style.Triggers>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Opacity" Value="0.4" />
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </ToolBar.Resources>
+            <ToolBar>
                 <Button Click="btnAddItem_Click" ToolTip="Add Item">
                     <ContentControl Template="{StaticResource ic_Add_16x}" />
                 </Button>

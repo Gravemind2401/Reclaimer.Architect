@@ -13,7 +13,8 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/Reclaimer;component/Resources/Templates.xaml" />
+                <ResourceDictionary Source="/Reclaimer;component/Styles/IconTemplates.xaml" />
+                <ResourceDictionary Source="/Reclaimer;component/Styles/Defaults.xaml" />
                 <ResourceDictionary Source="/Reclaimer.DXViewer;component/Resources/Templates.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
@@ -107,7 +108,7 @@
             </ToolBar>
         </ToolBarTray>
         <ToolBarTray DockPanel.Dock="Bottom" IsLocked="True">
-            <ToolBar Margin="3,1">
+            <ToolBar>
                 <ToolBar.Resources>
                     <Style TargetType="Label">
                         <Setter Property="Padding" Value="4,0,6,2" />

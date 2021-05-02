@@ -13,7 +13,8 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/Reclaimer;component/Resources/Templates.xaml" />
+                <ResourceDictionary Source="/Reclaimer;component/Styles/IconTemplates.xaml" />
+                <ResourceDictionary Source="/Reclaimer;component/Styles/Defaults.xaml" />
                 <ResourceDictionary Source="/Reclaimer.DXViewer;component/Resources/Templates.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
@@ -24,16 +25,6 @@
     <DockPanel>
         <ToolBarTray DockPanel.Dock="Top" IsLocked="True">
             <ToolBar>
-                <ToolBar.Resources>
-                    <Style x:Key="{x:Static ToolBar.ButtonStyleKey}" TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
-                        <Style.Triggers>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Opacity" Value="0.4" />
-                            </Trigger>
-                        </Style.Triggers>                    
-                    </Style>
-                </ToolBar.Resources>
-                
                 <Button Click="btnCollapseAll_Click"
                         ToolTip="Collapse all">
                     <ContentControl Template="{StaticResource ic_CollapseGroup_16x}" />
