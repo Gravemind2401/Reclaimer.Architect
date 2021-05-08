@@ -631,13 +631,13 @@ namespace Reclaimer.Models
         private IEnumerable<SceneNodeModel> GetPlaceholderInstances(SceneNodeModel parent, SceneNodeModel placeholder)
         {
             if (placeholder.NodeType == NodeType.AiDefaultZoneItem)
-                return Enumerable.Repeat(SquadHierarchy.DefaultZone, 1).Select(z => new SceneNodeModel(z.Name, NodeType.AiDefaultZoneItem) { Tag = z, IconType = 1 });
+                return Enumerable.Repeat(SquadHierarchy.DefaultZone, 1).Select(z => new SceneNodeModel(z.GetDisplayName(), NodeType.AiDefaultZoneItem) { Tag = z, IconType = 1 });
             if (placeholder.NodeType == NodeType.AiZoneItem)
-                return SquadHierarchy.Zones.Select(z => new SceneNodeModel(z.Name, NodeType.AiZoneItem) { Tag = z, IconType = 1 });
+                return SquadHierarchy.Zones.Select(z => new SceneNodeModel(z.GetDisplayName(), NodeType.AiZoneItem) { Tag = z, IconType = 1 });
             else if (placeholder.NodeType == NodeType.AiSquadItem)
-                return (parent.Tag as AiZone).Squads.Select(e => new SceneNodeModel(e.Name, NodeType.AiSquadItem) { Tag = e, IconType = 1 });
+                return (parent.Tag as AiZone).Squads.Select(e => new SceneNodeModel(e.GetDisplayName(), NodeType.AiSquadItem) { Tag = e, IconType = 1 });
             else if (placeholder.NodeType == NodeType.AiEncounterItem)
-                return (parent.Tag as AiSquad).Encounters.Select(s => new SceneNodeModel(s.Name, NodeType.AiEncounterItem) { Tag = s, IconType = 1 });
+                return (parent.Tag as AiSquad).Encounters.Select(s => new SceneNodeModel(s.GetDisplayName(), NodeType.AiEncounterItem) { Tag = s, IconType = 1 });
             else return new List<SceneNodeModel> { placeholder };
         }
         #endregion

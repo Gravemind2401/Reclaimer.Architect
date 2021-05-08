@@ -24,9 +24,8 @@
     <sys:Double x:Key="valueColWidthM">120</sys:Double>
     <sys:Double x:Key="valueColWidthL">310</sys:Double>
 
-    <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
+    <Style TargetType="Label" BasedOn="{StaticResource Reclaimer.LabelStyle}">
         <Setter Property="VerticalAlignment" Value="Top" />
-        <Setter Property="Foreground" Value="{DynamicResource CommonControls.TextBox.Text}" />
     </Style>
 
     <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
@@ -64,7 +63,7 @@
 
     <DataTemplate x:Key="StringContent">
         <TextBox Width="{StaticResource valueColWidthM}" MaxLength="{Binding Length}"
-             IsReadOnly="True" Text="{Binding Value}" />
+                 IsReadOnly="True" Text="{Binding Value}" />
     </DataTemplate>
 
     <DataTemplate x:Key="EnumContent">
@@ -75,11 +74,12 @@
 
     <DataTemplate x:Key="BitmaskContent">
         <ListBox Width="{StaticResource valueColWidthM}" MaxHeight="260"
-             ItemsSource="{Binding Options}">
+                 ItemsSource="{Binding Options}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Name}" 
-                          ToolTip="{Binding ToolTip}" ToolTipService.ShowOnDisabled="True" />
+                    <CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Name}"
+                              Foreground="{DynamicResource TreeView.Foreground}"
+                              ToolTip="{Binding ToolTip}" ToolTipService.ShowOnDisabled="True" />
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>

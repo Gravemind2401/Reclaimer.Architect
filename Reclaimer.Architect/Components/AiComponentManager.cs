@@ -242,17 +242,17 @@ namespace Reclaimer.Components
             var squadTag = treeNode.Parent.Tag as AiSquad;
 
             if (treeNode.NodeType == NodeType.AiSquadGroups)
-                return scenario.SquadHierarchy.SquadGroups.Select(group => new ScenarioListItem(group.Name, group));
+                return scenario.SquadHierarchy.SquadGroups.Select(group => new ScenarioListItem(group.GetDisplayName(), group));
             else if (treeNode.NodeType == NodeType.AiZones)
-                return scenario.SquadHierarchy.Zones.Select(zone => new ScenarioListItem(zone.Name, zone));
+                return scenario.SquadHierarchy.Zones.Select(zone => new ScenarioListItem(zone.GetDisplayName(), zone));
             else if (treeNode.NodeType == NodeType.AiZoneAreas)
                 return zoneTag.Areas.Select(area => new ScenarioListItem(area.GetDisplayName(), area));
             else if (treeNode.NodeType == NodeType.AiFiringPositions)
                 return zoneTag.FiringPositions.Select(fpos => new ScenarioListItem(fpos.GetDisplayName(), fpos));
             else if (treeNode.NodeType == NodeType.AiSquads)
-                return zoneTag.Squads.Select(squad => new ScenarioListItem(squad.Name, squad));
+                return zoneTag.Squads.Select(squad => new ScenarioListItem(squad.GetDisplayName(), squad));
             else if (treeNode.NodeType == NodeType.AiEncounters)
-                return squadTag.Encounters.Select(enc => new ScenarioListItem(enc.Name, enc));
+                return squadTag.Encounters.Select(enc => new ScenarioListItem(enc.GetDisplayName(), enc));
             else if (treeNode.NodeType == NodeType.AiStartingLocations
                 || treeNode.NodeType == NodeType.AiGroupStartingLocations
                 || treeNode.NodeType == NodeType.AiSoloStartingLocations)

@@ -35,6 +35,6 @@ namespace Reclaimer.Models.Ai
                 Name = ((Plugins.MetaViewer.Halo3.StringValue)meta).Value;
         }
 
-        string IMetaUpdateReceiver.GetDisplayName() => Name;
+        public virtual string GetDisplayName() => Name;
     }
 }
