@@ -131,7 +131,7 @@ namespace Reclaimer.Controls
             }
             catch (Exception ex)
             {
-                scenario.LogError($"Unable to save changes to {scenario.ScenarioTag.FileName()}", ex);
+                scenario.LogError($"Unable to save changes to {scenario.ScenarioTag.FileName()}", ex, true);
                 Substrate.ShowErrorMessage(ex.Message);
             }
         }

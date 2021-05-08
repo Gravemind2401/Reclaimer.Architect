@@ -21,7 +21,8 @@ namespace Reclaimer.Models
     public class ScenarioModel : BindableBase
     {
         internal bool IsBusy { get; private set; }
-        internal Action<string, Exception> LogError { get; set; }
+        internal Action<string> LogOutput { get; set; }
+        internal Action<string, Exception, bool> LogError { get; set; }
 
         public IIndexItem ScenarioTag { get; }
         public long RootAddress => 0; // ScenarioTag.MetaPointer.Address;

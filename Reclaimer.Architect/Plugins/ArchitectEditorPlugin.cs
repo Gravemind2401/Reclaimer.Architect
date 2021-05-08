@@ -65,6 +65,7 @@ namespace Reclaimer.Plugins
                         HierarchyView = hierarchyView,
                         PropertyView = propertyView,
                         RenderView = renderView,
+                        LogOutput = LogOutput,
                         LogError = LogError
                     };
 
@@ -120,7 +121,7 @@ namespace Reclaimer.Plugins
             }
             catch (Exception e)
             {
-                LogError($"Error loading tag: {fileName}", e);
+                LogError($"Error loading tag: {fileName}", e, true);
             }
         }
     }

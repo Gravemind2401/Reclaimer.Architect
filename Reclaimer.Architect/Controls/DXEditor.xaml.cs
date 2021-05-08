@@ -206,16 +206,24 @@ namespace Reclaimer.Controls
 
             Task.Run(async () =>
             {
-                await Task.WhenAll(scenario.ComponentManagers.Select(c=> c.InitializeResourcesAsync(factory)));
-
-                Dispatcher.Invoke(() =>
+                try
                 {
-                    PostLoadScenario();
+                    await Task.WhenAll(scenario.ComponentManagers.Select(c => c.InitializeResourcesAsync(factory)));
 
-                    isReady = true;
-                    IsEnabled = true;
-                    spinner.Visibility = Visibility.Collapsed;
-                });
+                    Dispatcher.Invoke(() =>
+                    {
+                        PostLoadScenario();
+
+                        isReady = true;
+                        IsEnabled = true;
+                        spinner.Visibility = Visibility.Collapsed;
+                    });
+                }
+                catch (Exception ex)
+                {
+                    scenario.LogError($"Error loading scenario {scenario.ScenarioTag.FileName()}", ex, true);
+                    Dispatcher.Invoke(() => (TabModel.Parent as TabWellModelBase)?.CloseTabCommand.Execute(TabModel));
+                }
             });
         }
 

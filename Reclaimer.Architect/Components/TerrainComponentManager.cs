@@ -30,7 +30,8 @@ namespace Reclaimer.Components
 
         public override Task InitializeResourcesAsync(ModelFactory factory)
         {
-            return Task.WhenAll(GetResourceInitializers(factory));
+            var tasks = GetResourceInitializers(factory).ToList();
+            return Task.WhenAll(tasks);
         }
 
         private IEnumerable<Task> GetResourceInitializers(ModelFactory factory)
