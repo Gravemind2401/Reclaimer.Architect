@@ -138,7 +138,12 @@ namespace Reclaimer.Controls
             //load altnodes beforehand so any root nodes will overwrite altnodes if they are duplicates
             //this brings in additional xml nodes to use their block names
             foreach (var t in altNodes)
-                MetaValueBase.GetMetaValue(t.Item1, context, t.Item2);
+            {
+                if (t.Item1.Name.ToLower() == "section")
+                    new StructureValue(t.Item1, context, context.CreateReader(), t.Item2);
+                else
+                    MetaValueBase.GetMetaValue(t.Item1, context, t.Item2);
+            }
 
             foreach (XmlNode n in rootNode.ChildNodes)
             {

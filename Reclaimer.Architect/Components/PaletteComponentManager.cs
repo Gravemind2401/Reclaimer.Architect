@@ -149,6 +149,7 @@ namespace Reclaimer.Components
             {
                 var palette = scenario.Palettes[paletteKey];
                 var altNodes = new List<Tuple<XmlNode, long>>();
+                altNodes.Add(Tuple.Create(scenario.Sections[Section.ObjectNames].Node, scenario.RootAddress));
                 altNodes.Add(Tuple.Create(palette.PaletteNode, scenario.RootAddress));
 
                 return new BlockPropertiesLocator

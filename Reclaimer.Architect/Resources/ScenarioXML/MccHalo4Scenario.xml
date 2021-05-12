@@ -292,9 +292,9 @@
       <bit name="Index 31" index="31" />
     </flags32>
   </section>
-  <section name="objectnames" offset="0x158" elementSize="0x8">
+  <section name="objectnames" srcId="object_names" offset="0x158" elementSize="0x8">
     <stringid name="Name" offset="0x0" visible="true" id="name" />
-    <enum16 name="Type" offset="0x4" visible="true">
+    <enum16 name="Type" offset="0x4" visible="true" id="placementtype">
       <option name="Null" value="0xFFFF" />
       <option name="Biped" value="0x0" />
       <option name="Vehicle" value="0x1" />
@@ -313,7 +313,7 @@
       <option name="Effect Scenery" value="0xE" />
       <option name="Spawner" value="0xF" />
     </enum16>
-    <int16 name="Placement Index" offset="0x6" visible="true" />
+    <int16 name="Placement Index" offset="0x6" visible="true" id="placementindex" />
   </section>
   <section name="palettes">
     <tagblock palette="scenery" srcId="scenario_scenery_palette" offset="0x170" elementSize="0x10">
@@ -351,7 +351,7 @@
   <section name="placements">
     <tagblock placements="scenery" offset="0x164" elementSize="0x17C">
       <blockIndex16 name="Palette Index" targetId="scenario_scenery_palette" offset="0x0" visible="true" id="paletteindex" />
-      <int16 name="Name Index" offset="0x2" visible="true" id="nameindex" />
+      <blockIndex16 name="Name Index" targetId="object_names" offset="0x2" visible="true" id="nameindex" />
       <flags32 name="Placement Flags" offset="0x4" visible="true">
         <bit name="Not Automatically" index="0" />
         <bit name="Not On Easy" index="1" />
@@ -693,7 +693,7 @@
     </tagblock>
     <tagblock placements="biped" offset="0x17C" elementSize="0x170">
       <blockIndex16 name="Palette Index" targetId="scenario_biped_palette" offset="0x0" visible="true" id="paletteindex" />
-      <int16 name="Name Index" offset="0x2" visible="true" id="nameindex" />
+      <blockIndex16 name="Name Index" targetId="object_names" offset="0x2" visible="true" id="nameindex" />
       <flags32 name="Placement Flags" offset="0x4" visible="true">
         <bit name="Not Automatically" index="0" />
         <bit name="Not On Easy" index="1" />
@@ -1052,7 +1052,7 @@
     </tagblock>
     <tagblock placements="vehicle" offset="0x194" elementSize="0x180">
       <blockIndex16 name="Palette Index" targetId="scenario_vehicle_palette" offset="0x0" visible="true" id="paletteindex" />
-      <int16 name="Name Index" offset="0x2" visible="true" id="nameindex" />
+      <blockIndex16 name="Name Index" targetId="object_names" offset="0x2" visible="true" id="nameindex" />
       <flags32 name="Placement Flags" offset="0x4" visible="true">
         <bit name="Not Automatically" index="0" />
         <bit name="Not On Easy" index="1" />
@@ -1416,7 +1416,7 @@
     </tagblock>
     <tagblock placements="equipment" offset="0x1AC" elementSize="0x154">
       <blockIndex16 name="Palette Index" targetId="scenario_equipment_palette" offset="0x0" visible="true" id="paletteindex" />
-      <int16 name="Name Index" offset="0x2" visible="true" id="nameindex" />
+      <blockIndex16 name="Name Index" targetId="object_names" offset="0x2" visible="true" id="nameindex" />
       <flags32 name="Placement Flags" offset="0x4" visible="true">
         <bit name="Not Automatically" index="0" />
         <bit name="Not On Easy" index="1" />
@@ -1759,7 +1759,7 @@
     </tagblock>
     <tagblock placements="weapon" offset="0x1C4" elementSize="0x170">
       <blockIndex16 name="Palette Index" targetId="scenario_weapon_palette" offset="0x0" visible="true" id="paletteindex" />
-      <int16 name="Name Index" offset="0x2" visible="true" id="nameindex" />
+      <blockIndex16 name="Name Index" targetId="object_names" offset="0x2" visible="true" id="nameindex" />
       <flags32 name="Placement Flags" offset="0x4" visible="true">
         <bit name="Not Automatically" index="0" />
         <bit name="Not On Easy" index="1" />
@@ -2119,7 +2119,7 @@
     </tagblock>
     <tagblock placements="machine" offset="0x1E8" elementSize="0x184">
       <blockIndex16 name="Palette Index" targetId="scenario_machine_palette" offset="0x0" visible="true" id="paletteindex" />
-      <int16 name="Name Index" offset="0x2" visible="true" id="nameindex" />
+      <blockIndex16 name="Name Index" targetId="object_names" offset="0x2" visible="true" id="nameindex" />
       <flags32 name="Placement Flags" offset="0x4" visible="true">
         <bit name="Not Automatically" index="0" />
         <bit name="Not On Easy" index="1" />
@@ -2526,7 +2526,7 @@
     </tagblock>
     <tagblock placements="control" offset="0x218" elementSize="0x17C">
       <blockIndex16 name="Palette Index" targetId="scenario_control_palette" offset="0x0" visible="true" id="paletteindex" />
-      <int16 name="Name Index" offset="0x2" visible="true" id="nameindex" />
+      <blockIndex16 name="Name Index" targetId="object_names" offset="0x2" visible="true" id="nameindex" />
       <flags32 name="Placement Flags" offset="0x4" visible="true">
         <bit name="Not Automatically" index="0" />
         <bit name="Not On Easy" index="1" />
@@ -2924,7 +2924,7 @@
     </tagblock>
     <tagblock placements="crate" offset="0x65C" elementSize="0x178">
       <blockIndex16 name="Palette Index" targetId="scenario_crate_palette" offset="0x0" visible="true" id="paletteindex" />
-      <int16 name="Name Index" offset="0x2" visible="true" id="nameindex" />
+      <blockIndex16 name="Name Index" targetId="object_names" offset="0x2" visible="true" id="nameindex" />
       <flags32 name="Placement Flags" offset="0x4" visible="true">
         <bit name="Not Automatically" index="0" />
         <bit name="Not On Easy" index="1" />
