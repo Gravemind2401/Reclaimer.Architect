@@ -189,6 +189,8 @@ namespace Reclaimer.Components
                     if (itemIndex < 0 || itemIndex >= holder.Definition.Placements.Count)
                         return false;
 
+                    ShiftObjectNames(paletteKey, itemIndex, holder.Definition.Placements.Count, true);
+
                     blockEditor.Remove(itemIndex);
                     blockEditor.UpdateBlockReference(holder.Definition.PlacementBlockRef);
                     holder.RemovePlacement(itemIndex);
@@ -197,6 +199,8 @@ namespace Reclaimer.Components
                 case ObjectOperation.Copy:
                     if (itemIndex < 0 || itemIndex >= holder.Definition.Placements.Count)
                         return false;
+
+                    ShiftObjectNames(paletteKey, itemIndex, holder.Definition.Placements.Count, false);
 
                     var destIndex = itemIndex + 1;
                     blockEditor.Copy(itemIndex, destIndex);
@@ -211,6 +215,28 @@ namespace Reclaimer.Components
             }
 
             return true;
+        }
+
+        private void ShiftObjectNames(string paletteKey, int startIndex, int blockCount, bool remove)
+        {
+            if (startIndex >= blockCount - 1)
+                return; //no changes needed if removing/copying the last block
+
+            if (!remove)
+                startIndex++;
+
+            var offset = remove ? -1 : 1;
+            for (int i = 0; i < scenario.ObjectNames.Count; i++)
+            {
+                var objName = scenario.ObjectNames[i];
+                if (objName.ComparePalette(paletteKey) && objName.PlacementIndex >= startIndex)
+                {
+                    if (remove && objName.PlacementIndex == startIndex)
+                        objName.PlacementIndex = -1;
+                    else
+                        objName.PlacementIndex += offset;
+                }
+            }
         }
 
         public override void DisposeSceneElements()

@@ -121,6 +121,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Blam\Common\CacheSegmenter.cs" />
+    <Compile Include="Blam\Common\PlacementType.cs" />
     <Compile Include="Blam\Halo3\model.cs" />
     <Compile Include="Blam\Halo3\object.cs" />
     <Compile Include="Blam\Halo3\scenario_structure_bsp.cs" />
@@ -192,6 +193,7 @@
     <Compile Include="Models\IStructureBspHandler.cs" />
     <Compile Include="Models\IScenarioHandler.cs" />
     <Compile Include="Models\NodeType.cs" />
+    <Compile Include="Models\ObjectName.cs" />
     <Compile Include="Models\ObjectPlacement.cs" />
     <Compile Include="Resources\PaletteType.cs" />
     <Compile Include="Models\ScenarioListItem.cs" />

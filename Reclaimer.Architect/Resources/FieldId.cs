@@ -13,6 +13,8 @@ namespace Reclaimer.Resources
         public const string Orientation = "orientation";
         public const string PaletteIndex = "paletteindex";
         public const string ParentIndex = "parentindex";
+        public const string PlacementIndex = "placementindex";
+        public const string PlacementType = "placementtype";
         public const string Position = "position";
         public const string Rotation = "rotation";
         public const string QRotation = "qrotation";

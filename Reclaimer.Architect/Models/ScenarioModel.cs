@@ -38,7 +38,7 @@ namespace Reclaimer.Models
 
         public ObservableCollection<TagReference> Bsps { get; }
         public ObservableCollection<TagReference> Skies { get; }
-        public List<string> ObjectNames { get; }
+        public List<ObjectName> ObjectNames { get; }
 
         public Dictionary<string, PaletteDefinition> Palettes { get; }
         public ObservableCollection<StartPosition> StartingPositions { get; }
@@ -132,7 +132,7 @@ namespace Reclaimer.Models
 
             Bsps = new ObservableCollection<TagReference>();
             Skies = new ObservableCollection<TagReference>();
-            ObjectNames = new List<string>();
+            ObjectNames = new List<ObjectName>();
             Palettes = new Dictionary<string, PaletteDefinition>();
             StartingPositions = new ObservableCollection<StartPosition>();
             TriggerVolumes = new ObservableCollection<TriggerVolume>();
@@ -478,14 +478,27 @@ namespace Reclaimer.Models
         {
             var section = Sections[Section.ObjectNames];
             var nameOffset = OffsetById(section.Node, FieldId.Name);
+            var typeOffset = OffsetById(section.Node, FieldId.PlacementType);
+            var indexOffset = OffsetById(section.Node, FieldId.PlacementIndex);
 
             for (int i = 0; i < section.TagBlock.Count; i++)
             {
-                reader.Seek(section.TagBlock.Pointer.Address + section.BlockSize * i + nameOffset, SeekOrigin.Begin);
+                var objectName = new ObjectName(this, i);
+                var baseAddress = section.TagBlock.Pointer.Address + section.BlockSize * i;
+
+                reader.Seek(baseAddress + nameOffset, SeekOrigin.Begin);
                 if (ScenarioTag.CacheFile.CacheType < CacheType.HaloReachBeta)
-                    ObjectNames.Add(reader.ReadNullTerminatedString(32));
+                    objectName.Name = reader.ReadNullTerminatedString(32);
                 else
-                    ObjectNames.Add(reader.ReadObject<StringId>());
+                    objectName.Name = reader.ReadObject<StringId>();
+
+                reader.Seek(baseAddress + typeOffset, SeekOrigin.Begin);
+                objectName.Type = reader.ReadInt16();
+
+                reader.Seek(baseAddress + indexOffset, SeekOrigin.Begin);
+                objectName.PlacementIndex = reader.ReadInt16();
+
+                ObjectNames.Add(objectName);
             }
         }
 
