@@ -53,8 +53,8 @@ namespace Reclaimer.Components
 
             foreach (var tv in TriggerVolumes)
             {
-                var permNode = new TreeItemModel { Header = (tv.DataContext as TriggerVolume).Name, IsChecked = true, Tag = tv };
-                sceneNode.Items.Add(permNode);
+                var tvNode = new TreeItemModel { Header = (tv.DataContext as TriggerVolume).GetDisplayName(), IsChecked = true, Tag = tv };
+                sceneNode.Items.Add(tvNode);
             }
 
             yield return sceneNode;
@@ -69,6 +69,22 @@ namespace Reclaimer.Components
                 editor.TreeViewItems.Add(sceneNode);
             else if (newNode?.NodeType != NodeType.TriggerVolumes && editor.TreeViewItems.Contains(sceneNode))
                 editor.TreeViewItems.Remove(sceneNode);
+        }
+
+        public override void OnViewportReady()
+        {
+            scenario.TriggerVolumes.ChildPropertyChanged += OnTriggerVolumePropertyChanged;
+        }
+
+        private void OnTriggerVolumePropertyChanged(object sender, ChildPropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(TriggerVolume.BlockIndex) || e.PropertyName == nameof(TriggerVolume.Name))
+            {
+                var vol = e.Element as TriggerVolume;
+                var node = sceneNode.Items.FirstOrDefault(n => (n.Tag as BoxManipulator3D).DataContext == vol);
+                if (node != null)
+                    node.Header = vol.GetDisplayName();
+            }
         }
 
         public override Helix.Element3D GetElement(SceneNodeModel treeNode, int itemIndex)
@@ -130,7 +146,7 @@ namespace Reclaimer.Components
                     blockEditor.Add();
 
                     var vol = new TriggerVolume(scenario)
-                    {   
+                    {
                         //really should be reading these from the stream...
                         ForwardVector = new RealVector3D(1, 0, 0),
                         UpVector = new RealVector3D(0, 0, 1),
@@ -148,6 +164,8 @@ namespace Reclaimer.Components
                     blockEditor.Remove(itemIndex);
                     scenario.TriggerVolumes.RemoveAt(itemIndex);
                     RemoveTriggerVolumeElement(itemIndex);
+
+                    UpdateBlockIndexes(itemIndex, scenario.TriggerVolumes.Count);
                     break;
 
                 case ObjectOperation.Copy:
@@ -160,6 +178,8 @@ namespace Reclaimer.Components
                     scenario.TriggerVolumes.Insert(destIndex, vol);
                     InsertTriggerVolumeElement(vol, destIndex);
                     vol.CopyFrom(scenario.TriggerVolumes[itemIndex]);
+
+                    UpdateBlockIndexes(itemIndex, scenario.TriggerVolumes.Count);
                     break;
             }
 
@@ -167,6 +187,24 @@ namespace Reclaimer.Components
             return true;
         }
 
+        private void UpdateBlockIndexes(int startIndex, int blockCount)
+        {
+            for (int i = startIndex; i < blockCount; i++)
+                scenario.TriggerVolumes[i].RaiseBlockIndexChanged();
+        }
+
+        public override void DisposeSceneElements()
+        {
+            scenario.TriggerVolumes.ChildPropertyChanged -= OnTriggerVolumePropertyChanged;
+
+            TriggerVolumeGroup?.Dispose();
+            TriggerVolumes.Clear();
+
+            TriggerVolumeGroup = null;
+            sceneNode.Items.Clear();
+        }
+
+        #region Binding Setup
         private void AddTriggerVolumeElement(TriggerVolume vol) => InsertTriggerVolumeElement(vol, TriggerVolumes.Count);
 
         private void InsertTriggerVolumeElement(TriggerVolume vol, int index)
@@ -213,14 +251,6 @@ namespace Reclaimer.Components
                 (node.Tag as IMeshNode).SetVisibility(node.IsChecked == true || i == selectedIndex);
             }
         }
-
-        public override void DisposeSceneElements()
-        {
-            TriggerVolumeGroup?.Dispose();
-            TriggerVolumes.Clear();
-
-            TriggerVolumeGroup = null;
-            sceneNode.Items.Clear();
-        }
+        #endregion
     }
 }

@@ -35,6 +35,6 @@ namespace Reclaimer.Models.Ai
                 Name = ((Plugins.MetaViewer.Halo3.StringValue)meta).Value;
         }
 
-        public virtual string GetDisplayName() => Name;
+        public virtual string GetDisplayName() => BlockIndex >= 0 ? $"[{BlockIndex:D3}] {Name}" : Name;
     }
 }

@@ -48,6 +48,9 @@ namespace Reclaimer.Components
         //called for any type of node, even null node, when the selection changes
         public virtual void OnSelectedTreeNodeChanged(SceneNodeModel newNode) { }
 
+        //called when everything has been added to the viewport and it is ready for interaction
+        public virtual void OnViewportReady() { }
+
         //only called if HandlesNodeType, can return null if item is not geometry
         //use to select the returned element when user clicks on an item in the listbox
         public virtual Helix.Element3D GetElement(SceneNodeModel treeNode, int itemIndex)

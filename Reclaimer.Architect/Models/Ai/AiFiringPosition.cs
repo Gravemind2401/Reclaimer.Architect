@@ -14,7 +14,7 @@ namespace Reclaimer.Models.Ai
     {
         internal AiZone Zone { get; }
         internal BlockReference BlockReference { get; }
-        internal int BlockIndex { get; }
+        internal override int BlockIndex { get; }
 
         public AiFiringPosition(ScenarioModel parent, AiZone zone, BlockReference blockRef, int index)
             : base(parent)

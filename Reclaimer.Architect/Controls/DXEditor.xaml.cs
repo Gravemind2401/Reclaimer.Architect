@@ -249,6 +249,9 @@ namespace Reclaimer.Controls
             }
 
             modelGroup.Visibility = Visibility.Visible;
+
+            foreach (var c in scenario.ComponentManagers)
+                c.OnViewportReady();
         }
 
         #region Treeview Events

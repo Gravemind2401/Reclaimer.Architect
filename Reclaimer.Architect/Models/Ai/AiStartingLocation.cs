@@ -16,7 +16,7 @@ namespace Reclaimer.Models.Ai
         internal readonly string SectionKey;
 
         internal BlockReference BlockReference { get; }
-        internal int BlockIndex { get; }
+        internal override int BlockIndex { get; }
 
         private StringId name;
         public StringId Name

@@ -114,6 +114,27 @@ namespace Reclaimer.Components
             PaletteHolders[PaletteType.Decal].GroupElement.IsRendering = nodeType == NodeType.Decals;
         }
 
+        public override void OnViewportReady()
+        {
+            foreach(var holder in PaletteHolders.Values.Where(h => h.Name != PaletteType.Decal))
+                holder.Definition.Placements.ChildPropertyChanged += OnPlacementPropertyChanged;
+        }
+
+        private void OnPlacementPropertyChanged(object sender, ChildPropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ObjectPlacement.BlockIndex) || e.PropertyName == nameof(ObjectPlacement.PaletteIndex) || e.PropertyName == nameof(ObjectPlacement.NameIndex))
+            {
+                var placement = e.Element as ObjectPlacement;
+                var holder = PaletteHolders[placement.PaletteKey];
+                var index = holder.Definition.Placements.IndexOf(placement);
+
+                if (index < 0) return;
+
+                var info = holder.GetInfoForIndex(index);
+                info.TreeItem.Header = info.Placement.GetDisplayName();
+            }
+        }
+
         public override Helix.Element3D GetElement(SceneNodeModel treeNode, int itemIndex)
         {
             var nodeType = treeNode?.NodeType ?? NodeType.None;
@@ -194,6 +215,8 @@ namespace Reclaimer.Components
                     blockEditor.Remove(itemIndex);
                     blockEditor.UpdateBlockReference(holder.Definition.PlacementBlockRef);
                     holder.RemovePlacement(itemIndex);
+
+                    UpdateBlockIndexes(paletteKey, itemIndex, holder.Definition.Placements.Count);
                     break;
 
                 case ObjectOperation.Copy:
@@ -208,6 +231,8 @@ namespace Reclaimer.Components
 
                     placement = holder.InsertPlacement(destIndex, scenario, paletteKey);
                     placement.CopyFrom(holder.Definition.Placements[itemIndex]);
+
+                    UpdateBlockIndexes(paletteKey, itemIndex, holder.Definition.Placements.Count);
                     break;
 
                 default:
@@ -239,10 +264,20 @@ namespace Reclaimer.Components
             }
         }
 
+        private void UpdateBlockIndexes(string paletteKey, int startIndex, int blockCount)
+        {
+            var holder = PaletteHolders[paletteKey];
+            for (int i = startIndex; i < blockCount; i++)
+                holder.Definition.Placements[i].RaiseBlockIndexChanged();
+        }
+
         public override void DisposeSceneElements()
         {
             foreach (var holder in PaletteHolders.Values)
+            {
+                holder.Definition.Placements.ChildPropertyChanged -= OnPlacementPropertyChanged;
                 holder.Dispose();
+            }
 
             PaletteHolders.Clear();
         }
@@ -322,7 +357,6 @@ namespace Reclaimer.Components
                 ConfigurePlacement(factory, holder, index);
 
                 var info = holder.GetInfoForIndex(index);
-                info.TreeItem.Header = info.Placement.GetDisplayName();
                 info.TreeItem.Tag = info.Element;
 
                 var listItem = scenario.Items.FirstOrDefault(i => i.Tag == info.Placement);

@@ -18,6 +18,8 @@ namespace Reclaimer.Models
         private volatile bool isBusy;
 
         protected ScenarioModel Parent { get; }
+        
+        internal abstract int BlockIndex { get; }
 
         private RealVector3D position;
         public RealVector3D Position
@@ -68,6 +70,11 @@ namespace Reclaimer.Models
         public abstract string GetDisplayName();
 
         public abstract void UpdateFromMetaValue(MetaValueBase meta, string fieldId);
+
+        public void RaiseBlockIndexChanged()
+        {
+            RaisePropertyChanged(nameof(BlockIndex));
+        }
 
         public override string ToString() => GetDisplayName();
     }

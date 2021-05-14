@@ -70,11 +70,6 @@ namespace Reclaimer.Models.Ai
             GroupStartLocations = new ObservableCollection<AiStartingLocation>();
             SoloStartLocations = new ObservableCollection<AiStartingLocation>();
         }
-
-        public override string GetDisplayName()
-        {
-            return $"[{BlockIndex:D3}] {Name}";
-        }
     }
 
     public class AiEncounter : AiNamedBlock

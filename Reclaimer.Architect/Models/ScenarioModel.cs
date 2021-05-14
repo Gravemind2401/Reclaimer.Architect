@@ -6,6 +6,7 @@ using Reclaimer.Components;
 using Reclaimer.Models.Ai;
 using Reclaimer.Plugins.MetaViewer;
 using Reclaimer.Resources;
+using Reclaimer.Utilities;
 using Reclaimer.Utilities.IO;
 using System;
 using System.Collections.Generic;
@@ -41,8 +42,8 @@ namespace Reclaimer.Models
         public List<ObjectName> ObjectNames { get; }
 
         public Dictionary<string, PaletteDefinition> Palettes { get; }
-        public ObservableCollection<StartPosition> StartingPositions { get; }
-        public ObservableCollection<TriggerVolume> TriggerVolumes { get; }
+        public DeepObservableCollection<StartPosition> StartingPositions { get; }
+        public DeepObservableCollection<TriggerVolume> TriggerVolumes { get; }
 
         public AiSquadHierarchy SquadHierarchy { get; }
 
@@ -134,8 +135,8 @@ namespace Reclaimer.Models
             Skies = new ObservableCollection<TagReference>();
             ObjectNames = new List<ObjectName>();
             Palettes = new Dictionary<string, PaletteDefinition>();
-            StartingPositions = new ObservableCollection<StartPosition>();
-            TriggerVolumes = new ObservableCollection<TriggerVolume>();
+            StartingPositions = new DeepObservableCollection<StartPosition>();
+            TriggerVolumes = new DeepObservableCollection<TriggerVolume>();
 
             using (var reader = CreateReader())
             {
@@ -715,12 +716,12 @@ namespace Reclaimer.Models
         public BlockReference PaletteBlockRef { get; set; }
         public BlockReference PlacementBlockRef { get; set; }
         public ObservableCollection<TagReference> Palette { get; set; }
-        public ObservableCollection<ObjectPlacement> Placements { get; set; }
+        public DeepObservableCollection<ObjectPlacement> Placements { get; set; }
 
         public PaletteDefinition()
         {
             Palette = new ObservableCollection<TagReference>();
-            Placements = new ObservableCollection<ObjectPlacement>();
+            Placements = new DeepObservableCollection<ObjectPlacement>();
         }
     }
 

@@ -15,6 +15,8 @@ namespace Reclaimer.Models
     {
         internal readonly string PaletteKey;
 
+        internal override int BlockIndex => Parent.Palettes[PaletteKey].Placements.IndexOf(this);
+
         private short paletteIndex;
         public short PaletteIndex
         {
@@ -81,10 +83,9 @@ namespace Reclaimer.Models
         {
             var palette = Parent.Palettes[PaletteKey];
             var block = palette.PlacementBlockRef;
-            var index = palette.Placements.IndexOf(this);
             var fieldOffset = palette.PlacementsNode.SelectSingleNode($"*[@id='{fieldId}']")?.GetIntAttribute("offset") ?? -1;
 
-            return fieldOffset < 0 ? fieldOffset : block.TagBlock.Pointer.Address + block.BlockSize * index + fieldOffset;
+            return fieldOffset < 0 ? fieldOffset : block.TagBlock.Pointer.Address + block.BlockSize * BlockIndex + fieldOffset;
         }
 
         public override string GetDisplayName()
@@ -94,9 +95,12 @@ namespace Reclaimer.Models
             if (PaletteIndex < 0 || PaletteIndex >= palette.Palette.Count)
                 return "<invalid>";
 
+            string name;
             if (NameIndex >= 0 && NameIndex < Parent.ObjectNames.Count)
-                return Parent.ObjectNames[NameIndex].Name;
-            else return palette.Palette[PaletteIndex].Tag?.FileName() ?? "<null>";
+                name = Parent.ObjectNames[NameIndex].Name;
+            else name = palette.Palette[PaletteIndex].Tag?.FileName() ?? "<null>";
+
+            return $"[{BlockIndex:D3}] {name}";
         }
 
         public override void UpdateFromMetaValue(MetaValueBase meta, string fieldId)

@@ -12,6 +12,8 @@ namespace Reclaimer.Models
 {
     public class StartPosition : ScenarioObject
     {
+        internal override int BlockIndex => Parent.StartingPositions.IndexOf(this);
+
         private RealVector2D orientation;
         public RealVector2D Orientation
         {
@@ -28,10 +30,9 @@ namespace Reclaimer.Models
         protected override long GetFieldAddress(string fieldId)
         {
             var section = Parent.Sections[Section.StartPositions];
-            var index = Parent.StartingPositions.IndexOf(this);
             var fieldOffset = section.Node.SelectSingleNode($"*[@id='{fieldId}']").GetIntAttribute("offset") ?? 0;
 
-            return section.TagBlock.Pointer.Address + section.BlockSize * index + fieldOffset;
+            return section.TagBlock.Pointer.Address + section.BlockSize * BlockIndex + fieldOffset;
         }
 
         public override string GetDisplayName()
