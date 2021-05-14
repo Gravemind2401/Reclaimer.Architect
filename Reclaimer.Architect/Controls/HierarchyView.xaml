@@ -111,11 +111,11 @@
                      s:SplitPanel.DesiredSize="200"
                      ItemsSource="{Binding Items}"
                      SelectedIndex="{Binding SelectedItemIndex, Mode=TwoWay}">
-                <ListBox.Resources>
-                    <Style TargetType="m:ScenarioListItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="m:ScenarioListItem" BasedOn="{StaticResource Reclaimer.ListBoxItemStyle}">
                         <EventSetter Event="MouseDoubleClick" Handler="ListItemMouseDoubleClick" />
                     </Style>
-                </ListBox.Resources>
+                </ListBox.ItemContainerStyle>
             </ListBox>
         </s:SplitPanel>
     </DockPanel>
