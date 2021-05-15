@@ -240,6 +240,22 @@ namespace Reclaimer.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+        ///&lt;!--derived from https://github.com/XboxChaos/Assembly/blob/dev/src/Assembly/Plugins/Halo3MCC/scnr.xml--&gt;
+        ///&lt;plugin game=&quot;Halo3MCC&quot; baseSize=&quot;0x7B8&quot;&gt;
+        ///  &lt;tagblock name=&quot;Structure BSPs&quot; offset=&quot;0x14&quot; elementSize=&quot;0x6C&quot;/&gt;
+        ///  &lt;tagblock name=&quot;Skies&quot; offset=&quot;0x30&quot; elementSize=&quot;0x14&quot;/&gt;
+        ///  &lt;tagblock name=&quot;Zone Set Potentially Visible Sets&quot; offset=&quot;0x3C&quot; elementSize=&quot;0x2C&quot;&gt;
+        ///    &lt;tagblock name=&quot;BSP Checksums&quot; offset=&quot;0x8&quot; elementSize=&quot;0x4&quot;/&gt;
+        ///    &lt;tagblock name=&quot;Structure Pote [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string MccHalo3Metadata {
+            get {
+                return ResourceManager.GetString("MccHalo3Metadata", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
         ///&lt;!--derived from https://github.com/XboxChaos/Assembly/blob/dev/src/Assembly/Plugins/ODSTMCC/scnr.xml--&gt;
         ///&lt;plugin game=&quot;ODSTMCC&quot; baseSize=&quot;0x840&quot;&gt;
         ///  &lt;tagblock name=&quot;Structure BSPs&quot; offset=&quot;0x14&quot; elementSize=&quot;0x6C&quot;/&gt;
@@ -271,6 +287,26 @@ namespace Reclaimer.Properties {
         internal static string MccHalo3ODSTScenario {
             get {
                 return ResourceManager.GetString("MccHalo3ODSTScenario", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;!--derived from https://github.com/XboxChaos/Assembly/blob/dev/src/Assembly/Plugins/Halo3/scnr.xml--&gt;
+        ///&lt;scenario&gt;
+        ///  &lt;section name=&quot;mission&quot;&gt;
+        ///    &lt;enum16 name=&quot;Map Type&quot; offset=&quot;0x0&quot; visible=&quot;true&quot;&gt;
+        ///      &lt;option name=&quot;Single Player&quot; value=&quot;0x0&quot; /&gt;
+        ///      &lt;option name=&quot;Multiplayer&quot; value=&quot;0x1&quot; /&gt;
+        ///      &lt;option name=&quot;Main Menu&quot; value=&quot;0x2&quot; /&gt;
+        ///    &lt;/enum16&gt;
+        ///    &lt;flags16 name=&quot;Flags&quot; offset=&quot;0x2&quot; visible=&quot;true&quot;&gt;
+        ///      &lt;bit name=&quot;Bit 0&quot; index=&quot;0&quot; /&gt;
+        ///      &lt;bit nam [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string MccHalo3Scenario {
+            get {
+                return ResourceManager.GetString("MccHalo3Scenario", resourceCulture);
             }
         }
         

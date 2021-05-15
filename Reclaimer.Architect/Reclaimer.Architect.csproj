@@ -398,6 +398,14 @@
       <SubType>Designer</SubType>
     </Resource>
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\ScenarioXML\MccHalo3Scenario.xml">
+      <SubType>Designer</SubType>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\MetadataXML\MccHalo3Metadata.xml" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>echo F | xcopy ".\$(TargetFileName)" "Plugins\Architect\Architect.dll" /Y

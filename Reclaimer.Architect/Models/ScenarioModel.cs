@@ -184,8 +184,10 @@ namespace Reclaimer.Models
             {
                 case CacheType.Halo3Retail:
                 case CacheType.MccHalo3:
-                case CacheType.MccHalo3U4:
                     prefix = "Halo3";
+                    break;
+                case CacheType.MccHalo3U4:
+                    prefix = "MccHalo3";
                     break;
                 case CacheType.Halo3ODST:
                     prefix = "Halo3ODST";
