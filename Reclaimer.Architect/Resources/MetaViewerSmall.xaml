@@ -1,6 +1,7 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:Reclaimer.Controls"
+                    xmlns:c="clr-namespace:Reclaimer.Controls;assembly=Reclaimer"
                     xmlns:mv="clr-namespace:Reclaimer.Plugins.MetaViewer;assembly=Reclaimer"
                     xmlns:u="clr-namespace:Studio.Utilities;assembly=Studio"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
@@ -63,11 +64,29 @@
     </DataTemplate>
 
     <DataTemplate x:Key="StringContent">
-        <TextBox Width="{StaticResource valueColWidthM}" MaxLength="{Binding Length}" Text="{Binding Value}" />
+        <TextBox Width="{StaticResource valueColWidthM}" MaxLength="{Binding Length}">
+            <TextBox.Text>
+                <Binding Path="Value" ValidatesOnExceptions="True">
+                    <Binding.ValidationRules>
+                        <mv:MetaValidationRule />
+                    </Binding.ValidationRules>
+                </Binding>
+            </TextBox.Text>
+        </TextBox>
     </DataTemplate>
 
     <DataTemplate x:Key="StringIdContent">
-        <TextBox Width="{StaticResource valueColWidthM}" IsReadOnly="True" Text="{Binding Value}" />
+        <c:AutoCompleteTextBox Width="{StaticResource valueColWidthM}"
+                                   SuggestionProvider="{Binding}"
+                                   VerticalAlignment="Center">
+            <c:AutoCompleteTextBox.Text>
+                <Binding Path="Value" ValidatesOnExceptions="True">
+                    <Binding.ValidationRules>
+                        <mv:MetaValidationRule />
+                    </Binding.ValidationRules>
+                </Binding>
+            </c:AutoCompleteTextBox.Text>
+        </c:AutoCompleteTextBox>
     </DataTemplate>
 
     <DataTemplate x:Key="EnumContent">
