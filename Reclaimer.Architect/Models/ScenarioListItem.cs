@@ -17,10 +17,21 @@ namespace Reclaimer.Models
             : this(content, null)
         { }
 
-        public ScenarioListItem(string content, object tag)
+        public ScenarioListItem(IDisplayName nameProvider)
+            : this(nameProvider?.GetDisplayName(), nameProvider)
+        { }
+
+        private ScenarioListItem(string content, object tag)
         {
             Content = content;
             Tag = tag;
+        }
+
+        public void Refresh()
+        {
+            var provider = Tag as IDisplayName;
+            if (provider != null)
+                Content = provider.GetDisplayName();
         }
 
         void IMetaUpdateReceiver.UpdateFromMetaValue(MetaValueBase meta, string fieldId)
@@ -31,10 +42,10 @@ namespace Reclaimer.Models
 
             receiver.UpdateFromMetaValue(meta, fieldId);
 
-            if (fieldId == FieldId.Name || fieldId == FieldId.TagReference)
+            if (fieldId == FieldId.Name || fieldId == FieldId.NameIndex || fieldId == FieldId.TagReference)
                 Content = receiver.GetDisplayName();
         }
 
-        string IMetaUpdateReceiver.GetDisplayName() => (Tag as IMetaUpdateReceiver)?.GetDisplayName();
+        string IDisplayName.GetDisplayName() => (Tag as IMetaUpdateReceiver)?.GetDisplayName();
     }
 }

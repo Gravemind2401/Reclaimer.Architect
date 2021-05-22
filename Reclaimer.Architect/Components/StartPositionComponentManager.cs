@@ -66,7 +66,7 @@ namespace Reclaimer.Components
 
         public override IEnumerable<ScenarioListItem> GetListItems(SceneNodeModel treeNode)
         {
-            return scenario.StartingPositions.Select(pos => new ScenarioListItem(pos.GetDisplayName(), pos));
+            return scenario.StartingPositions.Select(pos => new ScenarioListItem(pos));
         }
 
         internal override BlockPropertiesLocator GetPropertiesLocator(SceneNodeModel treeNode, int itemIndex)

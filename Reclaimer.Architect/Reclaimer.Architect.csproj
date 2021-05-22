@@ -188,6 +188,7 @@
     <Compile Include="Models\Ai\AiStartingLocation.cs" />
     <Compile Include="Models\BlockPropertiesLocator.cs" />
     <Compile Include="Models\IBspGeometryInstanceBlock.cs" />
+    <Compile Include="Models\IDisplayName.cs" />
     <Compile Include="Models\IMetaUpdateReceiver.cs" />
     <Compile Include="Models\InstancePlacement.cs" />
     <Compile Include="Models\IStructureBspHandler.cs" />

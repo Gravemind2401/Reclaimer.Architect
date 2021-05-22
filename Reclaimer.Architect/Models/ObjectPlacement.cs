@@ -127,12 +127,12 @@ namespace Reclaimer.Models
                     var blockIndex = meta as BlockIndexValue;
                     PaletteIndex = short.Parse(blockIndex.Value.ToString());
                     break;
+                case FieldId.NameIndex:
+                    blockIndex = meta as BlockIndexValue;
+                    NameIndex = short.Parse(blockIndex.Value.ToString());
+                    break;
                 case FieldId.Variant:
-                    var stringId = meta as StringIdValue;
-                    var cache = Parent.ScenarioTag.CacheFile;
-                    var intValue = cache.StringIndex.GetStringId(stringId.Value);
-                    if (intValue >= 0)
-                        Variant = new StringId(intValue, cache);
+                    SetStringId(meta, ref variant, nameof(Variant));
                     break;
             }
         }

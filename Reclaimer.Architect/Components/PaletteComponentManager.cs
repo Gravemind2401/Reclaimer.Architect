@@ -131,7 +131,8 @@ namespace Reclaimer.Components
                 if (index < 0) return;
 
                 var info = holder.GetInfoForIndex(index);
-                info.TreeItem.Header = info.Placement.GetDisplayName();
+                info.TreeItem.Header = placement.GetDisplayName();
+                scenario.Items.FirstOrDefault(i => i.Tag == placement)?.Refresh();
             }
         }
 
@@ -160,7 +161,7 @@ namespace Reclaimer.Components
         {
             var paletteKey = PaletteType.FromNodeType(treeNode.NodeType);
             foreach (var placement in scenario.Palettes[paletteKey].Placements)
-                yield return new ScenarioListItem(placement.GetDisplayName(), placement);
+                yield return new ScenarioListItem(placement);
         }
 
         internal override BlockPropertiesLocator GetPropertiesLocator(SceneNodeModel treeNode, int itemIndex)

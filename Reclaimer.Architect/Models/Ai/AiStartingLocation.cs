@@ -56,11 +56,7 @@ namespace Reclaimer.Models.Ai
             switch (fieldId)
             {
                 case FieldId.Name:
-                    var stringId = meta as StringIdValue;
-                    var cache = Parent.ScenarioTag.CacheFile;
-                    var intValue = cache.StringIndex.GetStringId(stringId.Value);
-                    if (intValue >= 0)
-                        Name = new StringId(intValue, cache);
+                    SetStringId(meta, ref name, nameof(Name));
                     break;
                 case FieldId.Position:
                 case FieldId.Rotation:

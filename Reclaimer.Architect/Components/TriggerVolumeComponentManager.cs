@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using System.Xml;
 
 using Helix = HelixToolkit.Wpf.SharpDX;
 
@@ -83,7 +84,10 @@ namespace Reclaimer.Components
                 var vol = e.Element as TriggerVolume;
                 var node = sceneNode.Items.FirstOrDefault(n => (n.Tag as BoxManipulator3D).DataContext == vol);
                 if (node != null)
+                {
+                    scenario.Items.FirstOrDefault(i => i.Tag == vol)?.Refresh();
                     node.Header = vol.GetDisplayName();
+                }
             }
         }
 
@@ -117,7 +121,7 @@ namespace Reclaimer.Components
 
         public override IEnumerable<ScenarioListItem> GetListItems(SceneNodeModel treeNode)
         {
-            return scenario.TriggerVolumes.Select(vol => new ScenarioListItem(vol.GetDisplayName(), vol));
+            return scenario.TriggerVolumes.Select(vol => new ScenarioListItem(vol));
         }
 
         internal override BlockPropertiesLocator GetPropertiesLocator(SceneNodeModel treeNode, int itemIndex)
@@ -126,11 +130,15 @@ namespace Reclaimer.Components
                 return null;
 
             var section = scenario.Sections[Section.TriggerVolumes];
+            var altNodes = new List<Tuple<XmlNode, long>>();
+            altNodes.Add(Tuple.Create(scenario.Sections[Section.ObjectNames].Node, scenario.RootAddress));
+
             return new BlockPropertiesLocator
             {
                 RootNode = section.Node,
                 BaseAddress = section.TagBlock.Pointer.Address
                     + itemIndex * section.BlockSize,
+                AdditionalNodes = altNodes,
                 TargetObject = scenario.TriggerVolumes[itemIndex]
             };
         }

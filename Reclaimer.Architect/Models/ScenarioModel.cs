@@ -688,7 +688,7 @@ namespace Reclaimer.Models
             RenderView?.SelectObject(SelectedNode, SelectedItemIndex);
         }
 
-        //reload items list and keep selection if possible
+        //reload items list and keep selection if possible - use after add/remove
         public void RefreshItemList()
         {
             var index = SelectedItemIndex;

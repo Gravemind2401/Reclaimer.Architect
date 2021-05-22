@@ -7,9 +7,8 @@ using System.Threading.Tasks;
 
 namespace Reclaimer.Models
 {
-    internal interface IMetaUpdateReceiver
+    internal interface IMetaUpdateReceiver : IDisplayName
     {
         void UpdateFromMetaValue(MetaValueBase meta, string fieldId);
-        string GetDisplayName();
     }
 }

@@ -2,6 +2,7 @@
 using Adjutant.Spatial;
 using Prism.Mvvm;
 using Reclaimer.Plugins.MetaViewer;
+using Reclaimer.Plugins.MetaViewer.Halo3;
 using Reclaimer.Resources;
 using System;
 using System.Collections.Generic;
@@ -66,6 +67,19 @@ namespace Reclaimer.Models
         }
 
         protected abstract long GetFieldAddress(string fieldId);
+
+        protected void SetStringId(MetaValueBase meta, ref StringId stringId, string propertyName)
+        {
+            var editor = meta as StringIdValue;
+            var cache = Parent.ScenarioTag.CacheFile;
+            var intValue = cache.StringIndex.GetStringId(editor.Value);
+
+            if (intValue >= 0 && stringId.Id != intValue)
+            {
+                stringId = new StringId(intValue, cache);
+                RaisePropertyChanged(propertyName);
+            }
+        }
 
         public abstract string GetDisplayName();
 

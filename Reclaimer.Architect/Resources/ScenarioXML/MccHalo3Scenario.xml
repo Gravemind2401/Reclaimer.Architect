@@ -2684,7 +2684,7 @@
   </section>
   <section name="triggervolumes" offset="0x260" elementSize="0x44">
     <stringId name="Name" offset="0x0" visible="true" id="name" />
-    <int16 name="Object Name" offset="0x4" visible="true" />
+    <blockIndex16 name="Object Name" targetId="object_names" offset="0x4" visible="true" id="nameindex" />
     <int16 name="Unknown" offset="0x6" visible="false" />
     <stringId name="Node Name" offset="0x8" visible="true" />
     <vector3 name="Forward Vector" offset="0xC" visible="true" id="forwardvector" />

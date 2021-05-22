@@ -242,17 +242,17 @@ namespace Reclaimer.Components
             var squadTag = treeNode.Parent.Tag as AiSquad;
 
             if (treeNode.NodeType == NodeType.AiSquadGroups)
-                return scenario.SquadHierarchy.SquadGroups.Select(group => new ScenarioListItem(group.GetDisplayName(), group));
+                return scenario.SquadHierarchy.SquadGroups.Select(group => new ScenarioListItem(group));
             else if (treeNode.NodeType == NodeType.AiZones)
-                return scenario.SquadHierarchy.Zones.Select(zone => new ScenarioListItem(zone.GetDisplayName(), zone));
+                return scenario.SquadHierarchy.Zones.Select(zone => new ScenarioListItem(zone));
             else if (treeNode.NodeType == NodeType.AiZoneAreas)
-                return zoneTag.Areas.Select(area => new ScenarioListItem(area.GetDisplayName(), area));
+                return zoneTag.Areas.Select(area => new ScenarioListItem(area));
             else if (treeNode.NodeType == NodeType.AiFiringPositions)
-                return zoneTag.FiringPositions.Select(fpos => new ScenarioListItem(fpos.GetDisplayName(), fpos));
+                return zoneTag.FiringPositions.Select(fpos => new ScenarioListItem(fpos));
             else if (treeNode.NodeType == NodeType.AiSquads)
-                return zoneTag.Squads.Select(squad => new ScenarioListItem(squad.GetDisplayName(), squad));
+                return zoneTag.Squads.Select(squad => new ScenarioListItem(squad));
             else if (treeNode.NodeType == NodeType.AiEncounters)
-                return squadTag.Encounters.Select(enc => new ScenarioListItem(enc.GetDisplayName(), enc));
+                return squadTag.Encounters.Select(enc => new ScenarioListItem(enc));
             else if (treeNode.NodeType == NodeType.AiStartingLocations
                 || treeNode.NodeType == NodeType.AiGroupStartingLocations
                 || treeNode.NodeType == NodeType.AiSoloStartingLocations)
@@ -263,7 +263,7 @@ namespace Reclaimer.Components
                         ? squadTag.GroupStartLocations
                         : squadTag.SoloStartLocations;
 
-                return locations.Select(loc => new ScenarioListItem(loc.GetDisplayName(), loc));
+                return locations.Select(loc => new ScenarioListItem(loc));
             }
             else return Enumerable.Empty<ScenarioListItem>();
         }

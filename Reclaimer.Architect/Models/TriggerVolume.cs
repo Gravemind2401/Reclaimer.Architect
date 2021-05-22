@@ -62,6 +62,14 @@ namespace Reclaimer.Models
 
         public override void UpdateFromMetaValue(MetaValueBase meta, string fieldId)
         {
+            if (fieldId == FieldId.Name)
+            {
+                SetStringId(meta, ref name, nameof(Name));
+                return;
+            }
+            if (fieldId == FieldId.NameIndex)
+                return;
+
             var multi = meta as MultiValue;
             var vector = new RealVector3D(multi.Value1, multi.Value2, multi.Value3);
 
