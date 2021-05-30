@@ -3,6 +3,7 @@ using Adjutant.Spatial;
 using Reclaimer.Plugins.MetaViewer;
 using Reclaimer.Plugins.MetaViewer.Halo3;
 using Reclaimer.Resources;
+using Reclaimer.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,7 +49,7 @@ namespace Reclaimer.Models.Ai
 
         public override string GetDisplayName()
         {
-            return Name.Value;
+            return Name.AsDisplayName();
         }
 
         public override void UpdateFromMetaValue(MetaValueBase meta, string fieldId)

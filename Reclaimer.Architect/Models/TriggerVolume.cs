@@ -3,6 +3,7 @@ using Adjutant.Spatial;
 using Reclaimer.Plugins.MetaViewer;
 using Reclaimer.Plugins.MetaViewer.Halo3;
 using Reclaimer.Resources;
+using Reclaimer.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -58,7 +59,7 @@ namespace Reclaimer.Models
             return section.TagBlock.Pointer.Address + section.BlockSize * BlockIndex + fieldOffset;
         }
 
-        public override string GetDisplayName() => $"[{BlockIndex:D3}] " + (string.IsNullOrEmpty(Name) ? "<none>" : Name);
+        public override string GetDisplayName() => $"[{BlockIndex:D3}] " + Name.AsDisplayName();
 
         public override void UpdateFromMetaValue(MetaValueBase meta, string fieldId)
         {

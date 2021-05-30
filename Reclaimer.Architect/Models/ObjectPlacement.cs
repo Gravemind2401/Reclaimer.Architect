@@ -3,6 +3,7 @@ using Adjutant.Spatial;
 using Reclaimer.Plugins.MetaViewer;
 using Reclaimer.Plugins.MetaViewer.Halo3;
 using Reclaimer.Resources;
+using Reclaimer.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -97,7 +98,7 @@ namespace Reclaimer.Models
 
             string name;
             if (NameIndex >= 0 && NameIndex < Parent.ObjectNames.Count)
-                name = Parent.ObjectNames[NameIndex].Name;
+                name = Parent.ObjectNames[NameIndex].Name.AsDisplayName();
             else name = palette.Palette[PaletteIndex].Tag?.FileName() ?? "<null>";
 
             return $"[{BlockIndex:D3}] {name}";

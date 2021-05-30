@@ -71,7 +71,7 @@ namespace Reclaimer.Utilities.IO
                 offsetInParent = node.GetIntAttribute("offset") ?? 0;
                 Name = node.GetStringAttribute("name");
                 blockRef = reader.ReadObject<TagBlock>();
-                EntryCount = BlockRef.Count;
+                EntryCount = BlockRef.IsInvalid ? 0 : BlockRef.Count;
                 EntrySize = node.GetIntAttribute("elementSize", "entrySize", "size") ?? 0;
 
                 if (EntryCount > 0)

@@ -305,5 +305,18 @@ namespace Reclaimer.Utilities
         {
             blockRef.TagBlock = new TagBlock(blockEditor.EntryCount, blockRef.TagBlock.Pointer);
         }
+
+        public static string AsDisplayName(this StringId stringId) => AsDisplayName(stringId.Value);
+
+        public static string AsDisplayName(this string str)
+        {
+            if (str == null)
+                return "<null>";
+            else if (str == string.Empty)
+                return "<empty>";
+            else if (string.IsNullOrWhiteSpace(str))
+                return "<whitespace>";
+            else return str;
+        }
     }
 }
