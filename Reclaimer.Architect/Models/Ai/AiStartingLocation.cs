@@ -49,7 +49,8 @@ namespace Reclaimer.Models.Ai
 
         public override string GetDisplayName()
         {
-            return Name.AsDisplayName();
+            var displayName = Name.AsDisplayName();
+            return BlockIndex >= 0 ? $"[{BlockIndex:D3}] {displayName}" : displayName;
         }
 
         public override void UpdateFromMetaValue(MetaValueBase meta, string fieldId)
