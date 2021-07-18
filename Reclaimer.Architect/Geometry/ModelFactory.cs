@@ -89,10 +89,9 @@ namespace Reclaimer.Geometry
             {
                 try
                 {
+                    var args = new DdsOutputArgs(mat.Flags.HasFlag(MaterialFlags.Transparent) ? DecompressOptions.Default : DecompressOptions.Bgr24);
                     var stream = new System.IO.MemoryStream();
-                    if (mat.Flags.HasFlag(MaterialFlags.Transparent))
-                        sub.Bitmap.ToDds(0).WriteToStream(stream, System.Drawing.Imaging.ImageFormat.Png, DecompressOptions.Default);
-                    else sub.Bitmap.ToDds(0).WriteToStream(stream, System.Drawing.Imaging.ImageFormat.Png, DecompressOptions.Bgr24);
+                    sub.Bitmap.ToDds(0).WriteToStream(stream, System.Drawing.Imaging.ImageFormat.Png, args);
                     tex = new Helix.TextureModel(stream);
                     if (!textureCache.TryAdd(key, tex))
                         stream.Dispose(); //another thread beat us to it

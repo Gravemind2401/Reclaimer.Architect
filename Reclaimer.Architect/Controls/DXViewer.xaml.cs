@@ -10,22 +10,14 @@ using Studio.Controls;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Drawing.Dds;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.Windows.Media.Imaging;
-using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 using Helix = HelixToolkit.Wpf.SharpDX;
 
@@ -38,8 +30,8 @@ namespace Reclaimer.Controls
     {
         private delegate IEnumerable<string> GetExportFormats();
         private delegate void WriteModelFile(IGeometryModel model, string fileName, string formatId);
-        private delegate bool GetDataFolder(out string dataFolder);
-        private delegate bool SaveImage(IBitmap bitmap, string baseDir);
+        private delegate void ExportBitmaps(IRenderGeometry geometry);
+        private delegate void ExportSelectedBitmaps(IRenderGeometry geometry, IEnumerable<int> shaderIndexes);
 
         private static readonly string[] DirectContentTags = new[] { "mode", "mod2", "sbsp" };
 
@@ -209,6 +201,23 @@ namespace Reclaimer.Controls
                 TreeViewItems.Add(new TreeItemModel { Header = child.Name, IsChecked = true, Tag = child });
         }
 
+        private IEnumerable<IGeometryPermutation> GetSelectedPermutations(IGeometryModel model)
+        {
+            foreach(var parent in TreeViewItems.Where(i => i.IsChecked != false))
+            {
+                var region = model.Regions.ElementAtOrDefault((parent.Tag as RenderModel3D.Region)?.SourceIndex ?? -1);
+                if (region == null)
+                    continue;
+
+                foreach (var child in parent.Items.Where(i => i.IsChecked == false))
+                {
+                    var permutation = region.Permutations.ElementAtOrDefault((child.Tag as RenderModel3D.Permutation)?.SourceIndex ?? -1);
+                    if (permutation != null)
+                        yield return permutation;
+                }
+            }
+        }
+
         #region Treeview Events
         private void TreeViewItem_MouseDoubleClick(object sender, RoutedEventArgs e)
         {
@@ -234,7 +243,7 @@ namespace Reclaimer.Controls
 
         private void SetState(TreeItemModel item, bool updateRender)
         {
-            if (item.HasItems == false)
+            if (item.HasItems == false) //permutation
             {
                 var parent = item.Parent as TreeItemModel;
                 if (parent != null)
@@ -251,7 +260,7 @@ namespace Reclaimer.Controls
                 if (updateRender)
                     (item.Tag as IMeshNode)?.SetVisibility(item.IsChecked ?? false);
             }
-            else
+            else //region
             {
                 foreach (var i in item.Items.Where(i => i.IsVisible))
                 {
@@ -349,54 +358,33 @@ namespace Reclaimer.Controls
                 if (!PromptFileSave(model, out fileName, out formatId))
                     return;
 
-                var selectedPerms = new List<IGeometryPermutation>();
-                foreach (var parent in TreeViewItems.Zip(model.Regions, (a, b) => new { Node = a, Region = b }))
-                {
-                    if (parent.Node.IsChecked == false)
-                        continue;
-
-                    foreach (var child in parent.Node.Items.Zip(parent.Region.Permutations, (a, b) => new { Node = a, Permutation = b }))
-                    {
-                        if (child.Node.IsChecked == true)
-                            selectedPerms.Add(child.Permutation);
-                    }
-                }
-
-                var masked = new MaskedGeometryModel(model, selectedPerms);
+                var masked = new MaskedGeometryModel(model, GetSelectedPermutations(model));
                 writeModelFile(masked, fileName, formatId);
             }
         }
 
-        private void btnSaveBitmaps_Click(object sender, RoutedEventArgs e)
+        private void btnExportBitmaps_Click(object sender, RoutedEventArgs e)
         {
-            var getFolder = Substrate.GetSharedFunction<GetDataFolder>("Reclaimer.Plugins.BatchExtractPlugin.GetDataFolder");
+            var export = Substrate.GetSharedFunction<ExportBitmaps>("Reclaimer.Plugins.ModelViewerPlugin.ExportBitmaps");
+            export?.Invoke(renderGeometry);
+        }
 
-            string folder;
-            if (!getFolder(out folder))
-                return;
-
-            Task.Run(() =>
+        private void btnExportSelectedBitmaps_Click(object sender, RoutedEventArgs e)
+        {
+            using (var model = renderGeometry.ReadGeometry(SelectedLod))
             {
-                var saveImage = Substrate.GetSharedFunction<SaveImage>("Reclaimer.Plugins.BatchExtractPlugin.SaveImage");
+                var export = Substrate.GetSharedFunction<ExportSelectedBitmaps>("Reclaimer.Plugins.ModelViewerPlugin.ExportSelectedBitmaps");
+                var matIndices = GetSelectedPermutations(model)
+                    .SelectMany(p => Enumerable.Range(p.MeshIndex, p.MeshCount))
+                    .Select(i => model.Meshes.ElementAtOrDefault(i))
+                    .Where(m => m != null)
+                    .SelectMany(m => m.Submeshes.Select(s => (int)s.MaterialIndex))
+                    .Distinct()
+                    .ToList();
 
-                foreach (var bitm in renderGeometry.GetAllBitmaps())
-                {
-                    try
-                    {
-                        SetStatus($"Extracting {bitm.Name}");
-                        saveImage(bitm, folder);
-                        LogOutput($"Extracted {bitm.Name}.{bitm.Class}");
-                    }
-                    catch (Exception ex)
-                    {
-                        LogError($"Error extracting {bitm.Name}.{bitm.Class}", ex);
-                    }
-                }
-
-                ClearStatus();
-                LogOutput($"Recursive bitmap extract complete for {renderGeometry.Name}.{renderGeometry.Class}");
-            });
-        } 
+                export.Invoke(renderGeometry, matIndices);
+            }
+        }
         #endregion
         #endregion
 

@@ -72,10 +72,15 @@
                     <ContentControl Template="{StaticResource ic_CheckboxList_16x}" />
                 </Button>
                 <Separator Visibility="{Binding IsExportable, Converter={StaticResource visibilityConverter}}" />
-                <Button Click="btnSaveBitmaps_Click" ToolTip="Save Bitmaps"
+                <Button Click="btnExportSelectedBitmaps_Click" ToolTip="Export selected bitmaps"
+                        Visibility="{Binding IsExportable, Converter={StaticResource visibilityConverter}}">
+                    <ContentControl Template="{StaticResource ic_ImageGroup_16x}" />
+                </Button>
+                <Button Click="btnExportBitmaps_Click" ToolTip="Export all bitmaps"
                         Visibility="{Binding IsExportable, Converter={StaticResource visibilityConverter}}">
                     <ContentControl Template="{StaticResource ic_ImageStack_16x}" />
                 </Button>
+                <Separator Visibility="{Binding IsExportable, Converter={StaticResource visibilityConverter}}" />
                 <Button Click="btnExportSelected_Click" ToolTip="Export selected geometry"
                         Visibility="{Binding IsExportable, Converter={StaticResource visibilityConverter}}">
                     <ContentControl Template="{StaticResource ic_Save_16x}" />
