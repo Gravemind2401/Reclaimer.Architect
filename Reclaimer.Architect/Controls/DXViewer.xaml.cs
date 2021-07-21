@@ -203,13 +203,13 @@ namespace Reclaimer.Controls
 
         private IEnumerable<IGeometryPermutation> GetSelectedPermutations(IGeometryModel model)
         {
-            foreach(var parent in TreeViewItems.Where(i => i.IsChecked != false))
+            foreach (var parent in TreeViewItems.Where(i => i.IsChecked != false))
             {
                 var region = model.Regions.ElementAtOrDefault((parent.Tag as RenderModel3D.Region)?.SourceIndex ?? -1);
                 if (region == null)
                     continue;
 
-                foreach (var child in parent.Items.Where(i => i.IsChecked == false))
+                foreach (var child in parent.Items.Where(i => i.IsChecked == true))
                 {
                     var permutation = region.Permutations.ElementAtOrDefault((child.Tag as RenderModel3D.Permutation)?.SourceIndex ?? -1);
                     if (permutation != null)
